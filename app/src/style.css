@@ -1,0 +1,513 @@
+/* Apparence de l'appli : pensée pour l'iPhone (grandes zones à toucher, mode sombre, encoche). */
+
+:root {
+  color-scheme: light dark;
+  --fond: #f5f6f1;
+  --surface: #ffffff;
+  --texte: #1b1f1c;
+  --discret: #687069;
+  --bordure: #e2e5dd;
+  --accent: #1d8348;
+  --accent-fonce: #166a3a;
+  --accent-doux: #e2f2e7;
+  --sur-accent: #ffffff;
+  --danger: #c0392b;
+  --info: #1f5fbf;
+  --info-doux: #e8f0fc;
+  --attention-doux: #fff4d6;
+  --attention: #7a5800;
+  --rayon: 14px;
+  --ombre: 0 1px 2px rgb(0 0 0 / 0.05), 0 6px 20px rgb(0 0 0 / 0.05);
+  --police: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fond: #121412;
+    --surface: #1d211e;
+    --texte: #eef1ec;
+    --discret: #9aa39c;
+    --bordure: #2e3430;
+    --accent: #3fb873;
+    --accent-fonce: #34a062;
+    --accent-doux: #1f3828;
+    --sur-accent: #08140c;
+    --danger: #ff6b5e;
+    --info: #8ab4ff;
+    --info-doux: #1b2738;
+    --attention-doux: #3a3012;
+    --attention: #f2cf73;
+    --ombre: none;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--fond);
+  color: var(--texte);
+  font: 17px/1.4 var(--police);
+  -webkit-tap-highlight-color: transparent;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+h1,
+h2 {
+  margin: 0;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 1.05rem;
+  font-weight: 650;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* Texte lu par VoiceOver mais pas affiché. */
+.cache {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.discret {
+  color: var(--discret);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* Écrans */
+
+.ecran {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 16px calc(24px + env(safe-area-inset-bottom));
+}
+
+.ecran-centre {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 12px;
+  text-align: center;
+  padding-top: env(safe-area-inset-top);
+}
+
+.logo {
+  border-radius: 22%;
+  box-shadow: var(--ombre);
+}
+
+.carte {
+  width: min(100%, 400px);
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: 22px;
+  padding: 28px 22px 18px;
+  box-shadow: var(--ombre);
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+}
+
+.carte form {
+  width: 100%;
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  text-align: left;
+}
+
+label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+input,
+textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 11px 14px;
+  border: 1px solid var(--bordure);
+  border-radius: 12px;
+  background: var(--fond);
+  font-size: 17px; /* au moins 16 px : sinon l'iPhone zoome sur le champ */
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+textarea {
+  resize: vertical;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-doux);
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* Boutons */
+
+.bouton {
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid var(--bordure);
+  border-radius: 12px;
+  background: var(--surface);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bouton.principal {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--sur-accent);
+}
+
+.bouton.principal:active {
+  background: var(--accent-fonce);
+}
+
+.bouton.danger {
+  color: var(--danger);
+}
+
+.bouton.large {
+  width: 100%;
+  margin-top: 14px;
+  min-height: 50px;
+}
+
+.bouton:disabled {
+  opacity: 0.6;
+}
+
+.lien {
+  background: none;
+  border: 0;
+  padding: 10px 4px;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bouton-icone {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--bordure);
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* Messages */
+
+.message {
+  margin: 6px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  background: var(--info-doux);
+  color: var(--info);
+}
+
+.message[data-genre="erreur"] {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: var(--danger);
+}
+
+.message[data-genre="succes"] {
+  background: var(--accent-doux);
+  color: var(--accent-fonce);
+}
+
+.bandeau {
+  margin: 0 0 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  background: var(--info-doux);
+  color: var(--info);
+}
+
+.bandeau[data-genre="hors-ligne"] {
+  background: var(--attention-doux);
+  color: var(--attention);
+}
+
+.bandeau[data-genre="erreur"] {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: var(--danger);
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* En-tête et ajout */
+
+.entete {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 -16px;
+  padding: calc(14px + env(safe-area-inset-top)) 16px 10px;
+  background: color-mix(in srgb, var(--fond) 88%, transparent);
+  backdrop-filter: saturate(1.4) blur(14px);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px);
+}
+
+.ajout {
+  display: flex;
+  gap: 8px;
+  margin: 4px 0 6px;
+}
+
+.ajout input {
+  background: var(--surface);
+}
+
+.ajout .quantite {
+  flex: 0 0 76px;
+  text-align: center;
+  padding-inline: 8px;
+}
+
+.bouton-ajout {
+  flex: 0 0 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--sur-accent);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.bouton-ajout:active {
+  background: var(--accent-fonce);
+}
+
+.bouton-ajout svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2.6;
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* La liste */
+
+.contenu {
+  margin-top: 14px;
+  display: grid;
+  gap: 22px;
+}
+
+.liste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  box-shadow: var(--ombre);
+  overflow: hidden;
+}
+
+.liste:empty {
+  display: none;
+}
+
+.article {
+  display: flex;
+  align-items: stretch;
+  min-height: 56px;
+}
+
+.article + .article {
+  border-top: 1px solid var(--bordure);
+}
+
+.case {
+  flex: 0 0 56px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.case svg {
+  width: 26px;
+  height: 26px;
+  padding: 3px;
+  border: 2px solid var(--discret);
+  border-radius: 50%;
+  stroke: transparent;
+  stroke-width: 3;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.achete .case svg {
+  background: var(--accent);
+  border-color: var(--accent);
+  stroke: var(--sur-accent);
+}
+
+.texte {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  align-content: center;
+  gap: 1px;
+  padding: 10px 16px 10px 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.nom {
+  overflow-wrap: anywhere;
+}
+
+.details {
+  color: var(--discret);
+  font-size: 0.88rem;
+}
+
+.achete .nom {
+  color: var(--discret);
+  text-decoration: line-through;
+}
+
+.surligne {
+  animation: surligner 1.2s ease-out;
+}
+
+@keyframes surligner {
+  from {
+    background: var(--accent-doux);
+  }
+}
+
+.titre-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  padding-inline: 4px;
+}
+
+.titre-section h2 {
+  color: var(--discret);
+  font-size: 0.95rem;
+}
+
+.vide {
+  text-align: center;
+  padding: 36px 16px;
+  border: 1.5px dashed var(--bordure);
+  border-radius: var(--rayon);
+}
+
+.vide-titre {
+  font-weight: 650;
+  margin: 0 0 4px;
+}
+
+.pied {
+  margin-top: 28px;
+  text-align: center;
+  font-size: 0.8rem;
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* Fenêtres */
+
+dialog {
+  width: min(100% - 24px, 460px);
+  border: 1px solid var(--bordure);
+  border-radius: 20px;
+  padding: 20px;
+  background: var(--surface);
+  color: var(--texte);
+  box-shadow: 0 20px 60px rgb(0 0 0 / 0.25);
+}
+
+dialog::backdrop {
+  background: rgb(0 0 0 / 0.35);
+}
+
+dialog form {
+  display: grid;
+  gap: 6px;
+}
+
+dialog h2 {
+  margin-bottom: 4px;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.lien.danger {
+  color: var(--danger);
+  justify-self: center;
+  margin-top: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

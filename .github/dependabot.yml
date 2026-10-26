@@ -24,3 +24,11 @@ updates:
     groups:
       firebase:
         patterns: ["*"]
+
+  - package-ecosystem: npm
+    directory: /app
+    schedule:
+      interval: monthly
+    groups:
+      appli:
+        patterns: ["*"]

@@ -3,24 +3,29 @@
 **Notre liste de courses qui trouve toute seule les promos de nos magasins.**
 
 Chaque matin, un robot lit les catalogues de **Lidl Lingolsheim** et d'**E.Leclerc Geispolsheim**
-et range toutes les promos dans un fichier. Bientôt, une appli sur nos deux iPhones comparera notre
-liste de courses à ces promos pour dépenser le moins possible, sans rien faire au quotidien.
+et range toutes les promos dans un fichier. Une appli sur nos deux iPhones garde notre liste de
+courses commune et la comparera à ces promos pour dépenser le moins possible, sans rien faire au
+quotidien.
+
+**👉 L'appli : https://lascampia67.github.io/promos-courses/** (réservée à nos deux comptes)
 
 [![Robot des promos](https://github.com/lascampia67/promos-courses/actions/workflows/robot.yml/badge.svg)](https://github.com/lascampia67/promos-courses/actions/workflows/robot.yml)
 [![Tests](https://github.com/lascampia67/promos-courses/actions/workflows/tests.yml/badge.svg)](https://github.com/lascampia67/promos-courses/actions/workflows/tests.yml)
 [![Règles Firebase](https://github.com/lascampia67/promos-courses/actions/workflows/regles.yml/badge.svg)](https://github.com/lascampia67/promos-courses/actions/workflows/regles.yml)
+[![Appli](https://github.com/lascampia67/promos-courses/actions/workflows/appli.yml/badge.svg)](https://github.com/lascampia67/promos-courses/actions/workflows/appli.yml)
 [![Version](https://img.shields.io/github/v/release/lascampia67/promos-courses?label=version)](https://github.com/lascampia67/promos-courses/releases)
 ![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue)
 
 > [!NOTE]
-> Projet personnel en construction (version `0.x`). Le robot fonctionne ; l'appli iPhone est la
-> prochaine étape.
+> Projet personnel en construction (version `0.x`). Le robot et la liste de courses commune
+> fonctionnent ; la comparaison de la liste avec les promos est la prochaine étape.
 
 ## Sommaire
 
 - [Où en est le projet](#où-en-est-le-projet)
 - [Comment ça marche](#comment-ça-marche)
 - [Les magasins et les sources](#les-magasins-et-les-sources)
+- [L'appli](#lappli)
 - [Au quotidien](#au-quotidien)
 - [Le fichier promos.json](#le-fichier-promosjson)
 - [Fiabilité](#fiabilité)
@@ -39,7 +44,7 @@ liste de courses à ces promos pour dépenser le moins possible, sans rien faire
 | 1 | Choisir les magasins | ✅ Fait |
 | 2 | Tester les sources de promos | ✅ Fait |
 | 3 | Créer le robot qui récupère les promos | ✅ Fait et validé (version 0.2.0) |
-| 4 | Créer l'appli (liste de courses commune + comparaison aux promos) | 🚧 En cours : base Firebase créée, règles d'accès écrites et testées |
+| 4 | Créer l'appli (liste de courses commune + comparaison aux promos) | 🚧 En cours : liste commune en test (version 0.3) ; comparaison avec les promos à venir |
 | 5 | L'installer sur nos deux iPhones | ⏳ À faire |
 
 Dernière mise à jour de ce tableau : 26/10/2026. Le détail des évolutions est dans le
@@ -55,7 +60,7 @@ flowchart LR
         H["⏰ Chaque matin, 5 h 47"] --> R["🤖 Robot<br/>(GitHub Actions)"]
         R --> J[("promos.json")]
     end
-    J --> A["📱 Appli sur nos iPhones<br/>(étape 4)"]
+    J --> A["📱 Appli sur nos iPhones<br/>(GitHub Pages)"]
     C[("📝 Liste de courses commune<br/>Firebase, privée")] <--> A
 ```
 
@@ -66,8 +71,8 @@ flowchart LR
    conditions (carte de fidélité, « 2e à -60 % »…), dates.
 4. Il vérifie que tout est au bon format, puis enregistre le fichier [`promos.json`](promos.json)
    dans ce dépôt.
-5. L'appli (étape 4) lira ce fichier. La liste de courses, elle, n'est **pas** stockée ici (ce dépôt
-   est public) mais dans une base **Firebase** privée et gratuite, réservée à nos deux comptes :
+5. L'appli lira ce fichier (étape suivante). La liste de courses, elle, n'est **pas** stockée ici (ce
+   dépôt est public) mais dans une base **Firebase** privée et gratuite, réservée à nos deux comptes :
    voir [docs/liste-commune.md](docs/liste-commune.md).
 
 ## Les magasins et les sources
@@ -79,6 +84,23 @@ flowchart LR
 
 Le détail (adresses consultées, choix faits, sources écartées) est dans
 [docs/sources.md](docs/sources.md).
+
+## L'appli
+
+Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
+**https://lascampia67.github.io/promos-courses/**
+
+| Liste | Modifier un article | Mode sombre |
+|---|---|---|
+| ![Liste de courses](docs/captures/liste.png) | ![Modifier un article](docs/captures/modifier.png) | ![Mode sombre](docs/captures/liste-sombre.png) |
+
+- **Liste commune** : ce que l'un ajoute, coche ou supprime apparaît aussitôt sur l'autre téléphone.
+- **Ajout rapide** avec quantité facultative ; un article déjà dans la liste est signalé.
+- **Caddie** : un article coché passe dans « Dans le caddie » ; « Tout retirer » vide le caddie.
+- **Marche sans réseau** (au fond du magasin) : les changements partent au retour du réseau.
+- **Privée** : seuls nos deux comptes peuvent s'y connecter.
+
+Mode d'emploi, fonctionnement et tests : [docs/appli.md](docs/appli.md).
 
 ## Au quotidien
 
@@ -137,9 +159,10 @@ est décrit par un schéma JSON : [`promos.schema.json`](src/robot_promos/promos
 - **Si toutes les sources sont en panne**, `promos.json` n'est pas modifié (on garde le précédent).
 - **Pannes passagères** : le robot réessaie automatiquement deux fois en attendant un peu.
 - **Format vérifié** : avant d'être enregistré, `promos.json` est contrôlé par son schéma JSON.
-- **Tests automatiques** : plus de 50 tests vérifient le code du robot à chaque modification (workflow
-  « Tests »), et 15 tests vérifient que la liste commune reste réservée à nos deux comptes (workflow
-  « Règles Firebase »).
+- **Tests automatiques** à chaque modification : plus de 50 tests pour le robot (workflow « Tests »),
+  15 tests qui vérifient que la liste commune reste réservée à nos deux comptes (« Règles Firebase »),
+  et des scénarios réels de l'appli dans Chrome et Safari, avec deux téléphones simulés (« Appli »).
+  Si un test de l'appli échoue, elle n'est pas publiée.
 - **Alerte** : en cas de problème, un avertissement s'affiche sur la page du lancement (onglet
   Actions) et GitHub envoie un e-mail si le lancement échoue.
 
@@ -188,17 +211,24 @@ magasin, la page du prospectus et ce qui était attendu.
 
 ## Pour les développeurs
 
-Il faut Python 3.12 ou plus récent.
+Le robot demande Python 3.12 ou plus récent ; l'appli et les règles Firebase, Node.js 22 et Java 21.
 
 ```bash
 git clone https://github.com/lascampia67/promos-courses.git
 cd promos-courses
+
+# Le robot
 python -m venv .venv && source .venv/bin/activate   # Windows : .venv\Scripts\activate
 pip install -e ".[dev]"
-
 python -m robot_promos            # lance le robot et écrit promos.json
 pytest                            # tests automatiques (sans internet)
 ruff check src tests              # style du code
+
+# L'appli
+cd app && npm ci
+npm run dev                       # appli sur l'ordinateur (vraie base Firebase !)
+npm test                          # tests de logique
+npm run e2e                       # scénarios réels sur l'émulateur Firebase
 ```
 
 Structure du dépôt :
@@ -217,14 +247,20 @@ promos-courses/
 │       ├── lidl_pdf.py             ← Lidl : lecture du PDF
 │       └── leclerc.py              ← Leclerc : catalogues du magasin
 ├── tests/                          ← tests automatiques du robot
+├── app/
+│   ├── index.html                  ← les écrans de l'appli
+│   ├── src/                        ← son fonctionnement (liste, connexion, apparence)
+│   ├── tests/  e2e/                ← tests de logique et scénarios réels
+│   └── public/icones/              ← icônes (iPhone, onglet)
 ├── firebase/
 │   ├── firestore.rules             ← règles d'accès à la liste commune
 │   └── tests/                      ← tests des règles (émulateur Firebase)
-├── docs/                           ← documentation détaillée
+├── docs/                           ← documentation détaillée (et captures d'écran)
 └── .github/workflows/
     ├── robot.yml                   ← lancement chaque matin
     ├── tests.yml                   ← vérification du code du robot
     ├── regles.yml                  ← vérification des règles Firebase
+    ├── appli.yml                   ← tests et publication de l'appli
     └── publication.yml             ← publication des versions
 ```
 

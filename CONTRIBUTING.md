@@ -55,6 +55,19 @@ npm test
 Une modification des règles doit ensuite être **publiée à la main** dans la console Firebase (voir
 [docs/liste-commune.md](docs/liste-commune.md#les-mettre-en-place-ou-les-modifier)).
 
+L'appli ([`app/`](app/)) a ses tests de logique et ses scénarios réels sur l'émulateur Firebase :
+
+```bash
+cd app
+npm ci
+npm test            # logique (Vitest)
+npm run e2e         # scénarios réels, deux comptes, émulateur Firebase (Playwright)
+npm run captures    # régénère les captures d'écran de docs/captures/
+```
+
+Attention : `npm run dev` lance l'appli sur l'ordinateur branchée sur la **vraie** base Firebase.
+Une fois sur `main`, le workflow « Appli » teste l'appli puis la publie sur GitHub Pages.
+
 ## Organisation du code
 
 | Fichier | Rôle |

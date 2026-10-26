@@ -19,6 +19,12 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 - Liste de courses commune : projet Firebase (offre gratuite Spark), règles d'accès Firestore
   réservées aux deux comptes du foyer, 15 tests sur l'émulateur Firebase et workflow « Règles Firebase ».
 - Documentation de la liste commune : [docs/liste-commune.md](docs/liste-commune.md).
+- **Appli web (version 0.3)** pour l'iPhone, publiée sur GitHub Pages : connexion, liste de courses
+  commune synchronisée en direct, ajout rapide avec quantité, doublons signalés, caddie, modification
+  et suppression, fonctionnement sans réseau, mode sombre, icônes, installable (PWA).
+- Tests de l'appli : logique (Vitest) et scénarios réels sur l'émulateur Firebase avec deux comptes,
+  dans Chrome et Safari (Playwright) ; workflow « Appli » qui teste puis publie.
+- Documentation de l'appli avec captures d'écran : [docs/appli.md](docs/appli.md).
 
 ### Modifié
 

@@ -1,0 +1,28 @@
+{
+  "name": "promos-courses-appli",
+  "private": true,
+  "version": "0.3.0",
+  "description": "Appli web (iPhone) : liste de courses commune et promos de nos magasins.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "e2e": "firebase emulators:exec --config ../firebase/firebase.json --only auth,firestore --project demo-promos-courses \"playwright test\"",
+    "captures": "CAPTURES=1 firebase emulators:exec --config ../firebase/firebase.json --only auth,firestore --project demo-promos-courses \"playwright test e2e/captures.spec.js\""
+  },
+  "dependencies": {
+    "firebase": "^13.1.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "firebase-tools": "^15.34.1",
+    "vite": "^8.3.5",
+    "vite-plugin-pwa": "^2.0.0",
+    "vitest": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

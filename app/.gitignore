@@ -1,0 +1,4 @@
+dist/
+dist-emulateurs/
+test-results/
+playwright-report/

@@ -1,0 +1,102 @@
+# Teste l'appli (logique + scénarios réels sur l'émulateur Firebase), puis la publie sur GitHub Pages :
+# https://lascampia67.github.io/promos-courses/
+name: Appli
+
+on:
+  push:
+    branches: [main]
+    paths: ["app/**", "firebase/**", ".github/workflows/appli.yml"]
+  pull_request:
+    paths: ["app/**", "firebase/**", ".github/workflows/appli.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: appli-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verifier:
+    name: Tester et construire l'appli
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v7
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Installer Java (nécessaire aux émulateurs Firebase)
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Installer les outils
+        run: npm ci
+
+      - name: Tests de logique
+        run: npm test
+
+      - name: Installer les navigateurs de test (Chrome et Safari)
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Scénarios réels sur l'émulateur Firebase
+        run: npm run e2e
+
+      - name: Garder les traces en cas d'échec
+        if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: traces-playwright
+          path: app/test-results
+          retention-days: 7
+
+      - name: Construire l'appli
+        run: npm run build
+
+      - name: Préparer la publication
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: app/dist
+
+  publier:
+    name: Publier sur GitHub Pages
+    needs: verifier
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - name: Vérifier que GitHub Pages est activé
+        id: pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if source=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq .build_type 2>/dev/null) && [ "$source" = "workflow" ]; then
+            echo "actif=oui" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning title=GitHub Pages n'est pas encore activé::Dans le dépôt : Settings → Pages → Source : « GitHub Actions », puis relancer ce workflow."
+            echo "actif=non" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publier
+        id: deploiement
+        if: steps.pages.outputs.actif == 'oui'
+        uses: actions/deploy-pages@v4

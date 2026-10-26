@@ -14,7 +14,7 @@ Elle n'est **pas** stockée dans ce dépôt (il est public) mais dans une base d
 |---|---|
 | Projet | `promos-courses` (offre gratuite Spark, sans carte bancaire) |
 | Connexion | E-mail et mot de passe, deux comptes créés à la main dans la console |
-| Base de données | Cloud Firestore, édition Standard, mode « production » (tout est fermé sauf ce que les règles autorisent) |
+| Base de données | Cloud Firestore, édition Standard, emplacement « Europe » (multirégion), mode « production » : tout est fermé sauf ce que les règles autorisent |
 | Règles d'accès | [`firebase/firestore.rules`](../firebase/firestore.rules) |
 
 Les informations de connexion de l'appli au projet (`firebaseConfig`, dont la clé `apiKey`) **ne sont
