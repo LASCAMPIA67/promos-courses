@@ -1,22 +1,29 @@
-# Crée une « Release » GitHub quand on pousse une étiquette de version (ex. v0.2.0),
-# ou à la main (bouton « Run workflow ») pour une étiquette qui existe déjà.
+# Crée une « Release » GitHub (avec son étiquette vX.Y.Z) :
+# - automatiquement, quand le numéro de version change dans src/robot_promos/__init__.py ;
+# - quand on pousse une étiquette de version (ex. v0.2.0) ;
+# - à la main (bouton « Run workflow »), par exemple pour publier une ancienne version.
 # Les notes de version sont reprises de la section correspondante du fichier CHANGELOG.md.
 name: Publication
 
 on:
   push:
+    branches: [main]
+    paths: ["src/robot_promos/__init__.py"]
     tags: ["v*.*.*"]
   workflow_dispatch:
     inputs:
       etiquette:
-        description: "Étiquette de la version à publier (ex. v0.2.0)"
-        required: true
+        description: "Version à publier (ex. v0.2.0). Vide = version actuelle du code."
+        required: false
+      cible:
+        description: "Commit à publier (vide = le dernier commit de main)"
+        required: false
 
 permissions:
   contents: write
 
-env:
-  ETIQUETTE: ${{ inputs.etiquette || github.ref_name }}
+concurrency:
+  group: publication
 
 jobs:
   publier:
@@ -27,7 +34,31 @@ jobs:
       - name: Récupérer le dépôt
         uses: actions/checkout@v5
 
+      - name: Trouver la version à publier
+        env:
+          ETIQUETTE_DEMANDEE: ${{ inputs.etiquette }}
+        run: |
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            etiquette="$GITHUB_REF_NAME"
+          elif [ -n "$ETIQUETTE_DEMANDEE" ]; then
+            etiquette="$ETIQUETTE_DEMANDEE"
+          else
+            etiquette="v$(sed -n 's/^__version__ = "\(.*\)"/\1/p' src/robot_promos/__init__.py)"
+          fi
+          echo "ETIQUETTE=$etiquette" >> "$GITHUB_ENV"
+          echo "Version : $etiquette"
+
+      - name: Vérifier qu'elle n'est pas déjà publiée
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$ETIQUETTE" > /dev/null 2>&1; then
+            echo "La version $ETIQUETTE est déjà publiée : rien à faire."
+            echo "DEJA_PUBLIEE=1" >> "$GITHUB_ENV"
+          fi
+
       - name: Extraire les notes de version du CHANGELOG
+        if: env.DEJA_PUBLIEE != '1'
         run: |
           version="${ETIQUETTE#v}"
           awk -v v="$version" '
@@ -42,6 +73,8 @@ jobs:
           cat notes.md
 
       - name: Créer la publication
+        if: env.DEJA_PUBLIEE != '1'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$ETIQUETTE" --title "Version ${ETIQUETTE#v}" --notes-file notes.md --verify-tag
+          CIBLE: ${{ inputs.cible || github.sha }}
+        run: gh release create "$ETIQUETTE" --target "$CIBLE" --title "Version ${ETIQUETTE#v}" --notes-file notes.md

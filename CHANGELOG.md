@@ -29,7 +29,7 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 - Vérification de `promos.json` avec un schéma JSON avant chaque enregistrement.
 - Nouvelles tentatives automatiques en cas de panne passagère d'un site.
 - Tests automatiques (pytest), vérification du style (ruff) et workflow « Tests ».
-- Publication automatique des versions (workflow « Publication ») et mises à jour par Dependabot.
+- Publication automatique des versions (workflow « Publication », dès que le numéro de version change) et mises à jour par Dependabot.
 - Documentation : README détaillé, format de `promos.json`, sources, guide de contribution.
 
 ### Modifié

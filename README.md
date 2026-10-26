@@ -227,7 +227,7 @@ Le guide complet (organisation, ajout d'une source, publication) est dans
 Les versions suivent le [versionnage sémantique](https://semver.org/lang/fr/) et sont décrites dans
 le [journal des versions](CHANGELOG.md). Chaque version est publiée dans les
 [**Releases**](https://github.com/lascampia67/promos-courses/releases) du dépôt, automatiquement,
-quand une étiquette `vX.Y.Z` est poussée.
+dès que le numéro de version change dans le code (détails dans [CONTRIBUTING.md](CONTRIBUTING.md#publier-une-nouvelle-version)).
 
 ## Limites connues
 

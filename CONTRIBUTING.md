@@ -67,12 +67,12 @@ Les versions suivent le [versionnage sémantique](https://semver.org/lang/fr/).
 1. Décrire les changements dans [CHANGELOG.md](CHANGELOG.md), sous un nouveau titre
    `## [X.Y.Z] - AAAA-MM-JJ`, et mettre à jour les liens en bas du fichier.
 2. Mettre le même numéro dans `src/robot_promos/__init__.py`.
-3. Enregistrer (commit), puis créer et pousser l'étiquette :
-   ```bash
-   git tag -a vX.Y.Z -m "Version X.Y.Z"
-   git push origin vX.Y.Z
-   ```
-4. Le workflow « Publication » crée la page de la version sur GitHub, avec les notes du CHANGELOG.
+3. Enregistrer (commit) et envoyer sur la branche `main`.
+4. Le workflow « Publication » voit que le numéro a changé : il crée l'étiquette `vX.Y.Z` et la page
+   de la version sur GitHub, avec les notes du CHANGELOG.
+
+On peut aussi publier en poussant soi-même une étiquette (`git tag -a vX.Y.Z` puis
+`git push origin vX.Y.Z`), ou à la main : onglet **Actions** → **Publication** → **Run workflow**.
 
 ## Signaler un problème ou proposer une idée
 
