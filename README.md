@@ -29,6 +29,7 @@ liste de courses à ces promos pour dépenser le moins possible, sans rien faire
 - [Versions](#versions)
 - [Limites connues](#limites-connues)
 - [Aide et contact](#aide-et-contact)
+- [Licence](#licence)
 
 ## Où en est le projet
 
@@ -36,8 +37,8 @@ liste de courses à ces promos pour dépenser le moins possible, sans rien faire
 |---|---|---|
 | 1 | Choisir les magasins | ✅ Fait |
 | 2 | Tester les sources de promos | ✅ Fait |
-| 3 | Créer le robot qui récupère les promos | ✅ Fait (version 0.2.0) — en attente de validation |
-| 4 | Créer l'appli (liste de courses commune + comparaison aux promos) | ⏳ À faire |
+| 3 | Créer le robot qui récupère les promos | ✅ Fait et validé (version 0.2.0) |
+| 4 | Créer l'appli (liste de courses commune + comparaison aux promos) | 🚧 En cours : choix du stockage de la liste commune |
 | 5 | L'installer sur nos deux iPhones | ⏳ À faire |
 
 Dernière mise à jour de ce tableau : 26/10/2026. Le détail des évolutions est dans le
@@ -245,3 +246,8 @@ dès que le numéro de version change dans le code (détails dans [CONTRIBUTING.
 
 Projet maintenu par **Emilio** ([@LASCAMPIA67](https://github.com/LASCAMPIA67)), avec l'aide de
 Claude (Anthropic) pour le code.
+
+## Licence
+
+Ce projet n'a **pas de licence** : tous droits réservés. Le code est visible car le dépôt est public,
+mais il ne peut pas être copié, modifié ou réutilisé sans l'accord de son auteur.

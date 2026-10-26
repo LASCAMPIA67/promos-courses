@@ -17,6 +17,8 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 ### Modifié
 
 - Les versions courtes (« express ») des catalogues Leclerc sont signalées dans leur nom.
+- Outils GitHub mis à jour : `actions/checkout` v7 et `actions/setup-python` v7 (proposé par Dependabot).
+- README : étape 3 validée, section « Licence » (aucune licence : tous droits réservés).
 
 ## [0.2.0] - 2026-10-26
 
