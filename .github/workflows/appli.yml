@@ -18,10 +18,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  preparer:
+    name: Préparer
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      playwright: ${{ steps.version.outputs.playwright }}
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v7
+
+      - name: Lire la version de Playwright utilisée par l'appli
+        id: version
+        run: echo "playwright=$(node -p "require('./app/package-lock.json').packages['node_modules/@playwright/test'].version")" >> "$GITHUB_OUTPUT"
+
   verifier:
     name: Tester et construire l'appli
+    needs: preparer
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # Image officielle de Playwright : Chrome et Safari (WebKit) y sont déjà installés, avec leurs
+    # dépendances. Plus rapide et plus fiable que de les installer à chaque fois.
+    container:
+      image: mcr.microsoft.com/playwright:v${{ needs.preparer.outputs.playwright }}-noble
     defaults:
       run:
         working-directory: app
@@ -47,9 +66,6 @@ jobs:
 
       - name: Tests de logique
         run: npm test
-
-      - name: Installer les navigateurs de test (Chrome et Safari)
-        run: npx playwright install --with-deps chromium webkit
 
       - name: Scénarios réels sur l'émulateur Firebase
         run: npm run e2e
