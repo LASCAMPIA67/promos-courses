@@ -40,10 +40,13 @@ class Leclerc(Source):
             fin = (op.get("end_date") or "")[:10] or None
             if fin and fin < aujourdhui():
                 continue
+            nom = op.get("catch_phrase") or op.get("name") or code
+            if "EXPRESS" in (op.get("name") or "").upper():
+                nom += " (version courte)"  # Leclerc publie aussi une version réduite de certains catalogues
             resultat.append(
                 Catalogue(
                     id=code,
-                    nom=op.get("catch_phrase") or op.get("name") or code,
+                    nom=nom,
                     debut=(op.get("start_date") or "")[:10] or None,
                     fin=fin,
                     version=f"{op.get('documentUid')}@{op.get('updatedDate')}",

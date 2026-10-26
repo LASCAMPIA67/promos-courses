@@ -14,6 +14,10 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+### Modifié
+
+- Les versions courtes (« express ») des catalogues Leclerc sont signalées dans leur nom.
+
 ## [0.2.0] - 2026-10-26
 
 ### Ajouté
@@ -52,7 +56,9 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
   dm (Kaufda).
 - Lancement automatique chaque jour vers 5 h 45 (heure de Paris) et à la demande.
 - Fichier `promos.json` (format 1).
+- Version antérieure à la mise en place des publications : pas de page « Release » (voir le lien
+  ci-dessous vers son enregistrement d'origine).
 
 [Non publié]: https://github.com/lascampia67/promos-courses/compare/v0.2.0...HEAD
-[0.2.0]: https://github.com/lascampia67/promos-courses/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/lascampia67/promos-courses/releases/tag/v0.1.0
+[0.2.0]: https://github.com/lascampia67/promos-courses/compare/ad703c7...v0.2.0
+[0.1.0]: https://github.com/lascampia67/promos-courses/commit/ad703c7
