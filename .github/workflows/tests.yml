@@ -1,0 +1,42 @@
+# Vérifie le code à chaque modification : style (ruff) et tests automatiques (pytest).
+name: Tests
+
+on:
+  push:
+    branches: [main]
+    paths: ["src/**", "tests/**", "pyproject.toml", ".github/workflows/tests.yml"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Style et tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v5
+
+      - name: Installer Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Installer le robot et les outils de test
+        run: pip install ".[dev]"
+
+      - name: Vérifier le style
+        run: |
+          ruff check src tests
+          ruff format --check src tests
+
+      - name: Lancer les tests
+        run: pytest
+
+      - name: Vérifier que promos.json respecte son format
+        run: python -c "import json; from robot_promos.offres import verifier; verifier(json.load(open('promos.json', encoding='utf-8')))"

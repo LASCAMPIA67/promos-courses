@@ -1,0 +1,47 @@
+# Crée une « Release » GitHub quand on pousse une étiquette de version (ex. v0.2.0),
+# ou à la main (bouton « Run workflow ») pour une étiquette qui existe déjà.
+# Les notes de version sont reprises de la section correspondante du fichier CHANGELOG.md.
+name: Publication
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      etiquette:
+        description: "Étiquette de la version à publier (ex. v0.2.0)"
+        required: true
+
+permissions:
+  contents: write
+
+env:
+  ETIQUETTE: ${{ inputs.etiquette || github.ref_name }}
+
+jobs:
+  publier:
+    name: Publier la version
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v5
+
+      - name: Extraire les notes de version du CHANGELOG
+        run: |
+          version="${ETIQUETTE#v}"
+          awk -v v="$version" '
+            /^## \[/ { dedans = ($0 ~ "^## \\[" v "\\]") ; next }
+            /^\[[^]]+\]: / { dedans = 0 }
+            dedans { print }
+          ' CHANGELOG.md > notes.md
+          if [ ! -s notes.md ]; then
+            echo "::error::Aucune section « ## [$version] » dans CHANGELOG.md"
+            exit 1
+          fi
+          cat notes.md
+
+      - name: Créer la publication
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$ETIQUETTE" --title "Version ${ETIQUETTE#v}" --notes-file notes.md --verify-tag

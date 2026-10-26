@@ -1,103 +1,247 @@
-# Promos courses
+# 🛒 Promos courses
 
-Appli perso pour nos deux iPhones : on y met notre liste de courses, et elle trouve toute seule
-quels articles sont en promo en ce moment, dans quel magasin et à quel prix.
+**Notre liste de courses qui trouve toute seule les promos de nos magasins.**
+
+Chaque matin, un robot lit les catalogues de **Lidl Lingolsheim** et d'**E.Leclerc Geispolsheim**
+et range toutes les promos dans un fichier. Bientôt, une appli sur nos deux iPhones comparera notre
+liste de courses à ces promos pour dépenser le moins possible, sans rien faire au quotidien.
+
+[![Robot des promos](https://github.com/lascampia67/promos-courses/actions/workflows/robot.yml/badge.svg)](https://github.com/lascampia67/promos-courses/actions/workflows/robot.yml)
+[![Tests](https://github.com/lascampia67/promos-courses/actions/workflows/tests.yml/badge.svg)](https://github.com/lascampia67/promos-courses/actions/workflows/tests.yml)
+[![Version](https://img.shields.io/github/v/release/lascampia67/promos-courses?label=version)](https://github.com/lascampia67/promos-courses/releases)
+![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue)
+
+> [!NOTE]
+> Projet personnel en construction (version `0.x`). Le robot fonctionne ; l'appli iPhone est la
+> prochaine étape.
+
+## Sommaire
+
+- [Où en est le projet](#où-en-est-le-projet)
+- [Comment ça marche](#comment-ça-marche)
+- [Les magasins et les sources](#les-magasins-et-les-sources)
+- [Au quotidien](#au-quotidien)
+- [Le fichier promos.json](#le-fichier-promosjson)
+- [Fiabilité](#fiabilité)
+- [Règles respectées](#règles-respectées)
+- [Dépannage](#dépannage)
+- [Pour les développeurs](#pour-les-développeurs)
+- [Versions](#versions)
+- [Limites connues](#limites-connues)
+- [Aide et contact](#aide-et-contact)
 
 ## Où en est le projet
 
-1. Choisir les magasins ✅
-2. Tester les sources ✅
-3. Créer le robot — **en cours**
-   - 3.1 Créer le dépôt ✅
-   - 3.2 Robot pour Lidl France, Lidl Allemagne et dm ✅ (en attente de validation)
-   - 3.3 Ajouter Leclerc et Auchan — à faire
-4. Créer l'appli (web, hébergée gratuitement sur GitHub Pages) — à faire
-5. L'installer sur nos iPhones — à faire
+| Étape | Description | État |
+|---|---|---|
+| 1 | Choisir les magasins | ✅ Fait |
+| 2 | Tester les sources de promos | ✅ Fait |
+| 3 | Créer le robot qui récupère les promos | ✅ Fait (version 0.2.0) — en attente de validation |
+| 4 | Créer l'appli (liste de courses commune + comparaison aux promos) | ⏳ À faire |
+| 5 | L'installer sur nos deux iPhones | ⏳ À faire |
 
-Dernière mise à jour de ce fichier : 26/10/2026.
-
-## Nos magasins
-
-| Magasin | Pays |
-|---|---|
-| Lidl Lingolsheim | France |
-| E.Leclerc Geispolsheim | France (pas encore dans le robot) |
-| Auchan Illkirch-Graffenstaden | France (pas encore dans le robot) |
-| Lidl Kehl-Goldscheuer | Allemagne |
-| dm Kehl-Goldscheuer | Allemagne |
+Dernière mise à jour de ce tableau : 26/10/2026. Le détail des évolutions est dans le
+[journal des versions](CHANGELOG.md).
 
 ## Comment ça marche
 
-Un **robot** (programme Python, dossier `robot/`) tourne tout seul chez GitHub, **chaque jour vers
-5 h 45, heure de Paris**. Il va lire les promos sur quelques sites, puis les écrit dans le fichier
-**`promos.json`** de ce dépôt. L'appli lira ce fichier.
+```mermaid
+flowchart LR
+    L["🟡 Lidl Lingolsheim<br/>prospectus PDF de la semaine"] --> R
+    E["🔵 E.Leclerc Geispolsheim<br/>catalogues du magasin"] --> R
+    subgraph G["GitHub — gratuit"]
+        H["⏰ Chaque matin, 5 h 47"] --> R["🤖 Robot<br/>(GitHub Actions)"]
+        R --> J[("promos.json")]
+    end
+    J --> A["📱 Appli sur nos iPhones<br/>(étape 4)"]
+    C["📝 Liste de courses commune<br/>(étape 4, hors de ce dépôt)"] --> A
+```
 
-Rien à faire au quotidien.
+1. **Chaque matin à 5 h 47** (heure de Paris), GitHub lance le robot tout seul.
+2. Le robot regarde la liste des catalogues de chaque magasin. Il ne relit un catalogue que **s'il a
+   changé** depuis la veille.
+3. Il en extrait chaque promo : produit, marque, prix, ancien prix, réduction, prix au kilo,
+   conditions (carte de fidélité, « 2e à -60 % »…), dates.
+4. Il vérifie que tout est au bon format, puis enregistre le fichier [`promos.json`](promos.json)
+   dans ce dépôt.
+5. L'appli (étape 4) lira ce fichier. La liste de courses, elle, ne sera **pas** stockée ici : ce dépôt
+   est public.
 
-### Lancer le robot à la main (pour tester)
+## Les magasins et les sources
 
-1. Sur GitHub, ouvrir l'onglet **Actions** du dépôt.
-2. À gauche, cliquer sur **Robot des promos**.
-3. À droite, cliquer sur **Run workflow**, puis sur le bouton vert **Run workflow**.
-4. Au bout d'une minute environ, cliquer sur le lancement : un tableau résume ce qui a été trouvé.
+| Magasin | Source | Ce qu'on obtient |
+|---|---|---|
+| **Lidl Lingolsheim** | Prospectus PDF officiel de Lidl France (semaine en cours et suivante) | Tous les produits du prospectus : prix, ancien prix, réduction, Lidl Plus, prix au kilo, lots, dates de chaque page. Environ 500 promos par jour. |
+| **E.Leclerc Geispolsheim** | Catalogues officiels du magasin (n° 1067) | Tous les catalogues en cours et à venir : prix, prix barré, « 2e à -X % », « 2 + 1 offert », Ticket E.Leclerc, prix au kilo, code-barres, photo. Environ 1 400 promos par jour. |
 
-### Si le robot s'arrête tout seul
+Le détail (adresses consultées, choix faits, sources écartées) est dans
+[docs/sources.md](docs/sources.md).
 
-GitHub met en pause les tâches automatiques d'un dépôt public quand il ne s'y passe rien pendant
-**60 jours**. Le robot enregistre chaque jour un nouveau `promos.json`, ce qui devrait compter
-comme de l'activité, mais GitHub ne le garantit pas noir sur blanc. Si `promos.json` n'est plus mis
-à jour (l'appli le signalera) :
-onglet **Actions** → **Robot des promos** → bouton **Enable workflow**.
+## Au quotidien
 
-## Les sources
+**Il n'y a rien à faire.** Le robot tourne tout seul chaque matin.
 
-| Source | Magasin | Ce qu'elle donne | Limites |
-|---|---|---|---|
-| Marktguru (marktguru.de) | Lidl Kehl | Toutes les promos du prospectus (≈ 800) : prix, prix au kilo/litre, dates, Lidl Plus | Pas d'ancien prix |
-| Bonial (bonial.fr) | Lidl Lingolsheim | Promos alimentaires avec ancien prix et Lidl Plus | Seulement 16 offres visibles sur ≈ 280 |
-| Prospectus Lidl (service officiel utilisé par lidl.fr) | Lidl Lingolsheim | Produits non alimentaires (cuisine, outils, vêtements…), semaine en cours et suivante | Pas d'alimentaire, pas d'ancien prix |
-| Kaufda (kaufda.de) | dm Kehl | Produits mis en avant par dm | Seulement 16 offres visibles sur ≈ 130 ; rarement de vraies baisses de prix (dm a des prix fixes toute l'année) |
+### Voir le résultat du dernier passage
 
-Sources écartées : l'API produits de dm.de (interdite aux robots), les pages /Catalogues/ de Tiendeo
-(interdites aux robots), les pages produits de lidl.fr (les prix n'y sont pas).
+1. Ouvrir l'onglet [**Actions**](https://github.com/lascampia67/promos-courses/actions) du dépôt.
+2. Cliquer sur le dernier lancement de **Robot des promos**.
+3. En bas de la page, le tableau **Résultat du robot** indique, pour chaque magasin, le nombre de
+   promos et chaque catalogue lu.
 
-**Piste pour mieux couvrir Lidl France :** le prospectus PDF de Lidl France contient du texte
-lisible (produits, prix, anciens prix). On pourrait en extraire les promos alimentaires
-gratuitement, sans IA payante. À décider.
+### Lancer le robot à la main
 
-## Règles que le robot respecte
-
-- Il lit le fichier `robots.txt` de chaque site et ne visite jamais une page interdite.
-- Un seul passage par jour, avec au moins 3 secondes de pause entre deux visites.
-- Si une source tombe en panne, il continue avec les autres, le note dans `promos.json`, et garde
-  les offres de la veille encore valables pour cette source.
-- Aucune donnée personnelle ni clé secrète dans ce dépôt (il est public).
+1. Onglet **Actions** → **Robot des promos** (dans la colonne de gauche).
+2. Bouton **Run workflow** à droite.
+3. Cocher « Relire tous les catalogues » seulement si on veut tout relire (sinon laisser décoché).
+4. Cliquer sur le bouton vert **Run workflow**. Le résultat arrive en 1 à 3 minutes.
 
 ## Le fichier promos.json
 
-- `mise_a_jour` : date et heure du dernier passage du robot.
-- `magasins` : la liste de nos magasins.
-- `sources` : pour chaque source, `etat` (`ok` ou `erreur`), `nb_offres` et une `remarque`.
-- `offres` : la liste des promos. Pour chacune :
+Un seul fichier, à la racine du dépôt, réécrit chaque matin. Il contient :
 
-| Champ | Exemple | Signification |
-|---|---|---|
-| `magasin` | `lidl-kehl` | Le magasin (voir `magasins`) |
-| `pays`, `langue` | `DE`, `de` | Pays du magasin et langue du nom du produit |
-| `produit`, `marque` | `Frische Vollmilch`, `Milbona` | |
-| `description` | `Je 1 l` | Quantité, conditions… |
-| `categorie` | `Milch` | Rayon, quand la source le donne |
-| `prix` | `1.11` | Prix en euros |
-| `ancien_prix` | `1.45` | Prix barré, si connu |
-| `prix_unitaire`, `unite` | `1.11`, `l` | Prix au `kg`, au `l` ou à la `pièce` |
-| `reduction` | `-34% avec Lidl Plus` | Texte de la réduction, ou calculée |
-| `date_debut`, `date_fin` | `2026-10-26`, `2026-10-31` | Validité de la promo (incluses) |
-| `carte_fidelite` | `true` | Il faut la carte (ex. Lidl Plus) |
-| `lien`, `image` | | Page source et photo |
+- la date et l'heure du passage du robot ;
+- l'état de chaque source (`ok`, `partiel` ou `erreur`) et la liste des catalogues lus ;
+- toutes les promos en cours **et à venir** (les promos terminées sont retirées).
 
-## Pour les curieux : lancer le robot sur un ordinateur
+Exemple d'une promo (extrait) :
 
+```json
+{
+  "magasin": "lidl-lingolsheim",
+  "produit": "Cervelas",
+  "marque": "SAINT ALBY",
+  "prix": 2.65,
+  "prix_unitaire": 6.63,
+  "unite": "kg",
+  "reduction": "-40 % sur le 2e avec Lidl Plus",
+  "lot": { "quantite": 2, "prix": 4.24, "prix_unitaire": 5.3 },
+  "carte_fidelite": true,
+  "date_debut": "2026-10-22",
+  "date_fin": "2026-10-28"
+}
 ```
-pip install -r requirements.txt
-python robot/robot.py
+
+Ici, un cervelas coûte 2,65 € (6,63 €/kg) ; en en prenant 2 avec Lidl Plus, on paie 4,24 € (5,30 €/kg).
+C'est ce genre de calcul que l'appli fera pour savoir si le lot vaut vraiment le coup.
+
+Tous les champs sont expliqués dans [docs/format-promos.md](docs/format-promos.md). Le format exact
+est décrit par un schéma JSON : [`promos.schema.json`](src/robot_promos/promos.schema.json).
+
+## Fiabilité
+
+- **Une source en panne n'arrête pas les autres.** Elle est marquée `erreur` ou `partiel` et ses
+  promos de la veille encore valables sont conservées.
+- **Si toutes les sources sont en panne**, `promos.json` n'est pas modifié (on garde le précédent).
+- **Pannes passagères** : le robot réessaie automatiquement deux fois en attendant un peu.
+- **Format vérifié** : avant d'être enregistré, `promos.json` est contrôlé par son schéma JSON.
+- **Tests automatiques** : plus de 50 tests vérifient le code à chaque modification (workflow « Tests »).
+- **Alerte** : en cas de problème, un avertissement s'affiche sur la page du lancement (onglet
+  Actions) et GitHub envoie un e-mail si le lancement échoue.
+
+## Règles respectées
+
+- Le robot lit le fichier `robots.txt` de chaque site et ne visite jamais une page interdite.
+- Un seul passage par jour, au moins 3 secondes entre deux visites, et un catalogue inchangé n'est
+  pas retéléchargé.
+- Le robot se présente sous son vrai nom (`promos-courses`) avec l'adresse de ce dépôt.
+- Rien n'est contourné (captcha, connexion…). Une seule exception, décidée le 26/10/2026 et expliquée
+  dans [docs/sources.md](docs/sources.md#eleclerc-geispolsheim) : le service des catalogues Leclerc
+  demande d'indiquer qu'on vient de sa visionneuse officielle.
+- Aucune donnée personnelle ni clé secrète dans ce dépôt public.
+
+## Dépannage
+
+<details>
+<summary><strong>Les promos ne sont plus mises à jour</strong></summary>
+
+GitHub met en pause les tâches automatiques d'un dépôt public quand il ne s'y passe rien pendant
+**60 jours**. Le robot enregistre chaque jour un nouveau `promos.json`, ce qui devrait compter comme
+de l'activité, mais GitHub ne le garantit pas. Si la date `mise_a_jour` de `promos.json` est ancienne :
+
+1. onglet **Actions** → **Robot des promos** ;
+2. si un bandeau jaune l'indique, cliquer sur **Enable workflow** ;
+3. lancer le robot à la main (voir [Au quotidien](#lancer-le-robot-à-la-main)).
+
+L'appli préviendra quand les données ont plus de 2 jours.
+</details>
+
+<details>
+<summary><strong>Un lancement est en rouge ou une source est en « erreur »</strong></summary>
+
+Cliquer sur le lancement dans l'onglet **Actions** : le message d'erreur est affiché. Le plus souvent,
+un site a changé sa présentation et le module de la source doit être adapté
+(voir [docs/sources.md](docs/sources.md#si-une-source-change)). En attendant, les promos de la veille
+restent disponibles.
+</details>
+
+<details>
+<summary><strong>Une promo du prospectus manque ou semble fausse</strong></summary>
+
+Ouvrir une *issue* avec le formulaire **Signaler un problème** (onglet **Issues**) en indiquant le
+magasin, la page du prospectus et ce qui était attendu.
+</details>
+
+## Pour les développeurs
+
+Il faut Python 3.12 ou plus récent.
+
+```bash
+git clone https://github.com/lascampia67/promos-courses.git
+cd promos-courses
+python -m venv .venv && source .venv/bin/activate   # Windows : .venv\Scripts\activate
+pip install -e ".[dev]"
+
+python -m robot_promos            # lance le robot et écrit promos.json
+pytest                            # tests automatiques (sans internet)
+ruff check src tests              # style du code
 ```
+
+Structure du dépôt :
+
+```text
+promos-courses/
+├── promos.json                     ← les promos, écrites chaque matin par le robot
+├── src/robot_promos/
+│   ├── robot.py                    ← chef d'orchestre
+│   ├── web.py                      ← téléchargement poli (robots.txt, pauses)
+│   ├── offres.py                   ← format d'une offre, doublons, vérification
+│   ├── promos.schema.json          ← schéma JSON de promos.json
+│   ├── config.py                   ← magasins et réglages
+│   └── sources/
+│       ├── lidl.py                 ← Lidl : prospectus de la semaine
+│       ├── lidl_pdf.py             ← Lidl : lecture du PDF
+│       └── leclerc.py              ← Leclerc : catalogues du magasin
+├── tests/                          ← tests automatiques
+├── docs/                           ← documentation détaillée
+└── .github/workflows/
+    ├── robot.yml                   ← lancement chaque matin
+    ├── tests.yml                   ← vérification du code
+    └── publication.yml             ← publication des versions
+```
+
+Le guide complet (organisation, ajout d'une source, publication) est dans
+[CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Versions
+
+Les versions suivent le [versionnage sémantique](https://semver.org/lang/fr/) et sont décrites dans
+le [journal des versions](CHANGELOG.md). Chaque version est publiée dans les
+[**Releases**](https://github.com/lascampia67/promos-courses/releases) du dépôt, automatiquement,
+quand une étiquette `vX.Y.Z` est poussée.
+
+## Limites connues
+
+- **Lidl** : les promos sont lues dans le PDF du prospectus. La lecture est très fiable, mais une mise
+  en page inhabituelle peut faire manquer un produit ou associer un mauvais prix. Les produits
+  « Uniquement en ligne » sont volontairement ignorés.
+- **Leclerc** : certaines promos portent sur toute une marque (« sur les produits présents en magasin
+  de… ») : elles n'ont pas de prix unique (`prix` vaut `null`).
+- Les prix sont ceux des catalogues : une promo peut être épuisée en magasin.
+
+## Aide et contact
+
+- Un problème, une idée : onglet [**Issues**](https://github.com/lascampia67/promos-courses/issues).
+- Un problème de sécurité (donnée publiée par erreur…) : voir [SECURITY.md](SECURITY.md).
+
+Projet maintenu par **Emilio** ([@LASCAMPIA67](https://github.com/LASCAMPIA67)), avec l'aide de
+Claude (Anthropic) pour le code.

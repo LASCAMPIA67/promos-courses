@@ -1,0 +1,16 @@
+name: Proposer une idée
+description: Une amélioration, un nouveau magasin, une nouvelle fonction…
+title: "[Idée] "
+labels: ["idée"]
+body:
+  - type: textarea
+    id: idee
+    attributes:
+      label: Votre idée
+      placeholder: "Ex. : prévenir quand le café préféré est en promo."
+    validations:
+      required: true
+  - type: textarea
+    id: pourquoi
+    attributes:
+      label: En quoi ça aiderait ?

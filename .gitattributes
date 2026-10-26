@@ -1,0 +1,6 @@
+# Fins de ligne normalisées (le projet est édité sous Windows et sous Linux).
+* text=auto eol=lf
+
+# promos.json est écrit par le robot : GitHub le replie dans les comparaisons
+# et ne le compte pas dans les statistiques de langages.
+promos.json linguist-generated=true

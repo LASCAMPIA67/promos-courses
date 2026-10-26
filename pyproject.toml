@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "robot-promos"
+dynamic = ["version"]
+description = "Robot qui récupère chaque jour les promos de nos magasins (Lidl Lingolsheim, E.Leclerc Geispolsheim)."
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [{ name = "Emilio" }]
+dependencies = [
+    "requests>=2.32,<3",
+    "pdfplumber>=0.11.4,<0.12",
+    "jsonschema>=4.23,<5",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "ruff>=0.8",
+]
+
+[project.urls]
+"Code source" = "https://github.com/lascampia67/promos-courses"
+"Journal des versions" = "https://github.com/lascampia67/promos-courses/blob/main/CHANGELOG.md"
+
+[tool.setuptools.dynamic]
+version = { attr = "robot_promos.__version__" }
+
+[tool.setuptools.package-data]
+robot_promos = ["promos.schema.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "BLE"]
+ignore = ["E741"]
+
+[tool.ruff.format]
+quote-style = "double"

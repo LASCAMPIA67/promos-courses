@@ -1,0 +1,34 @@
+name: Signaler un problème
+description: Une promo manquante ou fausse, le robot en panne…
+title: "[Problème] "
+labels: ["problème"]
+body:
+  - type: markdown
+    attributes:
+      value: Merci ! Décrivez le problème le plus simplement possible.
+  - type: dropdown
+    id: magasin
+    attributes:
+      label: Magasin concerné
+      options:
+        - Lidl Lingolsheim
+        - E.Leclerc Geispolsheim
+        - Les deux / le robot en général
+    validations:
+      required: true
+  - type: textarea
+    id: probleme
+    attributes:
+      label: Qu'est-ce qui ne va pas ?
+      placeholder: "Ex. : la promo sur le beurre (page 12 du prospectus) n'apparaît pas."
+    validations:
+      required: true
+  - type: textarea
+    id: attendu
+    attributes:
+      label: Qu'est-ce qui était attendu ?
+      placeholder: "Ex. : Beurre doux, 1,99 € au lieu de 2,49 €, avec Lidl Plus."
+  - type: input
+    id: lien
+    attributes:
+      label: Lien utile (lancement du robot, page du catalogue…)

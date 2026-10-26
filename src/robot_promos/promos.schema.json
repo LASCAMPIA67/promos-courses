@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lascampia67/promos-courses/blob/main/src/robot_promos/promos.schema.json",
+  "title": "promos.json",
+  "description": "Promos de nos magasins, écrites chaque jour par le robot. Explications : docs/format-promos.md",
+  "type": "object",
+  "required": ["format", "mise_a_jour", "version_robot", "magasins", "sources", "offres"],
+  "additionalProperties": false,
+  "properties": {
+    "format": {"const": 2, "description": "Version du format de ce fichier."},
+    "mise_a_jour": {"type": "string", "format": "date-time", "description": "Date et heure du passage du robot (heure de Paris)."},
+    "version_robot": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "magasins": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["nom", "enseigne", "ville"],
+        "additionalProperties": false,
+        "properties": {
+          "nom": {"type": "string"},
+          "enseigne": {"type": "string"},
+          "ville": {"type": "string"}
+        }
+      }
+    },
+    "sources": {"type": "array", "items": {"$ref": "#/$defs/source"}},
+    "offres": {"type": "array", "items": {"$ref": "#/$defs/offre"}}
+  },
+  "$defs": {
+    "date": {"type": ["string", "null"], "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+    "montant": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "source": {
+      "type": "object",
+      "required": ["id", "magasin", "nom", "etat", "nb_offres", "remarque", "catalogues"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string"},
+        "magasin": {"type": "string"},
+        "nom": {"type": "string"},
+        "etat": {"enum": ["ok", "partiel", "erreur"]},
+        "nb_offres": {"type": "integer", "minimum": 0},
+        "remarque": {"type": "string"},
+        "catalogues": {"type": "array", "items": {"$ref": "#/$defs/catalogue"}}
+      }
+    },
+    "catalogue": {
+      "type": "object",
+      "required": ["id", "nom", "debut", "fin", "version", "lien", "nb_offres", "reutilise"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string"},
+        "nom": {"type": "string"},
+        "debut": {"$ref": "#/$defs/date"},
+        "fin": {"$ref": "#/$defs/date"},
+        "version": {"type": "string"},
+        "lien": {"type": ["string", "null"]},
+        "nb_offres": {"type": "integer", "minimum": 0},
+        "reutilise": {"type": "boolean"}
+      }
+    },
+    "offre": {
+      "type": "object",
+      "required": ["id", "source", "magasin", "catalogue", "produit", "marque", "description", "categorie",
+                   "ean", "prix", "ancien_prix", "prix_unitaire", "unite", "reduction", "lot",
+                   "carte_fidelite", "date_debut", "date_fin", "lien", "image", "page"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "source": {"enum": ["lidl", "leclerc"]},
+        "magasin": {"enum": ["lidl-lingolsheim", "leclerc-geispolsheim"]},
+        "catalogue": {"type": "string"},
+        "produit": {"type": "string", "minLength": 1},
+        "marque": {"type": ["string", "null"]},
+        "description": {"type": ["string", "null"]},
+        "categorie": {"type": ["string", "null"]},
+        "ean": {"type": ["string", "null"]},
+        "prix": {"$ref": "#/$defs/montant", "description": "Prix d'UN article (avec la carte si carte_fidelite)."},
+        "ancien_prix": {"$ref": "#/$defs/montant"},
+        "prix_unitaire": {"$ref": "#/$defs/montant", "description": "Prix au kg, au litre ou à la pièce."},
+        "unite": {"enum": ["kg", "l", "pièce", null]},
+        "reduction": {"type": ["string", "null"]},
+        "lot": {
+          "type": ["object", "null"],
+          "required": ["quantite", "prix", "prix_unitaire"],
+          "additionalProperties": false,
+          "properties": {
+            "quantite": {"type": "integer", "minimum": 2},
+            "prix": {"$ref": "#/$defs/montant"},
+            "prix_unitaire": {"$ref": "#/$defs/montant"}
+          }
+        },
+        "carte_fidelite": {"type": "boolean"},
+        "date_debut": {"$ref": "#/$defs/date"},
+        "date_fin": {"$ref": "#/$defs/date"},
+        "lien": {"type": ["string", "null"]},
+        "image": {"type": ["string", "null"]},
+        "page": {"type": ["integer", "null"], "minimum": 1}
+      }
+    }
+  }
+}
