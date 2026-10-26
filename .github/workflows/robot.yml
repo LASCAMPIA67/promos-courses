@@ -1,0 +1,47 @@
+# Fait tourner le robot des promos chaque matin, et à la demande (bouton « Run workflow »).
+name: Robot des promos
+
+on:
+  schedule:
+    # Tous les jours à 5 h 47, heure de Paris (GitHub gère lui-même l'heure d'été / d'hiver).
+    # Pas pile à l'heure : GitHub est surchargé à chaque heure pile et prend du retard.
+    - cron: "47 5 * * *"
+      timezone: "Europe/Paris"
+  workflow_dispatch:
+
+permissions:
+  contents: write  # pour pouvoir enregistrer promos.json dans le dépôt
+
+concurrency:
+  group: robot-promos
+
+jobs:
+  robot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Installer les outils
+        run: pip install -r requirements.txt
+
+      - name: Lancer le robot
+        run: python robot/robot.py
+
+      - name: Enregistrer promos.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add promos.json
+          if git diff --cached --quiet; then
+            echo "Rien de nouveau."
+          else
+            git commit -m "Promos du $(TZ=Europe/Paris date +%d/%m/%Y)"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
