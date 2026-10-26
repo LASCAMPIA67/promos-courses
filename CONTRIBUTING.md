@@ -43,6 +43,18 @@ pytest                      # tests automatiques (sans internet)
 
 Les mêmes vérifications tournent sur GitHub (workflow « Tests ») à chaque modification du code.
 
+Les règles d'accès de la liste commune ([`firebase/firestore.rules`](firebase/firestore.rules)) ont
+leurs propres tests, sur l'émulateur Firebase (Node.js 22 et Java 21 nécessaires) :
+
+```bash
+cd firebase
+npm ci
+npm test
+```
+
+Une modification des règles doit ensuite être **publiée à la main** dans la console Firebase (voir
+[docs/liste-commune.md](docs/liste-commune.md#les-mettre-en-place-ou-les-modifier)).
+
 ## Organisation du code
 
 | Fichier | Rôle |

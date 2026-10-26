@@ -14,6 +14,12 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+### Ajouté
+
+- Liste de courses commune : projet Firebase (offre gratuite Spark), règles d'accès Firestore
+  réservées aux deux comptes du foyer, 15 tests sur l'émulateur Firebase et workflow « Règles Firebase ».
+- Documentation de la liste commune : [docs/liste-commune.md](docs/liste-commune.md).
+
 ### Modifié
 
 - Les versions courtes (« express ») des catalogues Leclerc sont signalées dans leur nom.

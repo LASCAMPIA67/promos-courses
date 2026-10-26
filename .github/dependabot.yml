@@ -16,3 +16,11 @@ updates:
     groups:
       python:
         patterns: ["*"]
+
+  - package-ecosystem: npm
+    directory: /firebase
+    schedule:
+      interval: monthly
+    groups:
+      firebase:
+        patterns: ["*"]

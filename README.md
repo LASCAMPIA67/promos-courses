@@ -8,6 +8,7 @@ liste de courses à ces promos pour dépenser le moins possible, sans rien faire
 
 [![Robot des promos](https://github.com/lascampia67/promos-courses/actions/workflows/robot.yml/badge.svg)](https://github.com/lascampia67/promos-courses/actions/workflows/robot.yml)
 [![Tests](https://github.com/lascampia67/promos-courses/actions/workflows/tests.yml/badge.svg)](https://github.com/lascampia67/promos-courses/actions/workflows/tests.yml)
+[![Règles Firebase](https://github.com/lascampia67/promos-courses/actions/workflows/regles.yml/badge.svg)](https://github.com/lascampia67/promos-courses/actions/workflows/regles.yml)
 [![Version](https://img.shields.io/github/v/release/lascampia67/promos-courses?label=version)](https://github.com/lascampia67/promos-courses/releases)
 ![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue)
 
@@ -38,7 +39,7 @@ liste de courses à ces promos pour dépenser le moins possible, sans rien faire
 | 1 | Choisir les magasins | ✅ Fait |
 | 2 | Tester les sources de promos | ✅ Fait |
 | 3 | Créer le robot qui récupère les promos | ✅ Fait et validé (version 0.2.0) |
-| 4 | Créer l'appli (liste de courses commune + comparaison aux promos) | 🚧 En cours : stockage de la liste choisi (Firebase, gratuit), création du projet |
+| 4 | Créer l'appli (liste de courses commune + comparaison aux promos) | 🚧 En cours : base Firebase créée, règles d'accès écrites et testées |
 | 5 | L'installer sur nos deux iPhones | ⏳ À faire |
 
 Dernière mise à jour de ce tableau : 26/10/2026. Le détail des évolutions est dans le
@@ -55,7 +56,7 @@ flowchart LR
         R --> J[("promos.json")]
     end
     J --> A["📱 Appli sur nos iPhones<br/>(étape 4)"]
-    C["📝 Liste de courses commune<br/>(étape 4, hors de ce dépôt)"] --> A
+    C[("📝 Liste de courses commune<br/>Firebase, privée")] <--> A
 ```
 
 1. **Chaque matin à 5 h 47** (heure de Paris), GitHub lance le robot tout seul.
@@ -65,8 +66,9 @@ flowchart LR
    conditions (carte de fidélité, « 2e à -60 % »…), dates.
 4. Il vérifie que tout est au bon format, puis enregistre le fichier [`promos.json`](promos.json)
    dans ce dépôt.
-5. L'appli (étape 4) lira ce fichier. La liste de courses, elle, ne sera **pas** stockée ici : ce dépôt
-   est public.
+5. L'appli (étape 4) lira ce fichier. La liste de courses, elle, n'est **pas** stockée ici (ce dépôt
+   est public) mais dans une base **Firebase** privée et gratuite, réservée à nos deux comptes :
+   voir [docs/liste-commune.md](docs/liste-commune.md).
 
 ## Les magasins et les sources
 
@@ -135,7 +137,9 @@ est décrit par un schéma JSON : [`promos.schema.json`](src/robot_promos/promos
 - **Si toutes les sources sont en panne**, `promos.json` n'est pas modifié (on garde le précédent).
 - **Pannes passagères** : le robot réessaie automatiquement deux fois en attendant un peu.
 - **Format vérifié** : avant d'être enregistré, `promos.json` est contrôlé par son schéma JSON.
-- **Tests automatiques** : plus de 50 tests vérifient le code à chaque modification (workflow « Tests »).
+- **Tests automatiques** : plus de 50 tests vérifient le code du robot à chaque modification (workflow
+  « Tests »), et 15 tests vérifient que la liste commune reste réservée à nos deux comptes (workflow
+  « Règles Firebase »).
 - **Alerte** : en cas de problème, un avertissement s'affiche sur la page du lancement (onglet
   Actions) et GitHub envoie un e-mail si le lancement échoue.
 
@@ -212,11 +216,15 @@ promos-courses/
 │       ├── lidl.py                 ← Lidl : prospectus de la semaine
 │       ├── lidl_pdf.py             ← Lidl : lecture du PDF
 │       └── leclerc.py              ← Leclerc : catalogues du magasin
-├── tests/                          ← tests automatiques
+├── tests/                          ← tests automatiques du robot
+├── firebase/
+│   ├── firestore.rules             ← règles d'accès à la liste commune
+│   └── tests/                      ← tests des règles (émulateur Firebase)
 ├── docs/                           ← documentation détaillée
 └── .github/workflows/
     ├── robot.yml                   ← lancement chaque matin
-    ├── tests.yml                   ← vérification du code
+    ├── tests.yml                   ← vérification du code du robot
+    ├── regles.yml                  ← vérification des règles Firebase
     └── publication.yml             ← publication des versions
 ```
 

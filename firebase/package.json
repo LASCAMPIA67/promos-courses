@@ -1,0 +1,17 @@
+{
+  "name": "promos-courses-firebase",
+  "private": true,
+  "description": "Règles d'accès Firestore de la liste de courses commune, et leurs tests.",
+  "type": "module",
+  "scripts": {
+    "test": "firebase emulators:exec --only firestore --project demo-promos-courses \"node --test tests/*.test.mjs\""
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^6.0.0",
+    "firebase": "^13.1.0",
+    "firebase-tools": "^15.34.1"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

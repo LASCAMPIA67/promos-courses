@@ -18,3 +18,9 @@ htmlcov/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Firebase (outils de test des règles)
+node_modules/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log

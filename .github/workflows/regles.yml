@@ -1,0 +1,44 @@
+# Vérifie les règles d'accès Firestore (liste de courses commune) sur l'émulateur Firebase.
+name: Règles Firebase
+
+on:
+  push:
+    branches: [main]
+    paths: ["firebase/**", ".github/workflows/regles.yml"]
+  pull_request:
+    paths: ["firebase/**", ".github/workflows/regles.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regles:
+    name: Tester les règles d'accès
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: firebase
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v7
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: firebase/package-lock.json
+
+      - name: Installer Java (nécessaire à l'émulateur Firestore)
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Installer les outils
+        run: npm ci
+
+      - name: Lancer les tests des règles
+        run: npm test
