@@ -1,6 +1,6 @@
 {
  "format": 2,
- "mise_a_jour": "2026-10-26T21:27:59+01:00",
+ "mise_a_jour": "2026-10-26T21:34:48+01:00",
  "version_robot": "0.2.0",
  "magasins": {
   "lidl-lingolsheim": {
@@ -21,7 +21,7 @@
    "nom": "Prospectus Lidl France",
    "etat": "ok",
    "nb_offres": 499,
-   "remarque": "2 catalogue(s) ; 2 inchangé(s) depuis le dernier passage",
+   "remarque": "2 catalogue(s) ; 76 produit(s) « uniquement en ligne » ignoré(s)",
    "catalogues": [
     {
      "id": "du-22-10-au-28-10-les-promos-de-la-semaine",
@@ -31,7 +31,7 @@
      "version": "https://assets.leaflets.schwarz/leaflets/pdfs/01a13e77-6880-71a2-8911-32371f5e4969/Du-22-10-au-28-10-Les-promos-de-la-semaine-00.pdf#55175310",
      "lien": "https://www.lidl.fr/l/catalogue-de-la-semaine/du-22-10-au-28-10-les-promos-de-la-semaine/ar/0",
      "nb_offres": 235,
-     "reutilise": true
+     "reutilise": false
     },
     {
      "id": "du-29-10-au-04-11-les-promos-de-la-semaine",
@@ -41,7 +41,7 @@
      "version": "https://assets.leaflets.schwarz/leaflets/pdfs/01a16269-b13a-7ae7-8eea-4b7468a71220/Du-29-10-au-04-11-Les-promos-de-la-semaine-00.pdf#43256318",
      "lien": "https://www.lidl.fr/l/catalogue-de-la-semaine/du-29-10-au-04-11-les-promos-de-la-semaine/ar/0",
      "nb_offres": 264,
-     "reutilise": true
+     "reutilise": false
     }
    ]
   },
@@ -51,7 +51,7 @@
    "nom": "Catalogues E.Leclerc Geispolsheim",
    "etat": "ok",
    "nb_offres": 1394,
-   "remarque": "9 catalogue(s) ; 9 inchangé(s) depuis le dernier passage",
+   "remarque": "9 catalogue(s)",
    "catalogues": [
     {
      "id": "26C409N",
@@ -61,7 +61,7 @@
      "version": "18660164073aa70d5bbccfa015b22a2f@2026-10-26T08:04:11Z",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26C409N/1067",
      "nb_offres": 29,
-     "reutilise": true
+     "reutilise": false
     },
     {
      "id": "26G310G",
@@ -71,7 +71,7 @@
      "version": "07da9b7ca474d937ebc986e4a3194029@2026-10-26T10:09:09Z",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
      "nb_offres": 307,
-     "reutilise": true
+     "reutilise": false
     },
     {
      "id": "26G310E",
@@ -81,7 +81,7 @@
      "version": "5a1e254d38373b2d261ef7340badfa64@2026-10-26T10:10:21Z",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310E/1067",
      "nb_offres": 7,
-     "reutilise": true
+     "reutilise": false
     },
     {
      "id": "26G124E",
@@ -91,7 +91,7 @@
      "version": "875a3f1e8a7ff843ff831af550030135@2026-10-21T09:45:29Z",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G124E/1067",
      "nb_offres": 19,
-     "reutilise": true
+     "reutilise": false
     },
     {
      "id": "26G124G",
@@ -101,7 +101,7 @@
      "version": "96a4c42bff10c8219b2775fd9f5c54cf@2026-10-26T08:33:28Z",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G124G/1067",
      "nb_offres": 340,
-     "reutilise": true
+     "reutilise": false
     },
     {
      "id": "26D009D",
@@ -111,7 +111,7 @@
      "version": "60892f34c8e392dbfe81adf23c4e7e2f@2026-10-26T08:06:15Z",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26D009D/1067",
      "nb_offres": 0,
-     "reutilise": true
+     "reutilise": false
     },
     {
      "id": "26G047G",
@@ -121,7 +121,7 @@
      "version": "ef5e6e393e883b27666cab63ed125268@2026-10-26T08:12:50Z",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G047G/1067",
      "nb_offres": 646,
-     "reutilise": true
+     "reutilise": false
     },
     {
      "id": "26G009P",
@@ -131,7 +131,7 @@
      "version": "fffae2e102be2e77a7b735c039a3fc5d@2026-10-26T08:10:23Z",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G009P/1067",
      "nb_offres": 46,
-     "reutilise": true
+     "reutilise": false
     },
     {
      "id": "26D001D",
@@ -141,7 +141,7 @@
      "version": "8d9c7659c709c6c978dc152b9f08f0f3@2026-04-17T16:30:47Z",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26D001D/1067",
      "nb_offres": 0,
-     "reutilise": true
+     "reutilise": false
     }
    ]
   }
