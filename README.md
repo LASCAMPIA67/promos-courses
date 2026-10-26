@@ -38,7 +38,7 @@ liste de courses à ces promos pour dépenser le moins possible, sans rien faire
 | 1 | Choisir les magasins | ✅ Fait |
 | 2 | Tester les sources de promos | ✅ Fait |
 | 3 | Créer le robot qui récupère les promos | ✅ Fait et validé (version 0.2.0) |
-| 4 | Créer l'appli (liste de courses commune + comparaison aux promos) | 🚧 En cours : choix du stockage de la liste commune |
+| 4 | Créer l'appli (liste de courses commune + comparaison aux promos) | 🚧 En cours : stockage de la liste choisi (Firebase, gratuit), création du projet |
 | 5 | L'installer sur nos deux iPhones | ⏳ À faire |
 
 Dernière mise à jour de ce tableau : 26/10/2026. Le détail des évolutions est dans le
