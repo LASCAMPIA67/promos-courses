@@ -9,7 +9,13 @@ function jour(decalage) {
   return `${date.getFullYear()}-${deux(date.getMonth() + 1)}-${deux(date.getDate())}`;
 }
 
-const LIDL = { source: "lidl", magasin: "lidl-lingolsheim", catalogue: "promos-de-la-semaine", categorie: null, ean: null };
+const LIDL = {
+  source: "lidl",
+  magasin: "lidl-lingolsheim",
+  catalogue: "promos-de-la-semaine",
+  categorie: null,
+  ean: null,
+};
 const LECLERC = { source: "leclerc", magasin: "leclerc-geispolsheim", catalogue: "26G310G", page: null };
 
 function offre(id, magasin, champs) {
@@ -68,10 +74,28 @@ const OFFRES = [
     unite: "kg",
     reduction: "-20 %",
   }),
-  offre("laitue", LIDL, { produit: "Laitue", description: "La pièce", prix: 0.79, prix_unitaire: 0.79, unite: "pièce" }),
+  offre("laitue", LIDL, {
+    produit: "Laitue",
+    description: "La pièce",
+    prix: 0.79,
+    prix_unitaire: 0.79,
+    unite: "pièce",
+  }),
   // Pas de « chips » dans le nom : trouvée par la famille « chips ».
-  offre("pringles", LIDL, { produit: "PRINGLES", description: "Le paquet de 165 g", prix: 1.99, ancien_prix: 2.79, reduction: "-28 %" }),
-  offre("beurre", LIDL, { produit: "Beurre doux", marque: "PÂTURAGES", prix: 1.99, date_debut: jour(-8), date_fin: jour(-1) }),
+  offre("pringles", LIDL, {
+    produit: "PRINGLES",
+    description: "Le paquet de 165 g",
+    prix: 1.99,
+    ancien_prix: 2.79,
+    reduction: "-28 %",
+  }),
+  offre("beurre", LIDL, {
+    produit: "Beurre doux",
+    marque: "PÂTURAGES",
+    prix: 1.99,
+    date_debut: jour(-8),
+    date_fin: jour(-1),
+  }),
   offre("bananes", LIDL, {
     produit: "Bananes",
     description: "Le kg. Origine Côte d'Ivoire",

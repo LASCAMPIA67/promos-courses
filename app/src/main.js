@@ -190,7 +190,10 @@ function ligneArticle(article, promos = []) {
   const contenu = document.createElement("button");
   contenu.type = "button";
   contenu.className = "texte";
-  contenu.setAttribute("aria-label", `Modifier ${article.nom}, ajouté par ${[auteur.nom, auteur.quand].filter(Boolean).join(" ")}`);
+  contenu.setAttribute(
+    "aria-label",
+    `Modifier ${article.nom}, ajouté par ${[auteur.nom, auteur.quand].filter(Boolean).join(" ")}`,
+  );
   const nom = document.createElement("span");
   nom.className = "nom";
   nom.textContent = article.nom;
@@ -374,7 +377,10 @@ function cartePromo(offre, aVenir, aujourdhui, { avecAjout = false } = {}) {
   if (explication.avantage) {
     const avantage = element("p", "avantage");
     avantage.dataset.genre = explication.genre;
-    avantage.append(element("strong", "avantage-titre", TITRES_AVANTAGE[explication.genre]), element("span", null, explication.avantage));
+    avantage.append(
+      element("strong", "avantage-titre", TITRES_AVANTAGE[explication.genre]),
+      element("span", null, explication.avantage),
+    );
     carte.append(avantage);
   }
 
@@ -614,7 +620,10 @@ function rendreGlissable(ligne, devant) {
   let depart = null;
   let glisse = false;
   const decalage = (evenement) =>
-    Math.max(-1.4 * LARGEUR_SUPPRIMER, Math.min(0, (depart.ouverte ? -LARGEUR_SUPPRIMER : 0) + evenement.clientX - depart.x));
+    Math.max(
+      -1.4 * LARGEUR_SUPPRIMER,
+      Math.min(0, (depart.ouverte ? -LARGEUR_SUPPRIMER : 0) + evenement.clientX - depart.x),
+    );
 
   devant.addEventListener("pointerdown", (evenement) => {
     if (evenement.button !== 0) return;

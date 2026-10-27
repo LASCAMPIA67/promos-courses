@@ -1,0 +1,53 @@
+# Analyse de sécurité du code (CodeQL, de GitHub) : le robot (Python), l'appli (JavaScript) et les
+# workflows eux-mêmes. Les problèmes trouvés s'affichent dans l'onglet Security → Code scanning.
+# Documentation : https://docs.github.com/fr/code-security/code-scanning
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ["promos.json", "**/*.md", "docs/**"]
+  pull_request:
+    paths-ignore: ["promos.json", "**/*.md", "docs/**"]
+  schedule:
+    # Chaque lundi à 3 h 23 (UTC) : les règles d'analyse s'enrichissent même sans changement du code.
+    - cron: "23 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyser:
+    name: Analyser (${{ matrix.langage }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      security-events: write # pour envoyer les résultats dans l'onglet Security
+    strategy:
+      fail-fast: false
+      matrix:
+        langage: [actions, javascript-typescript, python]
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Préparer CodeQL
+        uses: github/codeql-action/init@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+        with:
+          languages: ${{ matrix.langage }}
+          build-mode: none
+          # Règles de sécurité et de qualité du code.
+          queries: security-and-quality
+
+      - name: Analyser
+        uses: github/codeql-action/analyze@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+        with:
+          category: /language:${{ matrix.langage }}

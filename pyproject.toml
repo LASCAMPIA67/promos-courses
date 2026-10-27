@@ -18,7 +18,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=8",
-    "ruff>=0.8",
+    "ruff==0.17.3",
 ]
 
 [project.urls]
@@ -40,8 +40,28 @@ line-length = 120
 target-version = "py312"
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "B", "UP", "BLE"]
+# Règles choisies dans https://docs.astral.sh/ruff/rules/ : erreurs, style, imports, pièges
+# courants, modernisation, sécurité (bandit), dates sans fuseau, simplifications, pytest.
+select = [
+    "E", "F", "W",  # pycodestyle, Pyflakes
+    "I",            # ordre des imports
+    "B",            # pièges courants (bugbear)
+    "UP",           # syntaxe moderne
+    "BLE",          # pas de « except Exception » sans raison
+    "S",            # sécurité (bandit)
+    "DTZ",          # dates avec fuseau horaire
+    "SIM", "C4", "PIE", "RET", "PERF", "FURB",  # code plus simple
+    "PTH",          # pathlib plutôt que os.path
+    "LOG", "G",     # journalisation
+    "PT",           # bonnes pratiques pytest
+    "RUF",          # règles propres à Ruff
+]
 ignore = ["E741"]
+# Apostrophe typographique française : voulue dans les textes.
+allowed-confusables = ["’"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]  # assert est la façon normale d'écrire un test pytest
 
 [tool.ruff.format]
 quote-style = "double"

@@ -177,7 +177,9 @@ textarea {
   background: var(--fond);
   font-size: 17px; /* au moins 16 px : sinon l'iPhone zoome sur le champ */
   outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
 }
 
 textarea {
@@ -512,7 +514,9 @@ svg {
   border-radius: 50%;
   stroke: transparent;
   stroke-width: 3;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
 
 .achete .case svg {
@@ -716,7 +720,9 @@ svg {
 }
 
 .couleurs input:checked + .pastille-membre {
-  box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--couleur);
+  box-shadow:
+    0 0 0 3px var(--surface),
+    0 0 0 5px var(--couleur);
 }
 
 .couleurs input:focus-visible + .pastille-membre {

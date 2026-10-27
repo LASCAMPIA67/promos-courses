@@ -23,7 +23,7 @@ on:
         required: false
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: publication
@@ -33,11 +33,15 @@ jobs:
     name: Version validée
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: write # pour créer les versions et leurs étiquettes
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
       - name: Récupérer le dépôt
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Trouver la version à publier
         env:
@@ -94,11 +98,15 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: write # pour créer les versions et leurs étiquettes
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
       - name: Récupérer le dépôt
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Trouver la version en test
         run: |

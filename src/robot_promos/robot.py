@@ -158,8 +158,9 @@ def ecrire_resume(etats, total):
         "| Source | État | Offres | Remarque |",
         "|---|---|---|---|",
     ]
-    for e in etats:
-        lignes.append(f"| {e['nom']} | {icones[e['etat']]} {e['etat']} | {e['nb_offres']} | {e['remarque']} |")
+    lignes.extend(
+        f"| {e['nom']} | {icones[e['etat']]} {e['etat']} | {e['nb_offres']} | {e['remarque']} |" for e in etats
+    )
     lignes += [
         "",
         "### Catalogues",
@@ -173,7 +174,7 @@ def ecrire_resume(etats, total):
                 f"| {MAGASINS[e['magasin']]['nom']} | {c['nom']} | {c['debut']} | {c['fin']} | "
                 f"{c['nb_offres']} | {'non (inchangé)' if c['reutilise'] else 'oui'} |"
             )
-    with open(chemin, "a", encoding="utf-8") as f:
+    with Path(chemin).open("a", encoding="utf-8") as f:
         f.write("\n".join(lignes) + "\n")
 
 

@@ -19,7 +19,10 @@ test("dans Safari sur iPhone, l'appli propose de s'installer, puis se fait oubli
   const conseil = page.getByRole("complementary", { name: "Installez l'appli sur l'iPhone" });
   await expect(conseil).toBeVisible();
   await expect(conseil).toContainText("« Sur l'écran d'accueil »");
-  await expect(conseil.getByRole("link", { name: "Voir le guide" })).toHaveAttribute("href", /installation-iphone\.md$/);
+  await expect(conseil.getByRole("link", { name: "Voir le guide" })).toHaveAttribute(
+    "href",
+    /installation-iphone\.md$/,
+  );
 
   // « Plus tard » : le conseil disparaît, et ne revient pas en rouvrant l'appli.
   await conseil.getByRole("button", { name: "Plus tard" }).click();
@@ -32,7 +35,8 @@ test("dans Safari sur iPhone, l'appli propose de s'installer, puis se fait oubli
 
 test("sur un ordinateur, pas de conseil d'installation", async ({ browser }) => {
   const contexte = await browser.newContext({
-    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0 Safari/537.36",
+    userAgent:
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0 Safari/537.36",
   });
   const page = await contexte.newPage();
   await seConnecter(page, COMPTES.un);

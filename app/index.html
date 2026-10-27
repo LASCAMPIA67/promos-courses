@@ -32,7 +32,15 @@
         <p class="discret">Notre liste commune et les promos de Lidl et Leclerc.</p>
         <form id="form-connexion" novalidate>
           <label for="email">E-mail</label>
-          <input id="email" name="email" type="email" autocomplete="username" inputmode="email" autocapitalize="off" required />
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="username"
+            inputmode="email"
+            autocapitalize="off"
+            required
+          />
           <label for="mot-de-passe">Mot de passe</label>
           <input id="mot-de-passe" name="mot-de-passe" type="password" autocomplete="current-password" required />
           <p id="message-connexion" class="message" role="alert" hidden></p>
@@ -47,20 +55,31 @@
       <header class="entete">
         <h1>Liste de courses</h1>
         <button type="button" id="bouton-compte" class="bouton-icone" aria-label="Mon compte">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" /></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
+          </svg>
         </button>
       </header>
 
       <p id="bandeau" class="bandeau" role="status" hidden></p>
 
       <aside id="conseil-installation" class="conseil" aria-labelledby="titre-conseil" hidden>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3" /><path d="M12 7v7M9 11l3 3 3-3" /></svg>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="6" y="2" width="12" height="20" rx="3" />
+          <path d="M12 7v7M9 11l3 3 3-3" />
+        </svg>
         <div>
           <p id="titre-conseil" class="conseil-titre">Installez l'appli sur l'iPhone</p>
           <p>
             Dans Safari, touchez le bouton <strong>Partager</strong> (ou <strong>···</strong> puis Partager), puis
             <strong>« Sur l'écran d'accueil »</strong>.
-            <a href="https://github.com/lascampia67/promos-courses/blob/main/docs/installation-iphone.md" target="_blank" rel="noopener noreferrer">Voir le guide</a>
+            <a
+              href="https://github.com/lascampia67/promos-courses/blob/main/docs/installation-iphone.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Voir le guide</a
+            >
           </p>
           <button type="button" id="fermer-conseil" class="lien">Plus tard</button>
         </div>
@@ -69,7 +88,13 @@
       <form id="form-ajout" class="ajout" autocomplete="off">
         <label for="ajout-nom" class="cache">Article à ajouter</label>
         <div class="champ-ajout">
-          <input id="ajout-nom" placeholder="Ajouter un article…" maxlength="100" enterkeyhint="done" autocapitalize="sentences" />
+          <input
+            id="ajout-nom"
+            placeholder="Ajouter un article…"
+            maxlength="100"
+            enterkeyhint="done"
+            autocapitalize="sentences"
+          />
           <button type="button" id="effacer-saisie" class="effacer" aria-label="Effacer" hidden>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17" /></svg>
           </button>
@@ -117,7 +142,6 @@
         <span id="texte-annulation"></span>
         <button type="button" id="bouton-annuler" class="lien">Annuler</button>
       </div>
-
     </div>
 
     <!-- Modifier un article -->
@@ -162,12 +186,39 @@
         <input id="prenom" maxlength="30" autocomplete="given-name" autocapitalize="words" />
         <fieldset class="couleurs">
           <legend>Couleur de mes articles</legend>
-          <label><input type="radio" name="couleur" value="vert" /><span class="pastille-membre" data-couleur="vert"></span><span class="cache">Vert</span></label>
-          <label><input type="radio" name="couleur" value="violet" /><span class="pastille-membre" data-couleur="violet"></span><span class="cache">Violet</span></label>
-          <label><input type="radio" name="couleur" value="bleu" /><span class="pastille-membre" data-couleur="bleu"></span><span class="cache">Bleu</span></label>
-          <label><input type="radio" name="couleur" value="orange" /><span class="pastille-membre" data-couleur="orange"></span><span class="cache">Orange</span></label>
-          <label><input type="radio" name="couleur" value="rose" /><span class="pastille-membre" data-couleur="rose"></span><span class="cache">Rose</span></label>
-          <label><input type="radio" name="couleur" value="jaune" /><span class="pastille-membre" data-couleur="jaune"></span><span class="cache">Jaune</span></label>
+          <label
+            ><input type="radio" name="couleur" value="vert" /><span class="pastille-membre" data-couleur="vert"></span
+            ><span class="cache">Vert</span></label
+          >
+          <label
+            ><input type="radio" name="couleur" value="violet" /><span
+              class="pastille-membre"
+              data-couleur="violet"
+            ></span
+            ><span class="cache">Violet</span></label
+          >
+          <label
+            ><input type="radio" name="couleur" value="bleu" /><span class="pastille-membre" data-couleur="bleu"></span
+            ><span class="cache">Bleu</span></label
+          >
+          <label
+            ><input type="radio" name="couleur" value="orange" /><span
+              class="pastille-membre"
+              data-couleur="orange"
+            ></span
+            ><span class="cache">Orange</span></label
+          >
+          <label
+            ><input type="radio" name="couleur" value="rose" /><span class="pastille-membre" data-couleur="rose"></span
+            ><span class="cache">Rose</span></label
+          >
+          <label
+            ><input type="radio" name="couleur" value="jaune" /><span
+              class="pastille-membre"
+              data-couleur="jaune"
+            ></span
+            ><span class="cache">Jaune</span></label
+          >
         </fieldset>
         <p id="legende-membres" class="legende discret"></p>
         <p id="message-compte" class="message" role="alert" hidden></p>

@@ -344,32 +344,32 @@ def analyser_description(texte):
     - « Le produit de 75 cl : 3,99 € Les 3 produits dont 1 OFFERT : 7,98 € »
     """
     infos = {}
-    lot = re.search(r"Les (\d+) produits( dont (\d+) OFFERTS?)?\s*:\s*" + PRIX, texte, re.I)
+    lot = re.search(r"Les (\d+) produits( dont (\d+) OFFERTS?)?\s*:\s*" + PRIX, texte, re.IGNORECASE)
     avant_lot = texte[: lot.start()] if lot else texte
-    seul = re.search(r"Le produit de [^:]+:\s*" + PRIX, avant_lot, re.I)
+    seul = re.search(r"Le produit de [^:]+:\s*" + PRIX, avant_lot, re.IGNORECASE)
     if lot:
         infos["lot_quantite"] = int(lot.group(1))
         infos["lot_offerts"] = int(lot.group(3)) if lot.group(3) else 0
         infos["lot_prix"] = float(lot.group(4).replace(",", "."))
-        unitaire_lot = re.search(PRIX_UNITAIRE, texte[lot.end() : lot.end() + 40], re.I)
+        unitaire_lot = re.search(PRIX_UNITAIRE, texte[lot.end() : lot.end() + 40], re.IGNORECASE)
         if unitaire_lot:
             infos["lot_prix_unitaire"] = float(unitaire_lot.group(2).replace(",", "."))
     if seul:
         infos["prix_normal"] = float(seul.group(1).replace(",", "."))
-    unitaire = re.search(PRIX_UNITAIRE, avant_lot, re.I)
+    unitaire = re.search(PRIX_UNITAIRE, avant_lot, re.IGNORECASE)
     if unitaire:
         infos["unite"] = unitaire.group(1).lower()
         infos["prix_unitaire"] = float(unitaire.group(2).replace(",", "."))
-    elif re.search(r"\ble kilo\b|(?<![\d,.])1 kg\b", avant_lot, re.I):
+    elif re.search(r"\ble kilo\b|(?<![\d,.])1 kg\b", avant_lot, re.IGNORECASE):
         infos["unite"] = "kg"
         infos["par_kilo"] = True
-    elif re.search(r"\bla pièce\b(?!\s*(d['’]|de\b))", avant_lot, re.I):  # pas « la pièce d'environ 2 kg »
+    elif re.search(r"\bla pièce\b(?!\s*(d['’]|de\b))", avant_lot, re.IGNORECASE):  # pas « la pièce d'environ 2 kg »
         infos["unite"] = "pièce"
         infos["par_kilo"] = True
-    au_lieu = re.search(r"au lieu de\s*" + PRIX, avant_lot, re.I)
+    au_lieu = re.search(r"au lieu de\s*" + PRIX, avant_lot, re.IGNORECASE)
     if au_lieu:
         infos["au_lieu_de"] = float(au_lieu.group(1).replace(",", "."))
-    infos["lidl_plus"] = bool(re.search(r"avec lidl plus", texte, re.I))
+    infos["lidl_plus"] = bool(re.search(r"avec lidl plus", texte, re.IGNORECASE))
     return infos
 
 

@@ -46,7 +46,8 @@ def test_offre_deuxieme_produit_reduit():
     )
     o = convertir(brut, CATALOGUE, "2026-10-22", "2026-10-28")
     assert (o["marque"], o["produit"]) == ("SAINT ALBY", "Cervelas")
-    assert o["prix"] == 2.65 and o["ancien_prix"] is None
+    assert o["prix"] == 2.65
+    assert o["ancien_prix"] is None
     assert o["reduction"] == "-40 % sur le 2e"
     assert o["lot"] == {"quantite": 2, "prix": 4.24, "prix_unitaire": 5.30}
 
@@ -62,7 +63,8 @@ def test_offre_produit_offert():
     o = convertir(brut, CATALOGUE, "2026-10-22", "2026-10-28")
     assert o["reduction"] == "2 + 1 offert"
     assert o["prix"] == 1.99
-    assert o["lot"]["quantite"] == 3 and o["lot"]["prix"] == 3.98
+    assert o["lot"]["quantite"] == 3
+    assert o["lot"]["prix"] == 3.98
 
 
 def test_prix_au_kilo_quand_le_prix_est_au_kilo():

@@ -29,7 +29,8 @@ def test_creer_offre_ignore_un_ancien_prix_incoherent():
 
 def test_creer_offre_unite_sans_prix_unitaire_est_ignoree():
     o = offre(unite="kg")
-    assert o["unite"] is None and o["prix_unitaire"] is None
+    assert o["unite"] is None
+    assert o["prix_unitaire"] is None
 
 
 def test_creer_offre_normalise_le_pourcentage():

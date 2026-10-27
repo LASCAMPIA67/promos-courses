@@ -60,7 +60,8 @@ def test_catalogue_inchange_non_relu(tmp_path, monkeypatch):
     lancer(tmp_path, monkeypatch, FausseSource())
     source = FausseSource()
     code, doc = lancer(tmp_path, monkeypatch, source)
-    assert code == 0 and source.lectures == 0
+    assert code == 0
+    assert source.lectures == 0
     assert doc["sources"][0]["catalogues"][0]["reutilise"] is True
     assert [o["produit"] for o in doc["offres"]] == ["Banane v1"]
 

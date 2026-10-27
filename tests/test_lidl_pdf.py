@@ -79,7 +79,8 @@ def test_prix_sous_le_produit_et_produit_en_ligne():
         + ligne("19.99", 20, 345, PRIX)
     )
     (p,) = extraire(mots, [])
-    assert p.nom == "PARKSIDE Chariot de mécanicien" and p.prix == 19.99
+    assert p.nom == "PARKSIDE Chariot de mécanicien"
+    assert p.prix == 19.99
     assert p.en_ligne_seulement
 
 
@@ -95,7 +96,8 @@ def test_prix_en_morceaux_et_exposants():
 
 def test_analyser_description_lidl_plus():
     infos = analyser_description("600 g (1 kg = 7,08 €) avec Lidl Plus au lieu de 5,29 € (1 kg = 8,82 €)")
-    assert infos["lidl_plus"] and infos["au_lieu_de"] == 5.29
+    assert infos["lidl_plus"]
+    assert infos["au_lieu_de"] == 5.29
     assert (infos["prix_unitaire"], infos["unite"]) == (7.08, "kg")
 
 
@@ -103,7 +105,8 @@ def test_analyser_description_deuxieme_produit():
     infos = analyser_description("Le produit de 400 g : 2,65 € (1 kg = 6,63 €) Les 2 produits : 4,24 € (1 kg = 5,30 €)")
     assert infos["prix_normal"] == 2.65
     assert (infos["lot_quantite"], infos["lot_offerts"], infos["lot_prix"]) == (2, 0, 4.24)
-    assert infos["lot_prix_unitaire"] == 5.30 and infos["prix_unitaire"] == 6.63
+    assert infos["lot_prix_unitaire"] == 5.30
+    assert infos["prix_unitaire"] == 6.63
 
 
 def test_analyser_description_produit_offert():

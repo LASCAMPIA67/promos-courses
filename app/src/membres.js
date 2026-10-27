@@ -28,7 +28,8 @@ export function preparerFiche({ prenom, couleur }) {
     .replace(/\s+/g, " ")
     .trim();
   if (!propre) return { erreur: "Écrivez votre prénom." };
-  if (propre.length > LONGUEUR_PRENOM) return { erreur: `Prénom trop long (${LONGUEUR_PRENOM} caractères au maximum).` };
+  if (propre.length > LONGUEUR_PRENOM)
+    return { erreur: `Prénom trop long (${LONGUEUR_PRENOM} caractères au maximum).` };
   if (!COULEURS.includes(couleur)) return { erreur: "Choisissez une couleur." };
   return { fiche: { prenom: propre, couleur } };
 }

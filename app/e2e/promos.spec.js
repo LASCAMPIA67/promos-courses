@@ -31,7 +31,11 @@ test("les articles en promo sont signalés, avec le détail de chaque promo", as
   await page.getByRole("button", { name: "Voir 3 promos pour Lait" }).click();
   const fenetre = page.getByRole("dialog", { name: "Promos pour « Lait »" });
   await expect(fenetre).toBeVisible();
-  await expect(fenetre.locator(".promo-nom")).toHaveText(["Lait demi-écrémé UHT LACTEL", "Lait demi-écrémé MILSANI", "Chocolat au lait CÔTE D'OR"]);
+  await expect(fenetre.locator(".promo-nom")).toHaveText([
+    "Lait demi-écrémé UHT LACTEL",
+    "Lait demi-écrémé MILSANI",
+    "Chocolat au lait CÔTE D'OR",
+  ]);
 
   // Leclerc, à venir, en lot : prix à l'unité, et le prix en prenant les 2.
   const aVenir = fenetre.locator(".promo").nth(0);
@@ -87,7 +91,9 @@ test("« Chips » trouve aussi les marques de chips, comme Pringles", async ({ p
   await seConnecter(page, COMPTES.un);
   await ajouter(page, "Chips");
   await page.getByRole("button", { name: "Voir 1 promo pour Chips" }).click();
-  await expect(page.getByRole("dialog", { name: "Promos pour « Chips »" }).locator(".promo-nom")).toHaveText(["Pringles"]);
+  await expect(page.getByRole("dialog", { name: "Promos pour « Chips »" }).locator(".promo-nom")).toHaveText([
+    "Pringles",
+  ]);
 });
 
 test("des promos trop anciennes ou incomplètes sont signalées", async ({ page, context }) => {

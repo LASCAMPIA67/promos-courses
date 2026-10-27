@@ -1,6 +1,14 @@
 import { describe, expect, test } from "vitest";
 
-import { cle, messageErreur, nettoyer, pluriel, preparerSaisie, trierArticles, trouverDoublon } from "../src/articles.js";
+import {
+  cle,
+  messageErreur,
+  nettoyer,
+  pluriel,
+  preparerSaisie,
+  trierArticles,
+  trouverDoublon,
+} from "../src/articles.js";
 
 const date = (iso) => ({ toMillis: () => Date.parse(iso) });
 

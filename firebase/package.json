@@ -4,14 +4,21 @@
   "description": "Règles d'accès Firestore de la liste de courses commune, et leurs tests.",
   "type": "module",
   "scripts": {
-    "test": "firebase emulators:exec --only firestore --project demo-promos-courses \"node --test tests/*.test.mjs\""
+    "test": "firebase emulators:exec --only firestore --project demo-promos-courses \"node --test tests/*.test.mjs\"",
+    "lint": "eslint .",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@firebase/rules-unit-testing": "^6.0.0",
+    "eslint": "^10.13.0",
     "firebase": "^13.1.0",
-    "firebase-tools": "^15.34.1"
+    "firebase-tools": "^15.34.1",
+    "globals": "^17.13.0",
+    "prettier": "3.9.10"
   },
   "engines": {
-    "node": ">=22"
+    "node": "^22.13.0 || >=24"
   }
 }

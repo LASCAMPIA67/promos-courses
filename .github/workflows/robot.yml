@@ -21,8 +21,7 @@ on:
         default: false
 
 permissions:
-  contents: write # pour pouvoir enregistrer promos.json dans le dépôt
-  actions: read # pour savoir si le robot a déjà été lancé aujourd'hui
+  contents: read
 
 concurrency:
   group: robot-promos
@@ -32,6 +31,9 @@ jobs:
     name: Récupérer les promos
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: write # pour pouvoir enregistrer promos.json dans le dépôt
+      actions: read # pour savoir si le robot a déjà été lancé aujourd'hui
     steps:
       # Un lancement programmé ne fait rien si le robot a déjà été lancé aujourd'hui (heure de
       # Paris), à la main ou par un autre horaire. Un lancement à la main passe toujours.
@@ -51,13 +53,15 @@ jobs:
             echo "deja_passe=oui" >> "$GITHUB_OUTPUT"
           fi
 
+      # Le jeton git reste disponible pendant ce travail : il sert à enregistrer promos.json (rien
+      # d'autre n'est envoyé ni partagé depuis ce travail).
       - name: Récupérer le dépôt
         if: steps.aujourdhui.outputs.deja_passe != 'oui'
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Installer Python
         if: steps.aujourdhui.outputs.deja_passe != 'oui'
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.13"
           cache: pip
@@ -69,7 +73,14 @@ jobs:
 
       - name: Lancer le robot
         if: steps.aujourdhui.outputs.deja_passe != 'oui'
-        run: python -m robot_promos ${{ inputs.sans_cache && '--sans-cache' || '' }}
+        env:
+          SANS_CACHE: ${{ inputs.sans_cache }}
+        run: |
+          if [ "$SANS_CACHE" = "true" ]; then
+            python -m robot_promos --sans-cache
+          else
+            python -m robot_promos
+          fi
 
       - name: Enregistrer promos.json
         if: steps.aujourdhui.outputs.deja_passe != 'oui'

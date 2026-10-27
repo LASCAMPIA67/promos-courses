@@ -1,0 +1,6 @@
+# Fichiers construits ou produits par les outils : jamais mis en forme à la main.
+dist/
+dist-emulateurs/
+test-results/
+playwright-report/
+package-lock.json

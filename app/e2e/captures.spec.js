@@ -43,7 +43,9 @@ for (const theme of ["light", "dark"]) {
 
     if (theme === "light") {
       // Deux personnes, deux couleurs : une partie des articles est ajoutée depuis l'autre compte.
-      const autre = await (await page.context().browser().newContext({ baseURL: test.info().project.use.baseURL })).newPage();
+      const autre = await (
+        await page.context().browser().newContext({ baseURL: test.info().project.use.baseURL })
+      ).newPage();
       await servirPromos(autre.context());
       await seConnecter(autre, AUTRE);
       await (await choisirFiche(autre, "Alex", "Orange")).getByRole("button", { name: "Enregistrer" }).click();
@@ -84,7 +86,8 @@ for (const theme of ["light", "dark"]) {
       await page.mouse.move(boite.x + boite.width - 180, y, { steps: 10 });
       await page.mouse.up();
       await expect(page.getByRole("button", { name: "Supprimer Beurre doux" })).toBeVisible();
-      await page.waitForTimeout(300); // fin de l'animation
+      // eslint-disable-next-line playwright/no-wait-for-timeout -- la fin de l'animation, pour une image nette
+      await page.waitForTimeout(300);
       await page.screenshot({ path: `${DOSSIER}glisser.png` });
       await page.getByRole("button", { name: "Modifier Beurre doux" }).click(); // referme
     }
@@ -111,7 +114,8 @@ for (const theme of ["light", "dark"]) {
 
 test("capture du conseil d'installation (Safari sur iPhone)", async ({ browser }) => {
   const contexte = await browser.newContext({
-    userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 27_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.0 Mobile/15E148 Safari/604.1",
+    userAgent:
+      "Mozilla/5.0 (iPhone; CPU iPhone OS 27_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.0 Mobile/15E148 Safari/604.1",
     viewport: { width: 393, height: 852 },
     deviceScaleFactor: 2,
     locale: "fr-FR",

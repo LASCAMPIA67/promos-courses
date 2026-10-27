@@ -17,8 +17,30 @@ export const HEURES_AVANT_ALERTE = 36;
 
 // Petits mots et unités qui ne disent rien du produit.
 const MOTS_VIDES = new Set([
-  "a", "au", "aux", "avec", "d", "de", "des", "du", "en", "et", "l", "la", "le", "les", "ou", "par",
-  "pour", "sans", "sur", "un", "une", "cl", "kg", "ml",
+  "a",
+  "au",
+  "aux",
+  "avec",
+  "d",
+  "de",
+  "des",
+  "du",
+  "en",
+  "et",
+  "l",
+  "la",
+  "le",
+  "les",
+  "ou",
+  "par",
+  "pour",
+  "sans",
+  "sur",
+  "un",
+  "une",
+  "cl",
+  "kg",
+  "ml",
 ]);
 
 // Mots que seul l'accent distingue d'un autre : « pâté » n'est pas « pâte », « glacé » pas « glace ».
@@ -192,7 +214,10 @@ function trouver(index, motsCherches, aujourdhui, correspond) {
 export function articleDepuisPromo(offre, aujourdhui) {
   const nom = joliNom(offre.produit).slice(0, 100).trim();
   const prix = explicationPrix(offre).prix ?? offre.reduction;
-  return { nom, note: [enseigne(offre), prix, periodeCourte(offre, aujourdhui)].filter(Boolean).join(" · ").slice(0, 200) };
+  return {
+    nom,
+    note: [enseigne(offre), prix, periodeCourte(offre, aujourdhui)].filter(Boolean).join(" · ").slice(0, 200),
+  };
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -244,7 +269,8 @@ export function periodeCourte(offre, aujourdhui) {
 export function periode(offre, aujourdhui) {
   const { date_debut: debut, date_fin: fin } = offre;
   const demain = lendemain(aujourdhui);
-  if (debut && debut > aujourdhui) return debut === demain ? "À partir de demain" : `À partir du ${formaterJour(debut)}`;
+  if (debut && debut > aujourdhui)
+    return debut === demain ? "À partir de demain" : `À partir du ${formaterJour(debut)}`;
   if (!fin) return "";
   if (fin === aujourdhui) return "Dernier jour aujourd'hui";
   if (fin === demain) return "Jusqu'à demain";
@@ -322,7 +348,9 @@ const SIGLES = new Set(["aoc", "aop", "hd", "igp", "led", "pc", "tv", "uht", "us
 
 /** « LAIT DEMI-ÉCRÉMÉ UHT » → « Lait demi-écrémé UHT » (les noms tout en majuscules crient). */
 export function joliNom(texte) {
-  const nom = String(texte ?? "").replace(/\s+/g, " ").trim();
+  const nom = String(texte ?? "")
+    .replace(/\s+/g, " ")
+    .trim();
   if (/\p{Ll}/u.test(nom) || !/\p{Lu}{2}/u.test(nom)) return nom;
   const minuscules = nom
     .toLocaleLowerCase("fr-FR")
@@ -351,7 +379,8 @@ export function explicationPrix(offre) {
   const reduction = (offre.reduction ?? "").replace(/\s*avec Lidl Plus$/i, "");
   const euros = (montant) => (montant == null ? null : formaterPrix(montant));
   // Prix du lot, sauf s'il est douteux (« -50 % sur le 2e » au même prix qu'un seul : erreur du catalogue).
-  const lotFiable = offre.lot?.prix != null && (offre.prix == null || offre.lot.prix > offre.prix || /offert/i.test(reduction));
+  const lotFiable =
+    offre.lot?.prix != null && (offre.prix == null || offre.lot.prix > offre.prix || /offert/i.test(reduction));
   const auKiloDuLot =
     lotFiable && offre.lot.prix_unitaire != null && offre.unite && offre.unite !== "pièce"
       ? ` (${formaterPrixUnitaire(offre.lot.prix_unitaire, offre.unite)})`
@@ -412,7 +441,14 @@ export function explicationPrix(offre) {
       avantage: `${reduction ? `${reduction}, d` : "D"}éjà déduit`,
     };
   }
-  return { genre: "aucun", prix: euros(offre.prix), mention: null, barre: null, unitaire: prixUnitaire(offre), avantage: null };
+  return {
+    genre: "aucun",
+    prix: euros(offre.prix),
+    mention: null,
+    barre: null,
+    unitaire: prixUnitaire(offre),
+    avantage: null,
+  };
 }
 
 /**

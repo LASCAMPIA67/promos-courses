@@ -85,7 +85,8 @@ def test_deuxieme_produit_moins_cher():
         CATALOGUE,
     )
     assert o["reduction"] == "-60 % sur le 2e"
-    assert o["prix"] == 3.77 and o["prix_unitaire"] == 16.76
+    assert o["prix"] == 3.77
+    assert o["prix_unitaire"] == 16.76
     assert o["lot"] == {"quantite": 2, "prix": 5.28, "prix_unitaire": 11.73}
 
 
@@ -121,7 +122,8 @@ def test_offre_sur_toute_une_marque():
         CATALOGUE,
     )
     assert o["produit"] == "Tous les produits BONNE MAMAN présents en magasin"
-    assert o["prix"] is None and o["prix_unitaire"] is None
+    assert o["prix"] is None
+    assert o["prix_unitaire"] is None
     assert o["reduction"] == "-60 % sur le 2e"
 
 

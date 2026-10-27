@@ -25,7 +25,7 @@ import {
 } from "../src/promos.js";
 
 // Les espaces insécables des nombres et des dates françaises deviennent de simples espaces.
-const simple = (texte) => texte.replace(/[  ]/g, " ");
+const simple = (texte) => texte.replace(/[\u00a0\u202f]/g, " ");
 
 const AUJOURDHUI = "2026-10-27"; // un mardi
 
@@ -50,7 +50,13 @@ function offre(champs) {
 
 const OFFRES = [
   offre({ id: "chocolat", produit: "CHOCOLAT AU LAIT", marque: "CÔTE D'OR", source: "leclerc", prix: 2.15 }),
-  offre({ id: "lait-uht", produit: "LAIT DEMI-ÉCRÉMÉ UHT", source: "leclerc", date_debut: "2026-10-29", date_fin: "2026-11-04" }),
+  offre({
+    id: "lait-uht",
+    produit: "LAIT DEMI-ÉCRÉMÉ UHT",
+    source: "leclerc",
+    date_debut: "2026-10-29",
+    date_fin: "2026-11-04",
+  }),
   offre({ id: "lait", produit: "Lait demi-écrémé", marque: "MILSANI", prix: 0.89 }),
   offre({ id: "laitue", produit: "Laitue", prix: 0.79 }),
   offre({ id: "beurre", produit: "Beurre doux", date_debut: "2026-10-15", date_fin: "2026-10-21" }),
@@ -141,7 +147,14 @@ describe("rechercherPromos", () => {
   });
 
   test("rien à chercher : toutes les promos, celles en cours d'abord", () => {
-    expect(ids(rechercherPromos(index, "  ", AUJOURDHUI))).toEqual(["chocolat", "lait", "laitue", "nutella", "oeufs", "lait-uht"]);
+    expect(ids(rechercherPromos(index, "  ", AUJOURDHUI))).toEqual([
+      "chocolat",
+      "lait",
+      "laitue",
+      "nutella",
+      "oeufs",
+      "lait-uht",
+    ]);
     expect(ids(rechercherPromos(index, "", AUJOURDHUI, { magasin: "leclerc" }))).toEqual(["chocolat", "lait-uht"]);
     expect(rechercherPromos(null, "lait", AUJOURDHUI)).toEqual([]);
   });
@@ -185,7 +198,10 @@ describe("familles de produits", () => {
   });
 
   test("regroupe les mots : une famille en plusieurs mots compte pour un", () => {
-    expect(regrouper(motsCles("Papier toilette doux")).map(({ mots }) => mots.join(" "))).toEqual(["papier toilette", "dou"]);
+    expect(regrouper(motsCles("Papier toilette doux")).map(({ mots }) => mots.join(" "))).toEqual([
+      "papier toilette",
+      "dou",
+    ]);
     expect(regrouper(motsCles("Chips paprika"))[0].equivalents).toContainEqual(["pringle"]);
     expect(regrouper(motsCles("Lait"))).toEqual([{ mots: ["lait"], equivalents: [] }]);
   });
@@ -207,10 +223,25 @@ describe("Leclerc d'abord", () => {
 });
 
 describe("explicationPrix : où va la réduction", () => {
-  const texte = (e) => ({ ...e, prix: e.prix && simple(e.prix), barre: e.barre && simple(e.barre), avantage: e.avantage && simple(e.avantage) });
+  const texte = (e) => ({
+    ...e,
+    prix: e.prix && simple(e.prix),
+    barre: e.barre && simple(e.barre),
+    avantage: e.avantage && simple(e.avantage),
+  });
 
   test("Ticket E.Leclerc : on paie le prix plein, la réduction revient sur la carte", () => {
-    const e = texte(explicationPrix(offre({ source: "leclerc", prix: 2.76, ancien_prix: 3.95, reduction: "30 % en Ticket E.Leclerc", carte_fidelite: true })));
+    const e = texte(
+      explicationPrix(
+        offre({
+          source: "leclerc",
+          prix: 2.76,
+          ancien_prix: 3.95,
+          reduction: "30 % en Ticket E.Leclerc",
+          carte_fidelite: true,
+        }),
+      ),
+    );
     expect(e).toMatchObject({ genre: "carte-leclerc", prix: "3,95 €", mention: "en caisse", barre: null });
     expect(e.avantage).toBe("1,19 € (30 %) rendus sur la carte · revient à 2,76 €");
   });
@@ -222,29 +253,47 @@ describe("explicationPrix : où va la réduction", () => {
   });
 
   test("réduction réservée à la carte E.Leclerc, mais en caisse", () => {
-    const e = texte(explicationPrix(offre({ source: "leclerc", prix: 5.25, ancien_prix: 7, reduction: "-25 %", carte_fidelite: true })));
+    const e = texte(
+      explicationPrix(
+        offre({ source: "leclerc", prix: 5.25, ancien_prix: 7, reduction: "-25 %", carte_fidelite: true }),
+      ),
+    );
     expect(e.genre).toBe("carte-caisse");
     expect(e.avantage).toBe("-25 %, déjà déduit");
   });
 
   test("lot : le prix à l'unité, et le prix en prenant plusieurs", () => {
     const lot = { quantite: 2, prix: 3.57, prix_unitaire: 6.56 };
-    const e = texte(explicationPrix(offre({ source: "leclerc", prix: 2.55, prix_unitaire: 9.38, unite: "kg", reduction: "-60 % sur le 2e", lot })));
+    const e = texte(
+      explicationPrix(
+        offre({ source: "leclerc", prix: 2.55, prix_unitaire: 9.38, unite: "kg", reduction: "-60 % sur le 2e", lot }),
+      ),
+    );
     expect(e).toMatchObject({ genre: "lot", prix: "2,55 €", mention: "l'unité" });
     expect(simple(e.unitaire)).toBe("9,38 €/kg");
     expect(e.avantage).toBe("-60 % sur le 2e : 3,57 € les 2 (6,56 €/kg)");
     // Un prix de lot douteux n'est pas affiché.
-    const douteux = offre({ prix: 8.69, reduction: "-50 % sur le 2e", lot: { quantite: 2, prix: 8.69, prix_unitaire: null } });
+    const douteux = offre({
+      prix: 8.69,
+      reduction: "-50 % sur le 2e",
+      lot: { quantite: 2, prix: 8.69, prix_unitaire: null },
+    });
     expect(explicationPrix(douteux).avantage).toBe("-50 % sur le 2e");
   });
 
   test("Lidl Plus : le prix avec l'appli, et sans", () => {
-    const e = texte(explicationPrix(offre({ prix: 1.99, ancien_prix: 2.49, reduction: "-20 % avec Lidl Plus", carte_fidelite: true })));
+    const e = texte(
+      explicationPrix(
+        offre({ prix: 1.99, ancien_prix: 2.49, reduction: "-20 % avec Lidl Plus", carte_fidelite: true }),
+      ),
+    );
     expect(e).toMatchObject({ genre: "lidl-plus", prix: "1,99 €", mention: "avec Lidl Plus" });
     expect(e.avantage).toBe("Sans l'appli : 2,49 €");
     expect(explicationPrix(offre({ prix: 0.99, carte_fidelite: true })).avantage).toBe("À scanner en caisse");
     const lot = { quantite: 2, prix: 3.59, prix_unitaire: 8.98 };
-    const enLot = texte(explicationPrix(offre({ prix: 2.39, reduction: "-50 % sur le 2e avec Lidl Plus", carte_fidelite: true, lot })));
+    const enLot = texte(
+      explicationPrix(offre({ prix: 2.39, reduction: "-50 % sur le 2e avec Lidl Plus", carte_fidelite: true, lot })),
+    );
     expect(enLot.avantage).toBe("-50 % sur le 2e : 3,59 € les 2");
   });
 
@@ -255,16 +304,20 @@ describe("explicationPrix : où va la réduction", () => {
 
 describe("resumeDescription", () => {
   test("retire ce qui répète le prix", () => {
-    expect(resumeDescription("4 tranches. 140 g.Le kg : 11,36 €.Par 2 (280 g) : 2,38 € au lieu de 3,18 €.Le kg : 8,50 €")).toBe(
-      "4 tranches · 140 g",
-    );
-    expect(resumeDescription("250 g (1 kg = 7,96 €) avec Lidl Plus au lieu de 2,49 € (1 kg = 9,96 €) Saveur barbecue")).toBe(
-      "250 g · Saveur barbecue",
-    );
     expect(
-      resumeDescription("Le produit de 75 cl : 3,99 € (1 L = 5,32 €) Les 3 produits dont 1 OFFERT : 7,98 € (1 L = 3,55 €) au lieu de 11,97 € (1 L = 5,32 €) 12,5 % Vol"),
+      resumeDescription("4 tranches. 140 g.Le kg : 11,36 €.Par 2 (280 g) : 2,38 € au lieu de 3,18 €.Le kg : 8,50 €"),
+    ).toBe("4 tranches · 140 g");
+    expect(
+      resumeDescription("250 g (1 kg = 7,96 €) avec Lidl Plus au lieu de 2,49 € (1 kg = 9,96 €) Saveur barbecue"),
+    ).toBe("250 g · Saveur barbecue");
+    expect(
+      resumeDescription(
+        "Le produit de 75 cl : 3,99 € (1 L = 5,32 €) Les 3 produits dont 1 OFFERT : 7,98 € (1 L = 3,55 €) au lieu de 11,97 € (1 L = 5,32 €) 12,5 % Vol",
+      ),
     ).toBe("75 cl · 12,5 % Vol");
-    expect(resumeDescription("8/9 parts. 300 g.Le kg : 56,53 €. Même promotion disponible sur d'autres produits")).toBe("8/9 parts · 300 g");
+    expect(resumeDescription("8/9 parts. 300 g.Le kg : 56,53 €. Même promotion disponible sur d'autres produits")).toBe(
+      "8/9 parts · 300 g",
+    );
   });
 
   test("garde le reste tel quel", () => {
@@ -276,7 +329,10 @@ describe("resumeDescription", () => {
 
 describe("articleDepuisPromo", () => {
   test("nom du produit, et une note courte : où, combien, jusqu'à quand", () => {
-    const article = articleDepuisPromo(offre({ produit: "LAIT DEMI-ÉCRÉMÉ UHT", source: "leclerc", prix: 6.12 }), AUJOURDHUI);
+    const article = articleDepuisPromo(
+      offre({ produit: "LAIT DEMI-ÉCRÉMÉ UHT", source: "leclerc", prix: 6.12 }),
+      AUJOURDHUI,
+    );
     expect(article.nom).toBe("Lait demi-écrémé UHT");
     expect(simple(article.note)).toBe("Leclerc · 6,12 € · jusqu'au 28 oct.");
   });
@@ -310,7 +366,9 @@ describe("dates", () => {
 
   test("période en court, pour la note d'un article", () => {
     expect(simple(periodeCourte(offre({ date_fin: "2026-10-31" }), AUJOURDHUI))).toBe("jusqu'au 31 oct.");
-    expect(simple(periodeCourte(offre({ date_debut: "2026-11-01", date_fin: "2026-11-07" }), AUJOURDHUI))).toBe("dès le 1er nov.");
+    expect(simple(periodeCourte(offre({ date_debut: "2026-11-01", date_fin: "2026-11-07" }), AUJOURDHUI))).toBe(
+      "dès le 1er nov.",
+    );
     expect(periodeCourte(offre({ date_debut: null, date_fin: null }), AUJOURDHUI)).toBe("");
   });
 
@@ -380,7 +438,9 @@ describe("affichage", () => {
   });
 
   test("explication du problème d'un magasin", () => {
-    expect(phraseSource({ nom: "E.Leclerc Geispolsheim", etat: "erreur" })).toBe("Promos E.Leclerc Geispolsheim pas à jour.");
+    expect(phraseSource({ nom: "E.Leclerc Geispolsheim", etat: "erreur" })).toBe(
+      "Promos E.Leclerc Geispolsheim pas à jour.",
+    );
     expect(phraseSource({ nom: "Lidl Lingolsheim", etat: "partiel" })).toBe("Promos Lidl Lingolsheim incomplètes.");
   });
 });

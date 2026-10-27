@@ -1,5 +1,6 @@
 """Téléchargement poli : respect de robots.txt, pauses entre les requêtes, nouvelles tentatives."""
 
+import contextlib
 import re
 import time
 from urllib.parse import urlsplit
@@ -92,10 +93,8 @@ def lire_robots(texte):
         if cle in ("allow", "disallow") and valeur:
             regles.append((cle == "allow", valeur))
         elif cle == "crawl-delay":
-            try:
+            with contextlib.suppress(ValueError):
                 delai = float(valeur)
-            except ValueError:
-                pass
     return regles, delai
 
 

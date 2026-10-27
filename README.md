@@ -256,6 +256,8 @@ cd app && npm ci
 npm run dev                       # appli sur l'ordinateur (vraie base Firebase !)
 npm test                          # tests de logique
 npm run e2e                       # scénarios réels sur l'émulateur Firebase
+npm run lint                      # pièges courants (ESLint)
+npm run format:check              # mise en forme (Prettier)
 ```
 
 Structure du dépôt :
@@ -288,11 +290,12 @@ promos-courses/
     ├── tests.yml                   ← vérification du code du robot
     ├── regles.yml                  ← vérification des règles Firebase
     ├── appli.yml                   ← tests et publication de l'appli
+    ├── codeql.yml                  ← analyse de sécurité du code (CodeQL)
     └── publication.yml             ← publication des versions
 ```
 
-Le guide complet (organisation, ajout d'une source, publication) est dans
-[CONTRIBUTING.md](CONTRIBUTING.md).
+Le guide complet (organisation, outils de qualité et de sécurité, ajout d'une source, publication)
+est dans [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Versions
 

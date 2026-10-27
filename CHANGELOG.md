@@ -23,6 +23,12 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
   rappelle qui a quelle couleur. Les fiches sont dans Firebase (nouvelle collection `membres`),
   jamais dans ce dépôt ; sans fiche, une couleur est donnée d'office.
 - Tests : 5 tests de logique, 4 tests des règles et 1 scénario réel de plus ; capture « Mon compte ».
+- **Qualité du code**, d'après les documentations officielles : ESLint (avec les règles de
+  Playwright pour les scénarios) et Prettier pour l'appli et les tests des règles, vérifiés sur
+  GitHub ; règles Ruff étendues pour le robot (sécurité, dates, simplifications, pytest) ; version de
+  Node.js notée dans `.nvmrc`. Voir [CONTRIBUTING.md](CONTRIBUTING.md#qualité-et-sécurité-du-code).
+- **Analyse de sécurité CodeQL** (Python, JavaScript et workflows), chaque semaine et à chaque
+  modification.
 
 ### Modifié
 
@@ -35,6 +41,9 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 - Règles d'accès : la collection `membres` n'accepte que le prénom (1 à 30 caractères) et une des
   six couleurs, et chacun ne peut écrire que sa propre fiche.
+- Workflows GitHub : actions fixées sur un commit précis, droits du jeton réduits au nécessaire pour
+  chaque travail, jeton git non conservé quand il ne sert pas, valeur saisie à la main passée par une
+  variable d'environnement.
 
 ## [0.6.0] - 2026-10-27
 
