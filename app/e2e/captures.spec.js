@@ -3,24 +3,23 @@
 
 import { expect, test } from "@playwright/test";
 
-const PROJET = "demo-promos-courses";
-const COMPTE = { uid: "ElRK8CEajUMQmtajHXv5qZVVT6G2", email: "emilio@exemple.test", motDePasse: "motdepasse-1" };
+import { COMPTES, creerComptes, viderLaBase } from "./outils.js";
+import { servirPromos } from "./promos-exemple.js";
+
+const COMPTE = COMPTES.un;
 const DOSSIER = new URL("../../docs/captures/", import.meta.url).pathname;
 
 test.skip(!process.env.CAPTURES, "captures seulement à la demande (CAPTURES=1)");
 test.use({ deviceScaleFactor: 2 });
 
 test.beforeAll(async ({ request }) => {
-  await request.delete(`http://127.0.0.1:9099/emulator/v1/projects/${PROJET}/accounts`);
-  await request.post(`http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/projects/${PROJET}/accounts`, {
-    headers: { Authorization: "Bearer owner" },
-    data: { localId: COMPTE.uid, email: COMPTE.email, password: COMPTE.motDePasse },
-  });
-  await request.delete(`http://127.0.0.1:8080/emulator/v1/projects/${PROJET}/databases/(default)/documents`);
+  await creerComptes(request, [COMPTE]);
+  await viderLaBase(request);
 });
 
 for (const theme of ["light", "dark"]) {
-  test(`captures en mode ${theme === "light" ? "clair" : "sombre"}`, async ({ page }) => {
+  test(`captures en mode ${theme === "light" ? "clair" : "sombre"}`, async ({ page, context }) => {
+    await servirPromos(context);
     await page.emulateMedia({ colorScheme: theme });
     const suffixe = theme === "light" ? "" : "-sombre";
     await page.goto("");
@@ -51,8 +50,14 @@ for (const theme of ["light", "dark"]) {
       await page.getByRole("checkbox", { name: "Pâtes : à acheter" }).click();
     }
     await expect(page.locator("#liste-caddie .article")).toHaveCount(2);
+    await expect(page.locator(".bouton-promos")).toHaveCount(3);
     await page.locator("#ajout-nom").blur();
     await page.screenshot({ path: `${DOSSIER}liste${suffixe}.png` });
+
+    await page.getByRole("button", { name: "Voir 2 promos pour Lait demi-écrémé" }).click();
+    await expect(page.getByRole("dialog", { name: "Promos pour « Lait demi-écrémé »" })).toBeVisible();
+    await page.screenshot({ path: `${DOSSIER}promos${suffixe}.png` });
+    await page.getByRole("button", { name: "Fermer" }).click();
 
     if (theme === "light") {
       await page.getByRole("button", { name: "Modifier Lait demi-écrémé" }).click();

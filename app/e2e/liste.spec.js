@@ -2,49 +2,15 @@
 
 import { expect, test } from "@playwright/test";
 
-const PROJET = "demo-promos-courses";
-const AUTH = "http://127.0.0.1:9099";
-const FIRESTORE = "http://127.0.0.1:8080";
-
-// Les deux premiers comptes ont les identifiants autorisés par firebase/firestore.rules.
-const COMPTES = {
-  un: { uid: "ElRK8CEajUMQmtajHXv5qZVVT6G2", email: "compte1@exemple.test", motDePasse: "motdepasse-1" },
-  deux: { uid: "U92gcS4EipUUtAP1QOBenzGg8Aj1", email: "compte2@exemple.test", motDePasse: "motdepasse-2" },
-  intrus: { uid: "un-autre-compte", email: "intrus@exemple.test", motDePasse: "motdepasse-3" },
-};
+import { COMPTES, aAcheter, ajouter, caddie, creerComptes, seConnecter, viderLaBase } from "./outils.js";
 
 test.beforeAll(async ({ request }) => {
-  await request.delete(`${AUTH}/emulator/v1/projects/${PROJET}/accounts`);
-  for (const compte of Object.values(COMPTES)) {
-    const reponse = await request.post(`${AUTH}/identitytoolkit.googleapis.com/v1/projects/${PROJET}/accounts`, {
-      headers: { Authorization: "Bearer owner" },
-      data: { localId: compte.uid, email: compte.email, password: compte.motDePasse },
-    });
-    expect(reponse.ok()).toBeTruthy();
-  }
+  await creerComptes(request);
 });
 
 test.beforeEach(async ({ request }) => {
-  await request.delete(`${FIRESTORE}/emulator/v1/projects/${PROJET}/databases/(default)/documents`);
+  await viderLaBase(request);
 });
-
-async function seConnecter(page, compte) {
-  await page.goto("");
-  await page.getByLabel("E-mail").fill(compte.email);
-  await page.getByLabel("Mot de passe").fill(compte.motDePasse);
-  await page.getByRole("button", { name: "Se connecter" }).click();
-  await expect(page.getByRole("heading", { name: "Liste de courses" })).toBeVisible();
-}
-
-async function ajouter(page, nom, quantite = "") {
-  const formulaire = page.locator("#form-ajout");
-  await formulaire.getByLabel("Article à ajouter").fill(nom);
-  if (quantite) await formulaire.getByLabel("Quantité (facultatif)").fill(quantite);
-  await formulaire.getByRole("button", { name: "Ajouter l'article" }).click();
-}
-
-const aAcheter = (page) => page.locator("#liste-a-acheter");
-const caddie = (page) => page.locator("#liste-caddie");
 
 test("un mauvais mot de passe est refusé avec un message clair", async ({ page }) => {
   await page.goto("");

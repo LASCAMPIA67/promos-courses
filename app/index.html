@@ -68,6 +68,8 @@
       <p id="message-ajout" class="message" role="status" hidden></p>
 
       <main class="contenu">
+        <p id="etat-promos" class="etat-promos" role="status" hidden></p>
+
         <section aria-labelledby="titre-a-acheter">
           <h2 id="titre-a-acheter" class="cache">À acheter</h2>
           <ul id="liste-a-acheter" class="liste"></ul>
@@ -86,7 +88,10 @@
         </section>
       </main>
 
-      <footer class="pied discret">Version <span id="version"></span></footer>
+      <footer class="pied discret">
+        <p id="info-promos"></p>
+        <p>Version <span id="version"></span></p>
+      </footer>
     </div>
 
     <!-- Modifier un article -->
@@ -106,6 +111,24 @@
         </div>
         <button type="button" id="supprimer-article" class="lien danger">Supprimer l'article</button>
       </form>
+    </dialog>
+
+    <!-- Les promos d'un article -->
+    <dialog id="fenetre-promos" class="fenetre-promos" aria-labelledby="titre-fenetre-promos">
+      <div class="entete-fenetre">
+        <div>
+          <h2 id="titre-fenetre-promos">Promos</h2>
+          <p id="resume-promos" class="discret"></p>
+        </div>
+        <button type="button" class="bouton-icone" data-fermer aria-label="Fermer">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+        </button>
+      </div>
+      <ul id="liste-promos" class="promos"></ul>
+      <p class="discret note-promos">
+        Les promos viennent des catalogues de Lidl Lingolsheim et E.Leclerc Geispolsheim. Vérifiez en
+        magasin : prix et disponibilité peuvent varier.
+      </p>
     </dialog>
 
     <!-- Mon compte -->

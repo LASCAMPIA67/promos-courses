@@ -4,7 +4,7 @@
 
 Chaque matin, un robot lit les catalogues de **Lidl Lingolsheim** et d'**E.Leclerc Geispolsheim**
 et range toutes les promos dans un fichier. Une appli sur nos deux iPhones garde notre liste de
-courses commune et la comparera à ces promos pour dépenser le moins possible, sans rien faire au
+courses commune et la compare à ces promos pour dépenser le moins possible, sans rien faire au
 quotidien.
 
 **👉 L'appli : https://lascampia67.github.io/promos-courses/** (réservée à nos deux comptes)
@@ -18,7 +18,7 @@ quotidien.
 
 > [!NOTE]
 > Projet personnel en construction (version `0.x`). Le robot et la liste de courses commune
-> fonctionnent ; la comparaison de la liste avec les promos est la prochaine étape.
+> fonctionnent ; la comparaison de la liste avec les promos est en test.
 
 ## Sommaire
 
@@ -44,7 +44,7 @@ quotidien.
 | 1 | Choisir les magasins | ✅ Fait |
 | 2 | Tester les sources de promos | ✅ Fait |
 | 3 | Créer le robot qui récupère les promos | ✅ Fait et validé (version 0.2.0) |
-| 4 | Créer l'appli (liste de courses commune + comparaison aux promos) | 🚧 En cours : liste commune validée (version 0.3.0) ; comparaison avec les promos en préparation |
+| 4 | Créer l'appli (liste de courses commune + comparaison aux promos) | 🚧 En cours : liste commune validée (version 0.3.0) ; comparaison avec les promos en test (version 0.4) |
 | 5 | L'installer sur nos deux iPhones | ⏳ À faire |
 
 Dernière mise à jour de ce tableau : 27/10/2026. Le détail des évolutions est dans le
@@ -71,8 +71,8 @@ flowchart LR
    conditions (carte de fidélité, « 2e à -60 % »…), dates.
 4. Il vérifie que tout est au bon format, puis enregistre le fichier [`promos.json`](promos.json)
    dans ce dépôt.
-5. L'appli lira ce fichier (étape suivante). La liste de courses, elle, n'est **pas** stockée ici (ce
-   dépôt est public) mais dans une base **Firebase** privée et gratuite, réservée à nos deux comptes :
+5. L'appli lit ce fichier et signale les articles de la liste qui sont en promo. La liste de courses,
+   elle, n'est **pas** stockée ici (ce dépôt est public) mais dans une base **Firebase** privée et gratuite, réservée à nos deux comptes :
    voir [docs/liste-commune.md](docs/liste-commune.md).
 
 ## Les magasins et les sources
@@ -90,11 +90,15 @@ Le détail (adresses consultées, choix faits, sources écartées) est dans
 Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
 **https://lascampia67.github.io/promos-courses/**
 
-| Liste | Modifier un article | Mode sombre |
+| Liste | Promos d'un article | Mode sombre |
 |---|---|---|
-| ![Liste de courses](docs/captures/liste.png) | ![Modifier un article](docs/captures/modifier.png) | ![Mode sombre](docs/captures/liste-sombre.png) |
+| ![Liste de courses avec les articles en promo](docs/captures/liste.png) | ![Les promos du lait chez Lidl et Leclerc](docs/captures/promos.png) | ![Mode sombre](docs/captures/liste-sombre.png) |
 
 - **Liste commune** : ce que l'un ajoute, coche ou supprime apparaît aussitôt sur l'autre téléphone.
+- **Promos** : un article en promo chez Lidl ou Leclerc porte une étiquette « 2 promos ». En la
+  touchant, on voit chaque promo : magasin, prix, ancien prix, réduction, prix au kilo, prix par lot,
+  carte de fidélité, et jusqu'à quand (ou à partir de quand, pour les promos à venir).
+- **Promos à jour** : l'appli prévient si le robot n'est pas passé ou si un magasin manque.
 - **Ajout rapide** avec quantité facultative ; un article déjà dans la liste est signalé.
 - **Caddie** : un article coché passe dans « Dans le caddie » ; « Tout retirer » vide le caddie.
 - **Marche sans réseau** (au fond du magasin) : les changements partent au retour du réseau.
@@ -147,7 +151,7 @@ Exemple d'une promo (extrait) :
 ```
 
 Ici, un cervelas coûte 2,65 € (6,63 €/kg) ; en en prenant 2 avec Lidl Plus, on paie 4,24 € (5,30 €/kg).
-C'est ce genre de calcul que l'appli fera pour savoir si le lot vaut vraiment le coup.
+L'appli affiche ces deux prix au kilo côte à côte pour juger si le lot vaut vraiment le coup.
 
 Tous les champs sont expliqués dans [docs/format-promos.md](docs/format-promos.md). Le format exact
 est décrit par un schéma JSON : [`promos.schema.json`](src/robot_promos/promos.schema.json).
@@ -161,7 +165,8 @@ est décrit par un schéma JSON : [`promos.schema.json`](src/robot_promos/promos
 - **Format vérifié** : avant d'être enregistré, `promos.json` est contrôlé par son schéma JSON.
 - **Tests automatiques** à chaque modification : plus de 50 tests pour le robot (workflow « Tests »),
   15 tests qui vérifient que la liste commune reste réservée à nos deux comptes (« Règles Firebase »),
-  et des scénarios réels de l'appli dans Chrome et Safari, avec deux téléphones simulés (« Appli »).
+  30 tests de logique de l'appli et 9 scénarios réels dans Chrome et Safari, avec deux téléphones
+  simulés et des promos d'exemple (« Appli »).
   Si un test de l'appli échoue, elle n'est pas publiée.
 - **Alerte** : en cas de problème, un avertissement s'affiche sur la page du lancement (onglet
   Actions) et GitHub envoie un e-mail si le lancement échoue.
@@ -190,7 +195,7 @@ de l'activité, mais GitHub ne le garantit pas. Si la date `mise_a_jour` de `pro
 2. si un bandeau jaune l'indique, cliquer sur **Enable workflow** ;
 3. lancer le robot à la main (voir [Au quotidien](#lancer-le-robot-à-la-main)).
 
-L'appli préviendra quand les données ont plus de 2 jours.
+L'appli le signale d'elle-même : un bandeau jaune apparaît quand les promos ont plus de 36 heures.
 </details>
 
 <details>
@@ -249,7 +254,7 @@ promos-courses/
 ├── tests/                          ← tests automatiques du robot
 ├── app/
 │   ├── index.html                  ← les écrans de l'appli
-│   ├── src/                        ← son fonctionnement (liste, connexion, apparence)
+│   ├── src/                        ← son fonctionnement (liste, promos, connexion, apparence)
 │   ├── tests/  e2e/                ← tests de logique et scénarios réels
 │   └── public/icones/              ← icônes (iPhone, onglet)
 ├── firebase/

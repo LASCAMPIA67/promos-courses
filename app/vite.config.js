@@ -5,6 +5,8 @@ import { readFileSync } from "node:fs";
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
+import { URL_PROMOS } from "./src/promos.js";
+
 const { version } = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8"));
 
 export default defineConfig({
@@ -42,6 +44,20 @@ export default defineConfig({
       workbox: {
         navigateFallback: "index.html",
         globPatterns: ["**/*.{js,css,html,png,svg,webmanifest}"],
+        // Les promos : toujours les plus récentes quand il y a du réseau, sinon les dernières lues
+        // (au fond du magasin, sans réseau, on les a quand même).
+        runtimeCaching: [
+          {
+            urlPattern: new RegExp(`^${URL_PROMOS.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")}$`),
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "promos",
+              networkTimeoutSeconds: 10,
+              expiration: { maxEntries: 2 },
+              cacheableResponse: { statuses: [200] },
+            },
+          },
+        ],
       },
     }),
   ],

@@ -1,11 +1,15 @@
 # Le fichier `promos.json`
 
 `promos.json` est écrit chaque matin par le robot, à la racine du dépôt. C'est ce fichier que
-l'appli lira. Son format est décrit précisément (et vérifié à chaque passage) par le schéma
+l'appli lit, à l'adresse
+[`raw.githubusercontent.com/LASCAMPIA67/promos-courses/main/promos.json`](https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/main/promos.json).
+Son format est décrit précisément (et vérifié à chaque passage) par le schéma
 [`src/robot_promos/promos.schema.json`](../src/robot_promos/promos.schema.json).
 
 > **Version du format : 2.** Le champ `format` change si la structure du fichier change d'une façon
 > que l'appli doit connaître. Voir le [journal des versions](../CHANGELOG.md).
+> L'appli refuse un fichier d'un autre format (elle affiche « Promos indisponibles ») : un changement
+> de format doit donc être publié **en même temps** qu'une appli qui sait le lire.
 
 ## Vue d'ensemble
 
@@ -77,11 +81,20 @@ l'appli lira. Son format est décrit précisément (et vérifié à chaque passa
 | `image` | | Photo du produit (Leclerc) ou de la page du prospectus (Lidl). |
 | `page` | `3` | Numéro de page dans le prospectus (Lidl). |
 
-## Conseils pour l'appli
+## Comment l'appli s'en sert
 
-- **Comparer au kilo** : utiliser `prix_unitaire` (un article) et `lot.prix_unitaire` (si on achète le
-  lot). Un lot moins cher au kilo n'est intéressant que si on consomme vraiment la quantité.
-- **Promos à venir** : `date_debut` après aujourd'hui.
-- **Fraîcheur des données** : si `mise_a_jour` date de plus de 2 jours, prévenir (le robot est peut-être
-  arrêté : voir le README, section « Dépannage »).
-- **Sources en panne** : afficher la `remarque` des sources dont l'`etat` n'est pas `ok`.
+Le code est dans [`app/src/promos.js`](../app/src/promos.js) ; le détail côté utilisateur est dans
+[appli.md](appli.md#les-promos).
+
+- **Trouver les promos d'un article** : chaque mot de l'article (« lait », « demi-écrémé ») doit se
+  retrouver dans `produit` ou `marque`, sans tenir compte des majuscules, des accents ni du pluriel.
+- **Promos terminées** (`date_fin` passée) : ignorées. **Promos à venir** (`date_debut` après
+  aujourd'hui) : affichées avec « À partir du… ».
+- **Comparer au kilo** : `prix_unitaire` (un article) et `lot.prix_unitaire` (si on achète le lot) sont
+  affichés côte à côte. Un lot moins cher au kilo n'est intéressant que si on consomme vraiment la
+  quantité.
+- **Fraîcheur des données** : si `mise_a_jour` date de plus de 36 heures (le robot a manqué au moins un
+  passage), un bandeau jaune prévient que les promos ont pu changer (voir le README, section
+  « Dépannage »).
+- **Sources en difficulté** : pour chaque source dont l'`etat` n'est pas `ok`, l'appli signale que les
+  promos de ce magasin sont incomplètes (`partiel`) ou indisponibles (`erreur`).

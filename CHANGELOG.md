@@ -14,6 +14,19 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+### Ajouté
+
+- **Appli 0.4 : la liste comparée aux promos.** Les articles en promo chez Lidl ou Leclerc portent une
+  étiquette « 2 promos » ; en la touchant, le détail de chaque promo : magasin, prix, ancien prix,
+  réduction, prix au kilo, prix par lot, carte de fidélité, dates (promos en cours et à venir), lien
+  vers le catalogue. Le nombre d'articles en promo s'affiche en haut de la liste.
+- Recherche des promos qui ignore majuscules, accents et pluriel (« Œufs » trouve « 20 oeufs frais »),
+  sans confondre deux mots proches (« Lait » ne trouve pas « Laitue »).
+- Promos gardées sur le téléphone pour fonctionner sans réseau ; bandeau si elles sont trop anciennes
+  (robot pas passé depuis plus de 36 heures), si un magasin manque ou si elles sont indisponibles.
+- Tests : 20 tests de logique et 3 scénarios réels de plus (promos d'exemple aux dates du jour).
+- Captures d'écran des promos (modes clair et sombre).
+
 ## [0.3.0] - 2026-10-27
 
 ### Ajouté
