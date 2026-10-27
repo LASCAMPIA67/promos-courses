@@ -72,6 +72,16 @@ export function suivreMembres(db, rappel, enCasErreur) {
   );
 }
 
+/** Suit les rayons corrigés à la main pour le foyer (réglage « rayons ») : `rappel` reçoit { nom: rayon }. */
+export function suivreCorrectionsRayons(db, rappel, enCasErreur) {
+  return onSnapshot(doc(db, "reglages", "rayons"), (instantane) => rappel(instantane.data() ?? {}), enCasErreur);
+}
+
+/** Retient le rayon d'un article pour le foyer : `cle` est le nom réduit à ses mots (voir rayons.js). */
+export function corrigerRayon(db, cle, rayon) {
+  return setDoc(doc(db, "reglages", "rayons"), { [cle]: rayon }, { merge: true });
+}
+
 /** Enregistre sa propre fiche : { prenom, couleur }. */
 export function enregistrerMembre(db, uid, fiche) {
   return setDoc(doc(db, "membres", uid), fiche);

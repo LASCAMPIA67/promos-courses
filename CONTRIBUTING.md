@@ -84,6 +84,8 @@ Une fois sur `main`, le workflow « Appli » teste l'appli puis la publie sur Gi
 | [ESLint](https://eslint.org/docs/latest/) | Pièges courants du JavaScript ; pour les scénarios, les règles officielles de Playwright. | `app/eslint.config.js`, `firebase/eslint.config.js` |
 | [Prettier](https://prettier.io/docs/) | Mise en forme du JavaScript, du HTML et du CSS (lignes de 120 caractères, comme Ruff). | `.prettierrc.json` |
 | [EditorConfig](https://editorconfig.org) | Encodage, fins de ligne, indentation, pour tous les éditeurs. | `.editorconfig` |
+| [axe](https://github.com/dequelabs/axe-core) | Accessibilité de chaque écran de l'appli (WCAG 2.2 AA), en mode clair et sombre : contrastes, noms lus par VoiceOver, champs. | `app/e2e/accessibilite.spec.js`, workflow « Appli » |
+| [Lighthouse](https://developer.chrome.com/docs/lighthouse) | Rapidité, accessibilité et bonnes pratiques de l'appli construite, sur un téléphone simulé. | `app/lighthouserc.json`, workflow « Appli » |
 | [CodeQL](https://docs.github.com/fr/code-security/code-scanning) | Failles de sécurité du Python, du JavaScript et des workflows, chaque semaine et à chaque modification. | workflow « CodeQL », onglet **Security** |
 | [Dependabot](https://docs.github.com/fr/code-security/dependabot) | Mises à jour des outils et des actions GitHub, une fois par mois. | `.github/dependabot.yml` |
 

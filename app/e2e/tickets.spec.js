@@ -44,7 +44,7 @@ test("un ticket en photo : vu en grand sur les deux téléphones, corrigé, puis
   await expect(tickets(telephone2)).toContainText("garantie de la bouilloire");
 
   // En grand : la photo, allégée mais à sa taille (300 pixels de large : rien à réduire).
-  await telephone2.getByRole("button", { name: /^Ouvrir le ticket Lidl du / }).click();
+  await telephone2.getByRole("button", { name: /^Ouvrir le ticket Lidl · / }).click();
   const ticket = telephone2.getByRole("dialog", { name: /^Lidl, / });
   const image = ticket.getByRole("img", { name: "Photo du ticket de caisse" });
   await expect(image).toBeVisible();
@@ -90,7 +90,7 @@ test("un ticket en PDF (appli du magasin) : chaque page affichée, et partagé",
   await expect(fenetre.getByRole("radio", { name: "Lidl" })).toBeChecked(); // deviné d'après le nom
   await fenetre.getByRole("button", { name: "Enregistrer" }).click();
 
-  await page.getByRole("button", { name: /^Ouvrir le ticket Lidl du / }).click();
+  await page.getByRole("button", { name: /^Ouvrir le ticket Lidl · / }).click();
   const ticket = page.getByRole("dialog", { name: /^Lidl, / });
   const pagePdf = ticket.getByRole("img", { name: "Page 1 du ticket" });
   await expect(pagePdf).toBeVisible({ timeout: 20_000 });
@@ -166,7 +166,7 @@ test("sans réseau, le ticket est gardé sur le téléphone et envoyé au retour
   await telephone1.getByRole("dialog", { name: "Nouveau ticket" }).getByRole("button", { name: "Enregistrer" }).click();
   await expect(tickets(telephone1)).toContainText("envoi en cours…");
   // Il s'ouvre déjà, depuis le téléphone.
-  await telephone1.getByRole("button", { name: /^Ouvrir le ticket Leclerc du / }).click();
+  await telephone1.getByRole("button", { name: /^Ouvrir le ticket Leclerc · / }).click();
   await expect(telephone1.getByRole("img", { name: "Photo du ticket de caisse" })).toBeVisible();
   await telephone1.getByRole("button", { name: "Fermer" }).click();
 

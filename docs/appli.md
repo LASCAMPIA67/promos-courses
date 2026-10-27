@@ -15,13 +15,20 @@ Seuls nos deux comptes peuvent s'y connecter et voir la liste (voir
 
 Les captures sont faites avec des promos d'exemple et des prénoms fictifs (Camille en vert, Alex en orange).
 
-## Ce qu'elle sait faire (version 0.8)
+## Ce qu'elle sait faire (version 0.9)
 
 - **Se connecter** avec son e-mail et son mot de passe (une seule fois : la connexion reste active).
   Lien « Mot de passe oublié ? » pour recevoir un e-mail de changement de mot de passe.
 - **Ajouter un article** : écrire le nom (et, si on veut, la quantité), puis toucher **+** ou
   « OK » sur le clavier. Un article déjà dans la liste est signalé au lieu d'être ajouté en double
   (même écrit différemment : « Lait demi-écrémé » = « lait demi ecreme »).
+- **Rangée par rayon**, dans l'ordre où on traverse le magasin : fruits et légumes, boulangerie,
+  épicerie salée, épicerie sucrée, boissons, hygiène et beauté, entretien, bébé, animaux, viande et
+  poisson, frais, et le **surgelé en dernier** pour qu'il reste froid ; « Autres » pour ce que l'appli
+  ne reconnaît pas. Le rayon est deviné d'après le nom (« Chocolat au lait » va avec le chocolat,
+  « Lait au chocolat » avec le lait ; « Pringles » avec les chips). S'il est mal deviné, on le
+  change dans la fenêtre de l'article (« Rayon ») : c'est retenu pour ce nom d'article, sur les deux
+  téléphones (réglage `rayons`, voir [liste-commune.md](liste-commune.md)).
 - **Cocher** un article (le rond à gauche) : il passe dans « Dans le caddie ». Le décocher le remet
   dans la liste.
 - **Qui l'a ajouté, et quand** : sous le rond à cocher, une petite **pastille de couleur** dit qui
@@ -49,6 +56,11 @@ Les captures sont faites avec des promos d'exemple et des prénoms fictifs (Cami
 - **Se mettre à jour toute seule** : à chaque ouverture, elle vérifie si une nouvelle version est
   publiée et la prend, sans jamais recharger pendant qu'on écrit.
 - **Garder les tickets de caisse** (voir ci-dessous).
+- **Des gestes doux** : un article coché ou supprimé glisse et s'efface, celui qui arrive (ajouté,
+  coché, ou venu de l'autre téléphone) apparaît en douceur, les fenêtres s'ouvrent en fondu ; rien de
+  tout cela si l'iPhone est réglé sur « Réduire les animations ».
+- **Une jolie ouverture** : l'appli installée s'ouvre sur son logo (en clair ou en sombre) au lieu
+  d'un écran vide, puis la liste apparaît en fondu.
 - **Mode sombre** automatique, textes lisibles par VoiceOver, grandes zones à toucher.
 
 ## Les tickets de caisse
@@ -204,6 +216,7 @@ détails (« sans lactose », « grand format ») vont mieux dans la **note** de
 | [`app/src/main.js`](../app/src/main.js) | Le fonctionnement des écrans. |
 | [`app/src/liste.js`](../app/src/liste.js) | Lecture et modification de la liste dans Firebase. |
 | [`app/src/articles.js`](../app/src/articles.js) | Règles simples : nettoyage, doublons, tri, messages d'erreur. |
+| [`app/src/rayons.js`](../app/src/rayons.js) | Les rayons du magasin, dans l'ordre, et le rayon de chaque article d'après son nom. |
 | [`app/src/membres.js`](../app/src/membres.js) | Qui a ajouté quoi : couleur et prénom de chacun, date d'ajout en clair. |
 | [`app/src/tickets.js`](../app/src/tickets.js) | Les tickets de caisse : découpage du fichier, montant, date, classement par mois. |
 | [`app/src/fichiers.js`](../app/src/fichiers.js) | Photo allégée avant l'envoi, affichage en grand, partage. |
@@ -215,6 +228,7 @@ détails (« sans lactose », « grand format ») vont mieux dans la **note** de
 | [`app/src/style.css`](../app/src/style.css) | L'apparence (iPhone, mode sombre). |
 | [`app/vite.config.js`](../app/vite.config.js) | Construction de l'appli ([Vite](https://vite.dev)) et mode hors ligne / installable ([PWA](https://vite-pwa-org.netlify.app)). |
 | [`app/outils/generer_icones.py`](../app/outils/generer_icones.py) | Dessine les icônes de l'appli. |
+| [`app/outils/generer_ecrans.py`](../app/outils/generer_ecrans.py) | Dessine les écrans de démarrage de l'iPhone (un par taille d'écran, clair et sombre). |
 
 Aucune donnée n'est enregistrée ailleurs que dans Firebase et dans la mémoire du téléphone. Les
 prénoms et les couleurs, en particulier, ne sont que dans Firebase, jamais dans ce dépôt public. Les
@@ -227,6 +241,8 @@ que dans Firebase.
 |---|---|---|
 | Logique ([`app/tests`](../app/tests)) | Nettoyage des saisies, doublons, tri, messages d'erreur ; couleur et prénom de chacun, date d'ajout en clair ; tickets de caisse (découpage et recollage du fichier, montant, date, magasin deviné, classement par mois, taille des photos) ; recherche des promos (accents, pluriel, mots proches, marques, familles de produits, faux amis, début de mot, filtre par magasin), article créé depuis une promo, où va la réduction (caisse, lot, carte E.Leclerc, Lidl Plus), description sans les prix répétés, Leclerc d'abord, promos terminées ou à venir, dates, prix, fraîcheur des données ; quand proposer l'installation. | `npm test` |
 | Scénarios réels ([`app/e2e`](../app/e2e)) | Un navigateur à la taille d'un iPhone utilise l'appli branchée sur l'**émulateur Firebase** (jamais la vraie base), avec deux comptes et un [fichier de promos d'exemple](../app/e2e/promos-exemple.js) aux dates du jour : connexion refusée, ajout, doublon, cochage, modification, suppression, synchronisation en direct entre deux téléphones, mode hors connexion, refus d'un compte étranger, déconnexion, promo choisie avec « + Ajouter » affichée à droite de l'article (rien pour un article écrit à la main, promo retrouvée pour les articles des versions précédentes, « Promo terminée »), promos anciennes ou incomplètes, promos indisponibles puis retrouvées, conseil d'installation dans Safari sur iPhone, glisser pour supprimer avec « Annuler », « Chips » qui trouve Pringles, promos affichées en écrivant (Leclerc d'abord, ajout d'une promo ou du texte écrit, affichage par 30), prix expliqué (carte E.Leclerc, Lidl Plus), prénom et couleur choisis sur un téléphone et vus sur l'autre (pastille, heure d'ajout), tickets de caisse en photo et en PDF ([fichiers d'exemple](../app/e2e/fichiers-exemple.js) : vus en grand sur l'autre téléphone, corrigés, partagés, supprimés, proposés après « Tout retirer », sans réseau, refusés à un compte étranger). Sur GitHub, ils tournent dans Chrome **et Safari** (WebKit). | `npm run e2e` |
+| Accessibilité ([`app/e2e/accessibilite.spec.js`](../app/e2e/accessibilite.spec.js)) | Chaque écran (connexion, liste, recherche, promo, fenêtres, tickets), en mode clair et sombre, vérifié avec [axe](https://github.com/dequelabs/axe-core) selon les règles WCAG 2.2 niveau AA : contrastes, noms lus par VoiceOver, champs… | `npm run e2e` |
+| Rapidité ([Lighthouse](https://developer.chrome.com/docs/lighthouse)) | L'appli construite, mesurée sur un téléphone simulé : rapidité (85 sur 100 au moins), accessibilité (100), bonnes pratiques (95 au moins). Sur GitHub, à chaque modification (rapports gardés 14 jours). | `npm run build && npm run qualite` |
 | Captures d'écran | Régénère les images de cette page dans `docs/captures/`. | `npm run captures` |
 
 Commandes à lancer dans le dossier `app/` (Node.js 22 et Java 21 nécessaires), après `npm ci`.

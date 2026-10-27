@@ -52,7 +52,8 @@ export default defineConfig({
         globPatterns: ["**/*.{js,css,html,png,svg,webmanifest}"],
         // PDF.js (pour voir les tickets en PDF, 1,7 Mo) n'est pas installé d'avance avec l'appli :
         // il est téléchargé à la première ouverture d'un PDF, puis gardé (voir ci-dessous).
-        globIgnores: ["**/assets/pdf*"],
+        // Les écrans de démarrage ne servent qu'à l'installation sur l'iPhone : pas besoin de les garder.
+        globIgnores: ["**/assets/pdf*", "**/demarrage/**"],
         // Les promos : toujours les plus récentes quand il y a du réseau, sinon les dernières lues
         // (au fond du magasin, sans réseau, on les a quand même).
         runtimeCaching: [

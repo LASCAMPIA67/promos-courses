@@ -12,6 +12,7 @@
     "lint": "eslint .",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
+    "qualite": "lhci autorun",
     "e2e": "firebase emulators:exec --config ../firebase/firebase.json --only auth,firestore --project demo-promos-courses \"playwright test\"",
     "captures": "CAPTURES=1 firebase emulators:exec --config ../firebase/firebase.json --only auth,firestore --project demo-promos-courses \"playwright test e2e/captures.spec.js\""
   },
@@ -20,7 +21,9 @@
     "pdfjs-dist": "^6.4.299"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@eslint/js": "^10.0.1",
+    "@lhci/cli": "^0.15.1",
     "@playwright/test": "1.64.1",
     "eslint": "^10.13.0",
     "eslint-plugin-playwright": "^2.12.1",

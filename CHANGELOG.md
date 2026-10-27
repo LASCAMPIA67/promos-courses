@@ -14,6 +14,27 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+### Ajouté
+
+- **La liste rangée par rayon**, dans l'ordre où on traverse le magasin (fruits et légumes,
+  boulangerie, épiceries, boissons, hygiène, entretien, bébé, animaux, viande et poisson, frais, et
+  le surgelé en dernier). Le rayon est deviné d'après le nom de l'article et les familles de
+  produits ; un rayon mal deviné se change dans la fenêtre de l'article et c'est retenu pour le
+  foyer (réglage `reglages/rayons`).
+- **Des gestes doux** : un article coché ou supprimé glisse et s'efface, celui qui arrive apparaît en
+  douceur, les fenêtres s'ouvrent en fondu (rien si « Réduire les animations » est activé).
+- **Une jolie ouverture** : écrans de démarrage de l'iPhone (logo sur fond clair ou sombre, toutes
+  les tailles depuis l'iPhone X et le SE), puis la liste en fondu.
+- **Contrôle qualité automatique** : chaque écran est vérifié avec axe (accessibilité WCAG 2.2 AA,
+  mode clair et sombre) dans les scénarios réels, et l'appli construite est mesurée avec Lighthouse
+  (rapidité 93 à 97 sur 100, accessibilité et bonnes pratiques 100) à chaque modification.
+
+### Corrigé
+
+- Accessibilité : textes verts plus contrastés (liens, « Tout retirer », type de promo en mode
+  sombre) ; ce que lit VoiceOver commence par le texte affiché (articles, étiquette « Promo »,
+  tickets) ; le choix du fichier d'un ticket a un nom.
+
 ### Modifié
 
 - En bas de la liste, seule la version de l'appli reste : la phrase « Promos : aujourd'hui à… » est

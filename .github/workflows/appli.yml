@@ -97,6 +97,46 @@ jobs:
         with:
           path: app/dist
 
+  # Contrôle qualité de l'appli construite, avec Lighthouse (Google) : rapidité, accessibilité et
+  # bonnes pratiques de l'écran d'accueil. Ne bloque pas la publication ; les rapports sont gardés
+  # 14 jours (onglet du lancement → « Artifacts »).
+  qualite:
+    name: Contrôle qualité (Lighthouse)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Installer Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Installer les outils
+        run: npm ci
+
+      - name: Construire l'appli
+        run: npm run build
+
+      - name: Mesurer avec Lighthouse
+        run: npm run qualite
+
+      - name: Garder les rapports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: rapports-lighthouse
+          path: app/lighthouse
+          retention-days: 14
+
   publier:
     name: Publier sur GitHub Pages
     needs: verifier

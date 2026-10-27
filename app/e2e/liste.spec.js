@@ -26,14 +26,26 @@ test("ajouter, cocher, modifier et supprimer des articles", async ({ page }) => 
 
   await ajouter(page, "Lait demi-écrémé", "2 L");
   await ajouter(page, "Pain");
-  await expect(aAcheter(page).locator(".nom")).toHaveText(["Lait demi-écrémé", "Pain"]);
+  // Rangés par rayon, dans l'ordre du magasin : la boulangerie avant le frais.
+  await expect(aAcheter(page).locator(".titre-rayon")).toHaveText(["Boulangerie", "Frais"]);
+  await expect(aAcheter(page).locator(".nom")).toHaveText(["Pain", "Lait demi-écrémé"]);
   // Sous le nom : quand il a été ajouté, puis la quantité.
-  await expect(aAcheter(page).locator(".details").first()).toHaveText(/^\d\d:\d\d · 2 L$/);
+  await expect(aAcheter(page).locator(".article").filter({ hasText: "Lait" }).locator(".details")).toHaveText(
+    /^\d\d:\d\d · 2 L$/,
+  );
 
   // Un doublon est signalé au lieu d'être ajouté.
   await ajouter(page, "lait demi ecreme");
   await expect(page.locator("#message-ajout")).toHaveText("« Lait demi-écrémé » est déjà dans la liste.");
   await expect(aAcheter(page).locator(".article")).toHaveCount(2);
+
+  // Un rayon mal deviné se corrige, et c'est retenu pour ce nom d'article (sur les deux téléphones).
+  await page.getByRole("button", { name: "Modifier Pain" }).click();
+  const fenetrePain = page.getByRole("dialog", { name: "Modifier l'article" });
+  await expect(fenetrePain.getByLabel("Rayon")).toHaveValue("boulangerie");
+  await fenetrePain.getByLabel("Rayon").selectOption({ label: "Épicerie sucrée" });
+  await fenetrePain.getByRole("button", { name: "Enregistrer" }).click();
+  await expect(aAcheter(page).locator(".titre-rayon")).toHaveText(["Épicerie sucrée", "Frais"]);
 
   // Cocher : l'article passe dans le caddie.
   await page.getByRole("checkbox", { name: "Pain : à acheter" }).click();
@@ -163,7 +175,7 @@ test("chacun choisit son prénom et sa couleur : l'autre téléphone voit qui a 
   const ligne = aAcheter(telephone2).locator(".article").filter({ hasText: "Pommes" });
   await expect(ligne.locator(".pastille-membre")).toHaveAttribute("data-couleur", "rose");
   await expect(ligne.locator(".details")).toHaveText(/^\d\d:\d\d$/);
-  await telephone2.getByRole("button", { name: /^Modifier Pommes, ajouté par Camille aujourd'hui/ }).click();
+  await telephone2.getByRole("button", { name: /^Modifier Pommes.*, ajouté par Camille$/ }).click();
   await expect(telephone2.locator("#auteur-article")).toHaveText(/^Ajouté par Camille aujourd'hui à \d\d:\d\d$/);
   await telephone2.getByRole("button", { name: "Annuler" }).click();
 

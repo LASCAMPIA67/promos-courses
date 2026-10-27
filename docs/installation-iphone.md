@@ -7,7 +7,11 @@ Une fois installée :
 - elle marche **sans réseau** (au fond du magasin) avec la liste et les dernières promos ;
 - elle garde la connexion, même si on ne l'ouvre pas pendant des semaines (Safari, lui, peut effacer
   les données d'un site qu'on n'a pas visité depuis quelques jours) ;
-- elle se **met à jour toute seule** quand une nouvelle version est publiée.
+- elle se **met à jour toute seule** quand une nouvelle version est publiée ;
+- elle s'ouvre sur son **logo** (en clair ou en sombre) plutôt que sur un écran vide. Cet écran de
+  démarrage est enregistré par l'iPhone au moment de l'installation : sur une appli installée avant
+  la version 0.9, il n'apparaît qu'après l'avoir supprimée de l'écran d'accueil puis réinstallée
+  (il faut alors se reconnecter une fois ; la liste, elle, ne bouge pas).
 
 ![Le conseil d'installation affiché dans Safari](captures/installation.png)
 

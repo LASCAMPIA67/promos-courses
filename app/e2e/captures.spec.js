@@ -101,7 +101,7 @@ for (const theme of ["light", "dark"]) {
       await page.getByRole("button", { name: "Modifier Beurre doux" }).click(); // referme
     }
 
-    await page.getByRole("button", { name: /^Voir la promo de Lait demi-écrémé/ }).click();
+    await page.getByRole("button", { name: /^Voir la promo de Lait demi-écrémé/i }).click();
     await expect(page.getByRole("dialog", { name: "Promo pour « Lait demi-écrémé »" })).toBeVisible();
     await page.screenshot({ path: `${DOSSIER}promos${suffixe}.png` });
     await page.getByRole("button", { name: "Fermer" }).click();
@@ -143,7 +143,7 @@ for (const theme of ["light", "dark"]) {
       await page.locator("#liste-tickets").scrollIntoViewIfNeeded();
       await page.screenshot({ path: `${DOSSIER}tickets.png` });
 
-      await page.getByRole("button", { name: /^Ouvrir le ticket Leclerc du / }).click();
+      await page.getByRole("button", { name: /^Ouvrir le ticket Leclerc · / }).click();
       await expect(page.getByRole("img", { name: "Photo du ticket de caisse" })).toBeVisible();
       await page.screenshot({ path: `${DOSSIER}ticket.png` });
     }

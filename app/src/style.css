@@ -10,6 +10,7 @@
   --accent: #1d8348;
   --accent-fonce: #166a3a;
   --accent-doux: #e2f2e7;
+  --accent-texte: #146534;
   --sur-accent: #ffffff;
   --danger: #c0392b;
   --info: #1f5fbf;
@@ -39,6 +40,7 @@
     --accent: #3fb873;
     --accent-fonce: #34a062;
     --accent-doux: #1f3828;
+    --accent-texte: #5ccf8b;
     --sur-accent: #08140c;
     --danger: #ff6b5e;
     --info: #8ab4ff;
@@ -96,6 +98,7 @@ h2 {
 
 button,
 input,
+select,
 textarea {
   font: inherit;
   color: inherit;
@@ -141,6 +144,31 @@ textarea {
   box-shadow: var(--ombre);
 }
 
+/* Pendant le démarrage : le logo au centre exact de l'écran, comme l'écran de démarrage de l'iPhone. */
+.chargement {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.logo-demarrage {
+  box-shadow: none;
+  animation: respirer 1.6s ease-in-out 0.6s infinite;
+}
+
+@keyframes respirer {
+  50% {
+    transform: scale(0.94);
+    opacity: 0.85;
+  }
+}
+
+/* Chaque écran (connexion, liste) apparaît en fondu. */
+.ecran:not([hidden]) {
+  animation: fondu 0.25s ease-out;
+}
+
 .carte {
   width: min(100%, 400px);
   background: var(--surface);
@@ -168,6 +196,7 @@ label {
 }
 
 input,
+select,
 textarea {
   width: 100%;
   min-height: 48px;
@@ -187,6 +216,7 @@ textarea {
 }
 
 input:focus,
+select:focus,
 textarea:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-doux);
@@ -233,7 +263,7 @@ textarea:focus {
   background: none;
   border: 0;
   padding: 10px 4px;
-  color: var(--accent);
+  color: var(--accent-texte);
   font-weight: 600;
   cursor: pointer;
 }
@@ -278,7 +308,7 @@ svg {
 
 .message[data-genre="succes"] {
   background: var(--accent-doux);
-  color: var(--accent-fonce);
+  color: var(--accent-texte);
 }
 
 .bandeau {
@@ -314,7 +344,7 @@ svg {
 .conseil > svg {
   flex: 0 0 auto;
   margin-top: 2px;
-  color: var(--accent-fonce);
+  color: var(--accent-texte);
 }
 
 .conseil p {
@@ -326,7 +356,7 @@ svg {
 }
 
 .conseil a {
-  color: var(--accent-fonce);
+  color: var(--accent-texte);
   font-weight: 600;
 }
 
@@ -454,6 +484,26 @@ svg {
   display: none;
 }
 
+/* La liste rangée par rayon : un petit titre discret au-dessus de chaque groupe. */
+.rayons {
+  display: grid;
+  gap: 14px;
+}
+
+.rayons:empty {
+  display: none;
+}
+
+.titre-rayon {
+  margin: 0 0 6px;
+  padding-inline: 4px;
+  color: var(--discret);
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .article {
   position: relative;
   overflow: hidden;
@@ -529,7 +579,8 @@ svg {
   stroke-width: 3;
   transition:
     background 0.15s,
-    border-color 0.15s;
+    border-color 0.15s,
+    transform 0.12s;
 }
 
 .achete .case svg {
@@ -963,7 +1014,7 @@ dialog h2 {
   padding: 3px 9px;
   border-radius: 999px;
   background: var(--accent-doux);
-  color: var(--accent-fonce);
+  color: var(--accent-texte);
   font-size: 0.8rem;
   font-weight: 700;
 }
@@ -986,7 +1037,7 @@ dialog h2 {
 .lien-catalogue {
   flex: 0 0 auto;
   padding: 8px 0;
-  color: var(--accent);
+  color: var(--accent-texte);
   font-size: 0.82rem;
   font-weight: 600;
   text-decoration: none;
@@ -1011,7 +1062,7 @@ dialog h2 {
 
 .bouton-ajouter:disabled {
   background: var(--accent-doux);
-  color: var(--accent-fonce);
+  color: var(--accent-texte);
   cursor: default;
 }
 
@@ -1105,7 +1156,7 @@ dialog h2 {
   place-items: center;
   border-radius: 9px;
   background: var(--accent-doux);
-  color: var(--accent-fonce);
+  color: var(--accent-texte);
 }
 
 .icone-ticket svg {
@@ -1221,7 +1272,7 @@ dialog h2 {
 .choix-magasin input:checked + span {
   border-color: var(--accent);
   background: var(--accent-doux);
-  color: var(--accent-fonce);
+  color: var(--accent-texte);
 }
 
 .choix-magasin input:focus-visible + span {
@@ -1264,6 +1315,60 @@ dialog h2 {
 
 .actions-ticket .lien {
   padding-inline: 10px;
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* Des gestes doux */
+
+/* Un article qui part (coché, supprimé) glisse et s'efface ; celui qui arrive apparaît en douceur. */
+.article.part {
+  pointer-events: none;
+  animation: partir 0.18s ease-in forwards; /* DUREE_DEPART dans main.js */
+}
+
+.article.arrive {
+  animation: arriver 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes partir {
+  to {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+
+@keyframes arriver {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+/* Une fenêtre qui s'ouvre apparaît en douceur. */
+dialog[open] {
+  animation: apparaitre 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+dialog[open]::backdrop {
+  animation: fondu 0.2s ease-out;
+}
+
+@keyframes apparaitre {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
+@keyframes fondu {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Le rond coché se remplit d'un petit rebond. */
+.case:active svg {
+  transform: scale(0.88);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -42,7 +42,7 @@ test("un article ajouté depuis une promo l'affiche à droite ; écrit à la mai
   await expect(ligne(page, "Laitue").locator(".bouton-promos")).toHaveCount(0);
 
   // Le détail de cette promo-là, et d'elle seule.
-  await uht.getByRole("button", { name: /^Voir la promo de Lait demi-écrémé UHT/ }).click();
+  await uht.getByRole("button", { name: /^Voir la promo de Lait demi-écrémé UHT/i }).click();
   const fenetre = page.getByRole("dialog", { name: "Promo pour « Lait demi-écrémé UHT »" });
   const promo = fenetre.locator(".promo");
   await expect(promo).toHaveCount(1);
@@ -63,7 +63,7 @@ test("un article ajouté depuis une promo l'affiche à droite ; écrit à la mai
   await ajouterDepuisPromo(page, "lait", "Lait demi-écrémé");
   await expect(ligne(page, "Lait demi-écrémé").locator(".type-promo")).toHaveText("-15 % en caisse");
   await ligne(page, "Lait demi-écrémé")
-    .getByRole("button", { name: /^Voir la promo/ })
+    .getByRole("button", { name: /^Voir la promo/i })
     .click();
   const lidl = page.getByRole("dialog", { name: "Promo pour « Lait demi-écrémé »" }).locator(".promo");
   await expect(lidl.locator(".enseigne")).toHaveText("Lidl");
@@ -88,7 +88,7 @@ test("le prix dit clairement où va la réduction : carte E.Leclerc ou Lidl Plus
   await expect(ligne(page, "Bananes").locator(".type-promo")).toHaveText("-23 % Lidl Plus");
 
   await ligne(page, "Pain de mie complet")
-    .getByRole("button", { name: /^Voir la promo/ })
+    .getByRole("button", { name: /^Voir la promo/i })
     .click();
   const pain = page.getByRole("dialog", { name: "Promo pour « Pain de mie complet »" }).locator(".promo");
   await expect(pain.locator(".promo-prix")).toHaveText("2,35 €");
@@ -97,7 +97,7 @@ test("le prix dit clairement où va la réduction : carte E.Leclerc ou Lidl Plus
   await page.getByRole("button", { name: "Fermer" }).click();
 
   await ligne(page, "Bananes")
-    .getByRole("button", { name: /^Voir la promo/ })
+    .getByRole("button", { name: /^Voir la promo/i })
     .click();
   const bananes = page.getByRole("dialog", { name: "Promo pour « Bananes »" }).locator(".promo");
   await expect(bananes.locator(".promo-prix")).toHaveText("1,29 €");

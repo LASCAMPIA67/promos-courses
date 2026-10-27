@@ -12,11 +12,13 @@ import {
   ajouterArticle,
   ajouterTicket,
   cocherArticle,
+  corrigerRayon,
   enregistrerMembre,
   lireFichierTicket,
   modifierArticle,
   modifierTicket,
   suivreArticles,
+  suivreCorrectionsRayons,
   suivreMembres,
   suivreTickets,
   supprimerArticle,
@@ -43,6 +45,7 @@ import {
   sourcesEnDifficulte,
   typePromo,
 } from "./promos.js";
+import { AUTRES, RAYONS, cleRayon, rangerParRayon, rayonDe } from "./rayons.js";
 import {
   MAGASINS_TICKET,
   TICKETS_SOUS_LA_LISTE,
@@ -69,6 +72,9 @@ const etat = {
   arreterSuivi: null,
   membres: {}, // { uid: { prenom, couleur } } : qui est qui, pour les pastilles de couleur
   arreterMembres: null,
+  places: null, // Map id → « liste » ou « caddie » au dernier dessin : ce qui vient d'arriver s'anime
+  correctionsRayons: {}, // { nom réduit : rayon } : les rayons corrigés à la main (voir rayons.js)
+  arreterCorrections: null,
   tickets: [], // les tickets de caisse (fiches, sans leur fichier)
   arreterTickets: null,
   ticketOuvert: null, // { ticket, blob, liberer } : le ticket affiché en grand
@@ -101,9 +107,13 @@ onAuthStateChanged(auth, (utilisateur) => {
   etat.arreterSuivi?.();
   etat.arreterMembres?.();
   etat.arreterTickets?.();
+  etat.arreterCorrections?.();
   etat.arreterSuivi = null;
   etat.arreterMembres = null;
   etat.arreterTickets = null;
+  etat.arreterCorrections = null;
+  etat.correctionsRayons = {};
+  etat.places = null;
   etat.articles = [];
   etat.membres = {};
   etat.tickets = [];
@@ -136,6 +146,14 @@ onAuthStateChanged(auth, (utilisateur) => {
     },
     // Sans les fiches (règles pas encore publiées, réseau…), les pastilles prennent une couleur d'office.
     (erreur) => console.warn("Fiches des membres indisponibles :", erreur),
+  );
+  etat.arreterCorrections = suivreCorrectionsRayons(
+    db,
+    (corrections) => {
+      etat.correctionsRayons = corrections;
+      dessinerListe();
+    },
+    (erreur) => console.warn("Rayons corrigés indisponibles :", erreur),
   );
   etat.arreterTickets = suivreTickets(
     db,
@@ -194,17 +212,50 @@ function dessinerListe() {
     return;
   }
   const { aAcheter, dansLeCaddie } = trierArticles(etat.articles);
+  const rayons = rangerParRayon(aAcheter, etat.correctionsRayons);
   const aujourdhui = dateDuJour();
-  // À droite d'un article ajouté depuis une promo (« + Ajouter ») : cette promo, toujours à jour.
+  // Rangés par rayon, dans l'ordre du magasin. À droite d'un article ajouté depuis une promo
+  // (« + Ajouter ») : cette promo, toujours à jour.
   $("liste-a-acheter").replaceChildren(
-    ...aAcheter.map((a) => ligneArticle(a, promoChoisie(a, etat.promos?.index, aujourdhui))),
+    ...rayons.map(({ rayon, articles }) => {
+      const section = element("section", "rayon");
+      section.setAttribute("aria-label", rayon.nom);
+      const titre = element("h3", "titre-rayon", rayon.nom);
+      const liste = element("ul", "liste");
+      liste.append(...articles.map((a) => ligneArticle(a, promoChoisie(a, etat.promos?.index, aujourdhui))));
+      section.append(titre, liste);
+      return section;
+    }),
   );
   $("liste-caddie").replaceChildren(...dansLeCaddie.map((a) => ligneArticle(a)));
   $("liste-vide").hidden = aAcheter.length > 0;
   $("section-caddie").hidden = dansLeCaddie.length === 0;
   $("titre-caddie").textContent = `Dans le caddie (${dansLeCaddie.length})`;
+  // Un article qui vient d'arriver dans la liste ou dans le caddie (ajouté, coché, ou venu de l'autre
+  // téléphone) apparaît en douceur ; pas au premier affichage.
+  const places = new Map([...aAcheter.map((a) => [a.id, "liste"]), ...dansLeCaddie.map((a) => [a.id, "caddie"])]);
+  if (etat.places) {
+    for (const ligne of document.querySelectorAll(".article")) {
+      if (etat.places.get(ligne.dataset.id) !== places.get(ligne.dataset.id)) ligne.classList.add("arrive");
+    }
+  }
+  etat.places = places;
   dessinerEtatPromos();
 }
+
+/** Fait partir des lignes en douceur (elles glissent et s'effacent), puis lance `action`. */
+function fairePartir(lignes, action) {
+  const animees = [...lignes].filter((ligne) => !ligne.classList.contains("part"));
+  if (!animees.length) return;
+  for (const ligne of animees) ligne.classList.add("part");
+  setTimeout(action, mouvementReduit.matches ? 0 : DUREE_DEPART);
+}
+
+/** Durée du départ d'une ligne, comme dans style.css (« .article.part »). */
+const DUREE_DEPART = 180;
+
+/** Préférence de l'iPhone « Réduire les animations » : alors, aucune. */
+const mouvementReduit = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 function ligneArticle(article, promo = null) {
   const ligne = document.createElement("li");
@@ -221,7 +272,7 @@ function ligneArticle(article, promo = null) {
   caseACocher.setAttribute("aria-label", `${article.nom} : ${article.achete ? "dans le caddie" : "à acheter"}`);
   caseACocher.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>';
   caseACocher.addEventListener("click", () => {
-    cocherArticle(db, article).catch(signalerErreur);
+    fairePartir([ligne], () => cocherArticle(db, article).catch(signalerErreur));
   });
   // Sous le rond : la pastille de celui qui a ajouté l'article.
   const auteur = auteurDe(article);
@@ -231,14 +282,11 @@ function ligneArticle(article, promo = null) {
   const contenu = document.createElement("button");
   contenu.type = "button";
   contenu.className = "texte";
-  contenu.setAttribute(
-    "aria-label",
-    `Modifier ${article.nom}, ajouté par ${[auteur.nom, auteur.quandEnClair].filter(Boolean).join(" ")}`,
-  );
+  // Lu par VoiceOver : « Modifier Pain, 18:02 · 2 L, ajouté par Camille ».
   const nom = document.createElement("span");
   nom.className = "nom";
   nom.textContent = article.nom;
-  contenu.append(nom);
+  contenu.append(element("span", "cache", "Modifier "), nom);
   const details = [auteur.quand, article.quantite, noteCourte(article.note)].filter(Boolean).join(" · ");
   if (details) {
     const sousTitre = document.createElement("span");
@@ -246,6 +294,7 @@ function ligneArticle(article, promo = null) {
     sousTitre.textContent = details;
     contenu.append(sousTitre);
   }
+  contenu.append(element("span", "cache", `, ajouté par ${auteur.nom}`));
   contenu.addEventListener("click", () => ouvrirArticle(article));
 
   // Devant : la ligne elle-même ; derrière : le bouton « Supprimer », qu'on découvre en glissant.
@@ -275,7 +324,6 @@ function boutonPromo(article, promo) {
   const bouton = document.createElement("button");
   bouton.type = "button";
   bouton.className = "bouton-promos";
-  bouton.setAttribute("aria-label", `Voir la promo de ${article.nom} : ${type}`);
   const pastille = document.createElement("span");
   pastille.className = "pastille";
   pastille.innerHTML =
@@ -286,7 +334,13 @@ function boutonPromo(article, promo) {
   const legende = document.createElement("span");
   legende.className = "type-promo";
   legende.textContent = type;
-  bouton.append(pastille, legende);
+  // Lu par VoiceOver : « Voir la promo de Lait : -15 % en caisse ».
+  bouton.append(
+    element("span", "cache", "Voir la "),
+    pastille,
+    element("span", "cache", ` de ${article.nom} : `),
+    legende,
+  );
   bouton.addEventListener("click", () => ouvrirPromo(article, promo));
   return bouton;
 }
@@ -325,7 +379,9 @@ function surligner(id) {
 $("vider-caddie").addEventListener("click", async () => {
   const { dansLeCaddie } = trierArticles(etat.articles);
   if (await confirmer(`Retirer de la liste les ${pluriel(dansLeCaddie.length, "article")} du caddie ?`)) {
-    viderLeCaddie(db, dansLeCaddie).catch(signalerErreur);
+    fairePartir(document.querySelectorAll("#liste-caddie .article"), () =>
+      viderLeCaddie(db, dansLeCaddie).catch(signalerErreur),
+    );
     // Les courses sont finies : c'est le moment de garder le ticket.
     proposerAction("Courses finies : garder le ticket ?", "Ajouter", choisirFichierTicket, 12_000);
   }
@@ -739,7 +795,9 @@ document.addEventListener("pointerdown", (evenement) => {
 
 function supprimerAvecAnnulation(article) {
   fermerLignes();
-  supprimerArticle(db, article.id).catch(signalerErreur);
+  fairePartir(document.querySelectorAll(`.article[data-id="${article.id}"]`), () =>
+    supprimerArticle(db, article.id).catch(signalerErreur),
+  );
   const { nom, quantite, note, promo, achete } = article;
   proposerAnnulation(`« ${nom} » supprimé.`, () => {
     const remis = { nom, ...(quantite ? { quantite } : {}), ...(note ? { note } : {}), ...(promo ? { promo } : {}) };
@@ -781,6 +839,7 @@ function ouvrirArticle(article) {
   $("modif-nom").value = article.nom;
   $("modif-quantite").value = article.quantite ?? "";
   $("modif-note").value = article.note ?? "";
+  $("modif-rayon").value = rayonDe(article.nom, etat.correctionsRayons).id;
   afficherMessage($("message-article"), "");
   $("fenetre-article").showModal();
 }
@@ -802,8 +861,22 @@ $("form-article").addEventListener("submit", (evenement) => {
     return;
   }
   modifierArticle(db, etat.articleOuvert.id, article).catch(signalerErreur);
+  // Un rayon changé à la main est retenu pour ce nom d'article, sur les deux téléphones.
+  const rayon = $("modif-rayon").value;
+  if (rayon !== rayonDe(article.nom, etat.correctionsRayons).id) {
+    corrigerRayon(db, cleRayon(article.nom), rayon).catch(signalerErreur);
+  }
   $("fenetre-article").close();
 });
+
+// Les rayons proposés dans la fenêtre d'un article.
+$("modif-rayon").replaceChildren(
+  ...[...RAYONS, AUTRES].map(({ id, nom }) => {
+    const choix = element("option", null, nom);
+    choix.value = id;
+    return choix;
+  }),
+);
 
 $("supprimer-article").addEventListener("click", async () => {
   const article = etat.articleOuvert;
@@ -836,10 +909,6 @@ function ligneTicket(ticket) {
   const bouton = document.createElement("button");
   bouton.type = "button";
   bouton.className = "ligne-ticket";
-  bouton.setAttribute(
-    "aria-label",
-    `Ouvrir le ticket ${[MAGASINS_TICKET[ticket.magasin], `du ${jourEnLettres(ticket.date_achat)}`, ticket.montant != null ? formaterMontant(ticket.montant) : null].filter(Boolean).join(" ")}`,
-  );
   const icone = document.createElement("span");
   icone.className = "icone-ticket";
   icone.dataset.magasin = ticket.magasin;
@@ -850,7 +919,8 @@ function ligneTicket(ticket) {
   const titre = document.createElement("span");
   titre.className = "nom";
   titre.textContent = libelleTicket(ticket);
-  texte.append(titre);
+  // Lu par VoiceOver : « Ouvrir le ticket Leclerc · mar. 27/10 · 54,30 € ».
+  texte.append(element("span", "cache", "Ouvrir le ticket "), titre);
   const details = [ticket.note, ticket.enAttente ? "envoi en cours…" : null].filter(Boolean).join(" · ");
   if (details) {
     const sousTitre = document.createElement("span");

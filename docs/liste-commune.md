@@ -99,8 +99,11 @@ tickets.
 
 ### Collection `reglages` : réglages communs
 
-Pour les préférences du foyer (cartes de fidélité, magasins préférés…). Son contenu sera défini avec
-l'appli.
+Les préférences du foyer, une fiche par réglage :
+
+| Document | Contenu |
+|---|---|
+| `reglages/rayons` | Les rayons corrigés à la main : `{ "tomato ketchup": "epicerie-salee", … }`. La clé est le nom de l'article réduit à ses mots (minuscules, sans accents ni pluriel), la valeur un rayon de [`app/src/rayons.js`](../app/src/rayons.js). |
 
 ## Les règles d'accès
 

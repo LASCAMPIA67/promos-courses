@@ -114,6 +114,8 @@ Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
   aussitôt ; « + » ajoute ce qu'on a écrit (même sans promo), ou on ajoute une promo d'un geste (avec
   une note courte : « Lidl · 0,89 € »).
 - **Promos à jour** : l'appli prévient si le robot n'est pas passé ou si un magasin manque.
+- **Rangée par rayon**, dans l'ordre du magasin (le surgelé en dernier) ; un rayon mal deviné se
+  corrige une fois pour toutes.
 - **Ajout rapide** avec quantité facultative ; un article déjà dans la liste est signalé.
 - **Caddie** : un article coché passe dans « Dans le caddie » ; « Tout retirer » vide le caddie.
 - **Supprimer d'un geste** : glisser un article vers la gauche, comme dans Mail sur l'iPhone
