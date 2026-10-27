@@ -1,20 +1,22 @@
-# Crée une « Release » GitHub (avec son étiquette vX.Y.Z) :
-# - automatiquement, quand le numéro de version change dans src/robot_promos/__init__.py ;
-# - quand on pousse une étiquette de version (ex. v0.2.0) ;
-# - à la main (bouton « Run workflow »), par exemple pour publier une ancienne version, ou pour
-#   remettre à jour les notes d'une version déjà publiée.
-# Les notes de version sont reprises de la section correspondante du fichier CHANGELOG.md.
+# Publie les versions sur la page « Releases » de GitHub, avec les notes du CHANGELOG :
+#
+# - la version EN TEST (numéro de app/package.json, s'il est plus récent que la version validée) :
+#   publiée comme « Pre-release » et remise à jour à chaque envoi sur main, avec les notes de la
+#   section « [Non publié] » ;
+# - la version VALIDÉE (numéro de src/robot_promos/__init__.py) : publiée comme « Latest » dès que ce
+#   numéro change ; elle remplace la version en test du même numéro ;
+# - à la main (bouton « Run workflow ») : publier une ancienne version, ou remettre à jour ses notes.
 name: Publication
 
 on:
   push:
     branches: [main]
-    paths: ["src/robot_promos/__init__.py"]
+    paths-ignore: ["promos.json"] # le passage quotidien du robot ne change pas de version
     tags: ["v*.*.*"]
   workflow_dispatch:
     inputs:
       etiquette:
-        description: "Version à publier (ex. v0.2.0). Vide = version actuelle du code."
+        description: "Version à publier (ex. v0.2.0). Vide = version validée actuelle."
         required: false
       cible:
         description: "Commit à publier (vide = le dernier commit de main)"
@@ -27,10 +29,12 @@ concurrency:
   group: publication
 
 jobs:
-  publier:
-    name: Publier la version
+  validee:
+    name: Version validée
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Récupérer le dépôt
         uses: actions/checkout@v7
@@ -46,20 +50,14 @@ jobs:
           else
             etiquette="v$(sed -n 's/^__version__ = "\(.*\)"/\1/p' src/robot_promos/__init__.py)"
           fi
+          etat=$(gh release view "$etiquette" --json isPrerelease \
+            --jq 'if .isPrerelease then "en-test" else "publiee" end' 2>/dev/null || echo "absente")
           echo "ETIQUETTE=$etiquette" >> "$GITHUB_ENV"
-          echo "Version : $etiquette"
-
-      - name: Vérifier qu'elle n'est pas déjà publiée
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if gh release view "$ETIQUETTE" > /dev/null 2>&1; then
-            echo "La version $ETIQUETTE est déjà publiée."
-            echo "DEJA_PUBLIEE=1" >> "$GITHUB_ENV"
-          fi
+          echo "ETAT=$etat" >> "$GITHUB_ENV"
+          echo "Version $etiquette : $etat"
 
       - name: Extraire les notes de version du CHANGELOG
-        if: env.DEJA_PUBLIEE != '1' || github.event_name == 'workflow_dispatch'
+        if: env.ETAT != 'publiee' || github.event_name == 'workflow_dispatch'
         run: |
           version="${ETIQUETTE#v}"
           awk -v v="$version" '
@@ -76,15 +74,69 @@ jobs:
           perl -pi -e 's{\]\((?!https?://|#|mailto:)([^)]+)\)}{](https://github.com/$ENV{GITHUB_REPOSITORY}/blob/$ENV{ETIQUETTE}/$1)}g' notes.md
           cat notes.md
 
-      - name: Créer la publication
-        if: env.DEJA_PUBLIEE != '1'
+      - name: Retirer la version en test du même numéro
+        if: env.ETAT == 'en-test'
+        run: gh release delete "$ETIQUETTE" --cleanup-tag --yes
+
+      - name: Publier la version validée
+        if: env.ETAT != 'publiee'
         env:
-          GH_TOKEN: ${{ github.token }}
           CIBLE: ${{ inputs.cible || github.sha }}
-        run: gh release create "$ETIQUETTE" --target "$CIBLE" --title "Version ${ETIQUETTE#v}" --notes-file notes.md
+        run: gh release create "$ETIQUETTE" --target "$CIBLE" --title "Version ${ETIQUETTE#v}" --notes-file notes.md --latest
 
       - name: Remettre à jour les notes d'une version déjà publiée
-        if: env.DEJA_PUBLIEE == '1' && github.event_name == 'workflow_dispatch'
-        env:
-          GH_TOKEN: ${{ github.token }}
+        if: env.ETAT == 'publiee' && github.event_name == 'workflow_dispatch'
         run: gh release edit "$ETIQUETTE" --notes-file notes.md
+
+  en-test:
+    name: Version en test
+    needs: validee
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v7
+
+      - name: Trouver la version en test
+        run: |
+          validee=$(sed -n 's/^__version__ = "\(.*\)"/\1/p' src/robot_promos/__init__.py)
+          en_test=$(jq -r .version app/package.json)
+          etat=$(gh release view "v$en_test" --json isPrerelease \
+            --jq 'if .isPrerelease then "en-test" else "publiee" end' 2>/dev/null || echo "absente")
+          echo "ETIQUETTE=v$en_test" >> "$GITHUB_ENV"
+          if [ "$en_test" = "$validee" ] || [ "$etat" = "publiee" ]; then
+            echo "Pas de version en test : la version $en_test est déjà validée."
+          else
+            echo "A_PUBLIER=1" >> "$GITHUB_ENV"
+            echo "ETAT=$etat" >> "$GITHUB_ENV"
+            echo "Version en test : $en_test (version validée : $validee)"
+          fi
+
+      - name: Préparer les notes (section « Non publié » du CHANGELOG)
+        if: env.A_PUBLIER == '1'
+        run: |
+          {
+            echo "> [!NOTE]"
+            echo "> Version **en test** sur nos iPhones, pas encore validée. Elle est remise à jour à chaque"
+            echo "> changement, et deviendra la version ${ETIQUETTE#v} définitive une fois validée."
+            echo
+            awk '
+              /^## \[/ { dedans = ($0 ~ "^## \\[Non publié\\]") ; next }
+              /^\[[^]]+\]: / { dedans = 0 }
+              dedans { print }
+            ' CHANGELOG.md
+          } > notes.md
+          perl -pi -e 's{\]\((?!https?://|#|mailto:)([^)]+)\)}{](https://github.com/$ENV{GITHUB_REPOSITORY}/blob/$ENV{ETIQUETTE}/$1)}g' notes.md
+          cat notes.md
+
+      - name: Publier la version en test
+        if: env.A_PUBLIER == '1'
+        run: |
+          if [ "$ETAT" = "en-test" ]; then
+            gh release delete "$ETIQUETTE" --cleanup-tag --yes
+          fi
+          gh release create "$ETIQUETTE" --target "$GITHUB_SHA" --prerelease \
+            --title "Version ${ETIQUETTE#v} (en test)" --notes-file notes.md

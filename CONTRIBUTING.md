@@ -87,18 +87,28 @@ tests.
 
 ## Publier une nouvelle version
 
-Les versions suivent le [versionnage sémantique](https://semver.org/lang/fr/).
+Les versions suivent le [versionnage sémantique](https://semver.org/lang/fr/). Chaque version passe
+par deux temps, gérés par le workflow « Publication » :
 
-1. Décrire les changements dans [CHANGELOG.md](CHANGELOG.md), sous un nouveau titre
-   `## [X.Y.Z] - AAAA-MM-JJ`, et mettre à jour les liens en bas du fichier.
-2. Mettre le même numéro dans `src/robot_promos/__init__.py`.
-3. Enregistrer (commit) et envoyer sur la branche `main`.
-4. Le workflow « Publication » voit que le numéro a changé : il crée l'étiquette `vX.Y.Z` et la page
-   de la version sur GitHub, avec les notes du CHANGELOG.
+**1. En test.** Mettre le numéro de la version suivante dans `app/package.json` (il s'affiche en bas
+de l'appli) et décrire chaque changement dans [CHANGELOG.md](CHANGELOG.md), sous `## [Non publié]`.
+À chaque envoi sur `main`, la version est publiée (ou remise à jour) comme **pré-version**
+(« Pre-release ») `vX.Y.Z`, intitulée « Version X.Y.Z (en test) », avec les notes de `[Non publié]`.
 
-On peut aussi publier en poussant soi-même une étiquette (`git tag -a vX.Y.Z` puis
-`git push origin vX.Y.Z`), ou à la main : onglet **Actions** → **Publication** → **Run workflow**.
-Lancé à la main pour une version déjà publiée, il remet à jour ses notes à partir du CHANGELOG.
+**2. Validée.** Une fois la version validée sur nos iPhones :
+
+1. dans [CHANGELOG.md](CHANGELOG.md), renommer `## [Non publié]` en `## [X.Y.Z] - AAAA-MM-JJ`,
+   remettre un `## [Non publié]` vide au-dessus, et mettre à jour les liens en bas du fichier ;
+2. mettre le même numéro dans `src/robot_promos/__init__.py` ;
+3. enregistrer (commit) et envoyer sur `main`.
+
+« Publication » voit que le numéro validé a changé : il remplace la pré-version par la version
+définitive `vX.Y.Z` (« Latest »), avec les notes de sa section du CHANGELOG.
+
+On peut aussi publier une version validée en poussant soi-même une étiquette (`git tag -a vX.Y.Z`
+puis `git push origin vX.Y.Z`), ou à la main : onglet **Actions** → **Publication** → **Run
+workflow**. Lancé à la main pour une version déjà publiée, il remet à jour ses notes à partir du
+CHANGELOG.
 
 Dans les notes de version, les liens relatifs (`docs/appli.md`…) sont transformés en liens vers les
 fichiers de cette version, pour qu'ils marchent sur la page de la version.

@@ -22,6 +22,9 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
   version est publiée et la prend d'elle-même, sans recharger pendant qu'on écrit.
 - Guide pas à pas : [docs/installation-iphone.md](docs/installation-iphone.md).
 - Tests : 4 tests de logique et 2 scénarios réels de plus (conseil d'installation), capture d'écran.
+- **Version en test publiée automatiquement** dans les « Releases » comme pré-version
+  (« Version X.Y.Z (en test) »), remise à jour à chaque changement ; elle devient la version
+  définitive (« Latest ») une fois validée. Badge « en test » dans le README.
 
 ## [0.4.0] - 2026-10-27
 

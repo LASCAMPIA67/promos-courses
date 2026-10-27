@@ -14,7 +14,8 @@ quotidien.
 [![Tests](https://github.com/lascampia67/promos-courses/actions/workflows/tests.yml/badge.svg)](https://github.com/lascampia67/promos-courses/actions/workflows/tests.yml)
 [![Règles Firebase](https://github.com/lascampia67/promos-courses/actions/workflows/regles.yml/badge.svg)](https://github.com/lascampia67/promos-courses/actions/workflows/regles.yml)
 [![Appli](https://github.com/lascampia67/promos-courses/actions/workflows/appli.yml/badge.svg)](https://github.com/lascampia67/promos-courses/actions/workflows/appli.yml)
-[![Version](https://img.shields.io/github/v/release/lascampia67/promos-courses?label=version)](https://github.com/lascampia67/promos-courses/releases)
+[![Version](https://img.shields.io/github/v/release/lascampia67/promos-courses?label=version)](https://github.com/lascampia67/promos-courses/releases/latest)
+[![En test](https://img.shields.io/github/v/release/lascampia67/promos-courses?include_prereleases&label=en%20test&color=orange)](https://github.com/lascampia67/promos-courses/releases)
 ![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue)
 
 > [!NOTE]
@@ -283,9 +284,14 @@ Le guide complet (organisation, ajout d'une source, publication) est dans
 ## Versions
 
 Les versions suivent le [versionnage sémantique](https://semver.org/lang/fr/) et sont décrites dans
-le [journal des versions](CHANGELOG.md). Chaque version est publiée dans les
-[**Releases**](https://github.com/lascampia67/promos-courses/releases) du dépôt, automatiquement,
-dès que le numéro de version change dans le code (détails dans [CONTRIBUTING.md](CONTRIBUTING.md#publier-une-nouvelle-version)).
+le [journal des versions](CHANGELOG.md). Elles sont publiées automatiquement dans les
+[**Releases**](https://github.com/lascampia67/promos-courses/releases) du dépôt :
+
+- la version **en test** sur nos iPhones apparaît comme **pré-version** (« Pre-release »,
+  « Version X.Y.Z (en test) ») et suit chaque changement ;
+- une fois validée, elle devient la version définitive (« Latest »).
+
+Détails dans [CONTRIBUTING.md](CONTRIBUTING.md#publier-une-nouvelle-version).
 
 ## Limites connues
 
