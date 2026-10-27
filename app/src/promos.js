@@ -155,11 +155,22 @@ export function phrasesFraicheur(miseAJour, maintenant = new Date()) {
   };
 }
 
-/** Magasins dont les promos n'ont pas pu être lues en entier ce matin : [{ nom, etat }]. */
+/** Magasins dont les promos n'ont pas pu être lues en entier au dernier passage : [{ nom, etat }]. */
 export function sourcesEnDifficulte(donnees) {
   return (donnees?.sources ?? [])
     .filter((source) => source.etat !== "ok")
     .map((source) => ({ nom: donnees.magasins?.[source.magasin]?.nom ?? source.nom, etat: source.etat }));
+}
+
+/**
+ * Explique le problème d'un magasin. Le robot garde alors les promos encore valables de son
+ * passage précédent (voir le README, « Fiabilité »).
+ */
+export function phraseSource({ nom, etat }) {
+  const de = /^[aeiouyéèêàâîôûh]/i.test(nom) ? `d'${nom}` : `de ${nom}`;
+  return etat === "partiel"
+    ? `Une partie des promos ${de} n'a pas pu être mise à jour.`
+    : `Les promos ${de} n'ont pas pu être mises à jour : ce sont celles du passage précédent.`;
 }
 
 // ---------------------------------------------------------------------------------------------

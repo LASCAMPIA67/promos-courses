@@ -165,7 +165,7 @@ est décrit par un schéma JSON : [`promos.schema.json`](src/robot_promos/promos
 - **Format vérifié** : avant d'être enregistré, `promos.json` est contrôlé par son schéma JSON.
 - **Tests automatiques** à chaque modification : plus de 50 tests pour le robot (workflow « Tests »),
   15 tests qui vérifient que la liste commune reste réservée à nos deux comptes (« Règles Firebase »),
-  30 tests de logique de l'appli et 9 scénarios réels dans Chrome et Safari, avec deux téléphones
+  31 tests de logique de l'appli et 9 scénarios réels dans Chrome et Safari, avec deux téléphones
   simulés et des promos d'exemple (« Appli »).
   Si un test de l'appli échoue, elle n'est pas publiée.
 - **Alerte** : en cas de problème, un avertissement s'affiche sur la page du lancement (onglet

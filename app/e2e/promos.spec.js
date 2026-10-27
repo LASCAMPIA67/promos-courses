@@ -68,7 +68,7 @@ test("des promos trop anciennes ou incomplètes sont signalées", async ({ page,
   const etat = page.locator("#etat-promos");
   await expect(etat).toContainText("Les promos datent du");
   await expect(etat).toContainText("elles ont pu changer");
-  await expect(etat).toContainText("Promos E.Leclerc Geispolsheim indisponibles aujourd'hui.");
+  await expect(etat).toContainText("Les promos d'E.Leclerc Geispolsheim n'ont pas pu être mises à jour");
 });
 
 test("sans promos, la liste marche quand même", async ({ page, context }) => {

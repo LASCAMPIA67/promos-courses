@@ -24,7 +24,7 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
   sans confondre deux mots proches (« Lait » ne trouve pas « Laitue »).
 - Promos gardées sur le téléphone pour fonctionner sans réseau ; bandeau si elles sont trop anciennes
   (robot pas passé depuis plus de 36 heures), si un magasin manque ou si elles sont indisponibles.
-- Tests : 20 tests de logique et 3 scénarios réels de plus (promos d'exemple aux dates du jour).
+- Tests : 21 tests de logique et 3 scénarios réels de plus (promos d'exemple aux dates du jour).
 - Captures d'écran des promos (modes clair et sombre).
 
 ### Modifié

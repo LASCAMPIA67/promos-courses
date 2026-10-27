@@ -16,6 +16,7 @@ import {
   infosPromo,
   joliNom,
   periode,
+  phraseSource,
   phrasesFraicheur,
   resumePromos,
   sourcesEnDifficulte,
@@ -260,9 +261,7 @@ function dessinerEtatPromos() {
     const phrases = phrasesFraicheur(etat.promos.donnees.mise_a_jour);
     info = phrases.info;
     if (phrases.alerte) alertes.push(phrases.alerte);
-    for (const { nom, etat: etatSource } of sourcesEnDifficulte(etat.promos.donnees)) {
-      alertes.push(`Promos ${nom} ${etatSource === "partiel" ? "incomplètes" : "indisponibles"} aujourd'hui.`);
-    }
+    alertes.push(...sourcesEnDifficulte(etat.promos.donnees).map(phraseSource));
   }
   afficherMessage($("etat-promos"), alertes.join(" "), "attention");
   $("info-promos").textContent = info;

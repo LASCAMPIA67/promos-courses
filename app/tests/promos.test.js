@@ -13,6 +13,7 @@ import {
   joliNom,
   motsCles,
   periode,
+  phraseSource,
   phrasesFraicheur,
   resumePromos,
   sourcesEnDifficulte,
@@ -209,5 +210,14 @@ describe("affichage", () => {
     };
     expect(sourcesEnDifficulte(fichier)).toEqual([{ nom: "E.Leclerc Geispolsheim", etat: "erreur" }]);
     expect(sourcesEnDifficulte(null)).toEqual([]);
+  });
+
+  test("explication du problème d'un magasin", () => {
+    expect(phraseSource({ nom: "E.Leclerc Geispolsheim", etat: "erreur" })).toBe(
+      "Les promos d'E.Leclerc Geispolsheim n'ont pas pu être mises à jour : ce sont celles du passage précédent.",
+    );
+    expect(phraseSource({ nom: "Lidl Lingolsheim", etat: "partiel" })).toBe(
+      "Une partie des promos de Lidl Lingolsheim n'a pas pu être mise à jour.",
+    );
   });
 });
