@@ -415,9 +415,42 @@ svg {
 }
 
 .article {
+  position: relative;
+  overflow: hidden;
+}
+
+/* La ligne, qu'on fait glisser vers la gauche pour découvrir le bouton « Supprimer ». */
+.article-devant {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: stretch;
   min-height: 56px;
+  background: var(--surface);
+  transition: transform 0.22s ease;
+  touch-action: pan-y; /* le défilement vertical reste au navigateur, le glissement est pour nous */
+}
+
+.article.glisse .article-devant {
+  transition: none;
+}
+
+.article.ouverte .article-devant {
+  transform: translateX(-88px); /* LARGEUR_SUPPRIMER dans main.js */
+}
+
+.supprimer-glisse {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 88px;
+  border: 0;
+  background: #d93025;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 650;
+  cursor: pointer;
 }
 
 .article + .article {
@@ -510,7 +543,7 @@ svg {
   filter: brightness(0.94);
 }
 
-.surligne {
+.surligne .article-devant {
   animation: surligner 1.2s ease-out;
 }
 
@@ -830,6 +863,32 @@ dialog h2 {
 
 .resultats:empty {
   display: none;
+}
+
+/* « Article supprimé. Annuler », juste au-dessus des onglets. */
+.annulation {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(76px + env(safe-area-inset-bottom));
+  z-index: 4;
+  max-width: 608px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 8px 6px 16px;
+  border-radius: 12px;
+  background: var(--texte);
+  color: var(--fond);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.25);
+  font-size: 0.95rem;
+}
+
+.annulation .lien {
+  color: var(--accent-doux);
+  padding: 10px 8px;
 }
 
 /* ------------------------------------------------------------------------------------------ */

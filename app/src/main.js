@@ -38,6 +38,7 @@ const etat = {
   articles: [],
   arreterSuivi: null,
   articleOuvert: null,
+  ligneOuverte: null, // article dont le bouton « Supprimer » est visible (glissé vers la gauche)
   promos: null, // { donnees, index, luesLe }
   promosIndisponibles: false,
   vue: "liste", // onglet affiché : « liste » ou « promos »
@@ -126,6 +127,11 @@ $("mot-de-passe-oublie").addEventListener("click", async () => {
 // La liste
 
 function dessinerListe() {
+  // Un doigt est posé sur la liste (pour cocher ou glisser) : on redessine quand il se lève.
+  if (doigtPose) {
+    listeEnRetard = true;
+    return;
+  }
   const { aAcheter, dansLeCaddie } = trierArticles(etat.articles);
   const aujourdhui = dateDuJour();
   const promos = new Map(aAcheter.map((a) => [a.id, chercherPromos(etat.promos?.index, a.nom, aujourdhui)]));
@@ -176,8 +182,22 @@ function ligneArticle(article, promos = []) {
   }
   contenu.addEventListener("click", () => ouvrirArticle(article));
 
-  ligne.append(caseACocher, contenu);
-  if (promos.length) ligne.append(boutonPromos(article, promos));
+  // Devant : la ligne elle-même ; derrière : le bouton « Supprimer », qu'on découvre en glissant.
+  const devant = document.createElement("div");
+  devant.className = "article-devant";
+  devant.append(caseACocher, contenu);
+  if (promos.length) devant.append(boutonPromos(article, promos));
+
+  const supprimer = document.createElement("button");
+  supprimer.type = "button";
+  supprimer.className = "supprimer-glisse";
+  supprimer.textContent = "Supprimer";
+  supprimer.setAttribute("aria-label", `Supprimer ${article.nom}`);
+  supprimer.addEventListener("click", () => supprimerAvecAnnulation(article));
+
+  ligne.append(supprimer, devant);
+  montrerSupprimer(ligne, article.id === etat.ligneOuverte);
+  rendreGlissable(ligne, devant);
   return ligne;
 }
 
@@ -509,6 +529,132 @@ registerSW({
     });
   },
 });
+
+// ---------------------------------------------------------------------------------------------
+// Glisser un article vers la gauche pour le supprimer, comme dans Mail sur l'iPhone
+
+const LARGEUR_SUPPRIMER = 88; // en pixels, comme dans style.css
+
+// Pendant qu'un doigt est posé sur la liste, un changement venu de l'autre téléphone ne la redessine
+// pas tout de suite : le geste en cours n'est pas interrompu.
+let doigtPose = false;
+let listeEnRetard = false;
+document.addEventListener("pointerdown", (evenement) => {
+  if (evenement.target.closest?.(".liste")) doigtPose = true;
+});
+for (const fin of ["pointerup", "pointercancel"]) {
+  document.addEventListener(fin, () => {
+    // Après les gestionnaires de la ligne, qui finissent le glissement.
+    setTimeout(() => {
+      doigtPose = false;
+      if (listeEnRetard) {
+        listeEnRetard = false;
+        dessinerListe();
+      }
+    });
+  });
+}
+
+function montrerSupprimer(ligne, visible) {
+  ligne.classList.toggle("ouverte", visible);
+  const bouton = ligne.querySelector(".supprimer-glisse");
+  if (visible) bouton.removeAttribute("aria-hidden");
+  else bouton.setAttribute("aria-hidden", "true");
+  bouton.tabIndex = visible ? 0 : -1;
+}
+
+function fermerLignes() {
+  for (const ligne of document.querySelectorAll(".article.ouverte")) montrerSupprimer(ligne, false);
+  etat.ligneOuverte = null;
+}
+
+function rendreGlissable(ligne, devant) {
+  let depart = null;
+  let glisse = false;
+  const decalage = (evenement) =>
+    Math.max(-1.4 * LARGEUR_SUPPRIMER, Math.min(0, (depart.ouverte ? -LARGEUR_SUPPRIMER : 0) + evenement.clientX - depart.x));
+
+  devant.addEventListener("pointerdown", (evenement) => {
+    if (evenement.button !== 0) return;
+    depart = { x: evenement.clientX, y: evenement.clientY, ouverte: ligne.classList.contains("ouverte") };
+    glisse = false;
+  });
+
+  devant.addEventListener("pointermove", (evenement) => {
+    if (!depart) return;
+    const dx = evenement.clientX - depart.x;
+    const dy = evenement.clientY - depart.y;
+    if (!glisse) {
+      if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) depart = null; // on fait défiler la liste
+      if (!depart || Math.abs(dx) < 10) return;
+      glisse = true;
+      devant.setPointerCapture(evenement.pointerId);
+      ligne.classList.add("glisse");
+    }
+    devant.style.transform = `translateX(${decalage(evenement)}px)`;
+  });
+
+  const finir = (evenement) => {
+    if (!depart) return;
+    if (glisse) {
+      const ouvrir = decalage(evenement) < -LARGEUR_SUPPRIMER / 2;
+      ligne.classList.remove("glisse");
+      devant.style.transform = "";
+      fermerLignes();
+      if (ouvrir) {
+        montrerSupprimer(ligne, true);
+        etat.ligneOuverte = ligne.dataset.id;
+      }
+    }
+    depart = null;
+  };
+  devant.addEventListener("pointerup", finir);
+  devant.addEventListener("pointercancel", () => {
+    ligne.classList.remove("glisse");
+    devant.style.transform = "";
+    depart = null;
+  });
+
+  // Après un glissement, le doigt levé ne coche ni n'ouvre l'article ; toucher une ligne ouverte la referme.
+  devant.addEventListener(
+    "click",
+    (evenement) => {
+      if (!glisse && !ligne.classList.contains("ouverte")) return;
+      evenement.stopPropagation();
+      evenement.preventDefault();
+      if (!glisse) fermerLignes();
+      glisse = false;
+    },
+    true,
+  );
+}
+
+// Toucher ailleurs referme la ligne ouverte.
+document.addEventListener("pointerdown", (evenement) => {
+  if (etat.ligneOuverte && !evenement.target.closest(".article.ouverte")) fermerLignes();
+});
+
+function supprimerAvecAnnulation(article) {
+  fermerLignes();
+  supprimerArticle(db, article.id).catch(signalerErreur);
+  const { nom, quantite, note, achete } = article;
+  proposerAnnulation(`« ${nom} » supprimé.`, () => {
+    const remis = { nom, ...(quantite ? { quantite } : {}), ...(note ? { note } : {}) };
+    ajouterArticle(db, etat.utilisateur.uid, remis, { achete }).catch(signalerErreur);
+  });
+}
+
+let attenteAnnulation;
+function proposerAnnulation(texte, annuler) {
+  clearTimeout(attenteAnnulation);
+  $("texte-annulation").textContent = texte;
+  $("annulation").hidden = false;
+  $("bouton-annuler").onclick = () => {
+    $("annulation").hidden = true;
+    annuler();
+  };
+  attenteAnnulation = setTimeout(() => ($("annulation").hidden = true), 6000);
+}
 
 // ---------------------------------------------------------------------------------------------
 // Modifier ou supprimer un article

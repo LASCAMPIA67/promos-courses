@@ -25,6 +25,12 @@ Les captures sont faites avec des promos d'exemple.
 - **Cocher** un article (le rond à gauche) : il passe dans « Dans le caddie ». Le décocher le remet
   dans la liste.
 - **Modifier** un article (toucher son nom) : nom, quantité, note (« sans lactose »…), ou le supprimer.
+- **Supprimer d'un geste** : glisser l'article vers la gauche, puis toucher **Supprimer** (comme
+  dans Mail sur l'iPhone). Pendant 6 secondes, **Annuler** le remet à sa place, même s'il était
+  dans le caddie. Toucher la ligne, ou ailleurs, la referme.
+
+  ![Article glissé vers la gauche : le bouton Supprimer apparaît](captures/glisser.png)
+
 - **Tout retirer** : vide d'un coup les articles du caddie, une fois les courses faites.
 - **En direct sur les deux téléphones** : ce que l'un fait apparaît aussitôt chez l'autre.
 - **Sans réseau** (au fond du magasin) : tout continue de marcher ; un bandeau jaune le signale et
@@ -67,10 +73,34 @@ les promos en cours et à venir des deux magasins :
   s'il est déjà dans la liste, le bouton l'indique (« ✓ Dans la liste ») ;
 - les promos s'affichent par 30 ; « Voir plus de promos » montre les suivantes.
 
+### Les familles de produits
+
+Beaucoup de produits ne portent pas le nom de ce qu'ils sont : des chips s'appellent « Pringles »
+ou « Doritos », un soda « Regular » (Coca-Cola), des couches « Changes bébé ». L'appli connaît donc
+des **familles** : écrire « Chips » dans la liste trouve aussi les promos Pringles, Lay's, Doritos,
+Vico, Bret's, Crusti Croc…
+
+| On écrit | L'appli trouve aussi |
+|---|---|
+| Chips | Pringles, Lay's, Doritos, Vico, Bret's, Monster Munch, Crusti Croc (Lidl)… |
+| Soda | Coca-Cola, Pepsi, Fanta, Orangina, Oasis, Schweppes, Freeway (Lidl)… |
+| Couches | Pampers, Huggies, Lotus Baby, « Changes bébé »… |
+| Shampoing | « Shampooing » (les deux orthographes), Elseve, Head & Shoulders… |
+| Fromage | Camembert, comté, emmental, Babybel, Kiri, Boursin… |
+| Bière, café, eau, chocolat, biscuits, céréales, lessive, dentifrice… | leurs marques les plus courantes |
+
+Les promos qui contiennent le mot écrit passent d'abord, puis celles trouvées par la famille. Il y a
+environ 50 familles, dans [`app/src/familles.js`](../app/src/familles.js) : une marque qui manque
+peut y être ajoutée (il suffit de la demander). Seules les marques qui ne font qu'une sorte de
+produit y sont : « Président » (beurre **et** fromage) n'y est pas, pour ne pas mélanger.
+
+Quelques mots ne se distinguent que par l'accent : « pâtes » ne trouve pas « pâté », ni « glaces »
+les « marrons glacés ».
+
 ### Bien nommer ses articles
 
-L'appli cherche **tous les mots** de l'article dans le nom du produit ou dans sa marque, sans tenir
-compte des majuscules, des accents ni du pluriel :
+L'appli cherche **tous les mots** de l'article dans le nom du produit ou dans sa marque (ou dans sa
+famille, voir ci-dessus), sans tenir compte des majuscules, des accents ni du pluriel :
 
 | Article | Trouve | Ne trouve pas |
 |---|---|---|
@@ -101,6 +131,7 @@ détails (« sans lactose », « grand format ») vont mieux dans la **note** de
 | [`app/src/liste.js`](../app/src/liste.js) | Lecture et modification de la liste dans Firebase. |
 | [`app/src/articles.js`](../app/src/articles.js) | Règles simples : nettoyage, doublons, tri, messages d'erreur. |
 | [`app/src/promos.js`](../app/src/promos.js) | Les promos : recherche pour chaque article et dans toutes les promos, dates, prix, fraîcheur des données. |
+| [`app/src/familles.js`](../app/src/familles.js) | Les familles de produits : « chips » → Pringles, Lay's, Doritos… |
 | [`app/src/installation.js`](../app/src/installation.js) | Quand proposer d'installer l'appli sur l'iPhone. |
 | [`app/src/firebase.js`](../app/src/firebase.js) | Connexion au projet Firebase (et à l'émulateur pour les tests). |
 | [`app/src/style.css`](../app/src/style.css) | L'apparence (iPhone, mode sombre). |
@@ -115,8 +146,8 @@ que dans Firebase.
 
 | Tests | Ce qu'ils vérifient | Commande |
 |---|---|---|
-| Logique ([`app/tests`](../app/tests)) | Nettoyage des saisies, doublons, tri, messages d'erreur ; recherche des promos (accents, pluriel, mots proches, marques, début de mot, filtre par magasin), article créé depuis une promo, promos terminées ou à venir, dates, prix, fraîcheur des données ; quand proposer l'installation. | `npm test` |
-| Scénarios réels ([`app/e2e`](../app/e2e)) | Un navigateur à la taille d'un iPhone utilise l'appli branchée sur l'**émulateur Firebase** (jamais la vraie base), avec deux comptes et un [fichier de promos d'exemple](../app/e2e/promos-exemple.js) aux dates du jour : connexion refusée, ajout, doublon, cochage, modification, suppression, synchronisation en direct entre deux téléphones, mode hors connexion, refus d'un compte étranger, déconnexion, étiquettes et détail des promos, promos anciennes ou incomplètes, promos indisponibles puis retrouvées, conseil d'installation dans Safari sur iPhone, recherche dans toutes les promos (filtre, ajout à la liste, affichage par 30). Sur GitHub, ils tournent dans Chrome **et Safari** (WebKit). | `npm run e2e` |
+| Logique ([`app/tests`](../app/tests)) | Nettoyage des saisies, doublons, tri, messages d'erreur ; recherche des promos (accents, pluriel, mots proches, marques, familles de produits, faux amis, début de mot, filtre par magasin), article créé depuis une promo, promos terminées ou à venir, dates, prix, fraîcheur des données ; quand proposer l'installation. | `npm test` |
+| Scénarios réels ([`app/e2e`](../app/e2e)) | Un navigateur à la taille d'un iPhone utilise l'appli branchée sur l'**émulateur Firebase** (jamais la vraie base), avec deux comptes et un [fichier de promos d'exemple](../app/e2e/promos-exemple.js) aux dates du jour : connexion refusée, ajout, doublon, cochage, modification, suppression, synchronisation en direct entre deux téléphones, mode hors connexion, refus d'un compte étranger, déconnexion, étiquettes et détail des promos, promos anciennes ou incomplètes, promos indisponibles puis retrouvées, conseil d'installation dans Safari sur iPhone, glisser pour supprimer avec « Annuler », « Chips » qui trouve Pringles, recherche dans toutes les promos (filtre, ajout à la liste, affichage par 30). Sur GitHub, ils tournent dans Chrome **et Safari** (WebKit). | `npm run e2e` |
 | Captures d'écran | Régénère les images de cette page dans `docs/captures/`. | `npm run captures` |
 
 Commandes à lancer dans le dossier `app/` (Node.js 22 et Java 21 nécessaires), après `npm ci`.

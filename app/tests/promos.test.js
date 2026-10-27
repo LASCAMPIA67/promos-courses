@@ -17,6 +17,7 @@ import {
   phraseSource,
   phrasesFraicheur,
   rechercherPromos,
+  regrouper,
   resumePromos,
   sourcesEnDifficulte,
 } from "../src/promos.js";
@@ -141,6 +142,50 @@ describe("rechercherPromos", () => {
     expect(ids(rechercherPromos(index, "  ", AUJOURDHUI))).toEqual(["chocolat", "lait", "laitue", "nutella", "oeufs", "lait-uht"]);
     expect(ids(rechercherPromos(index, "", AUJOURDHUI, { magasin: "leclerc" }))).toEqual(["chocolat", "lait-uht"]);
     expect(rechercherPromos(null, "lait", AUJOURDHUI)).toEqual([]);
+  });
+});
+
+describe("familles de produits", () => {
+  const index = indexerPromos({
+    format: 2,
+    offres: [
+      offre({ id: "pringles", produit: "PRINGLES" }),
+      offre({ id: "lays", produit: "Chips", marque: "LAY’S" }),
+      offre({ id: "doritos", produit: "DORITOS", source: "leclerc" }),
+      offre({ id: "changes", produit: "CHANGES BEBE", marque: "PAMPERS", source: "leclerc" }),
+      offre({ id: "shampooing", produit: "Shampooing familial", marque: "CIEN" }),
+      offre({ id: "pate", produit: "Pâté de volaille" }),
+      offre({ id: "pates", produit: "Pâtes fraîches" }),
+      offre({ id: "marrons", produit: "Marrons glacés" }),
+      offre({ id: "magnum", produit: "Utopia double noisettes", marque: "MAGNUM" }),
+    ],
+  });
+
+  test("« chips » trouve aussi les marques de chips, après les produits qui s'appellent « chips »", () => {
+    expect(ids(chercherPromos(index, "Chips", AUJOURDHUI))).toEqual(["lays", "pringles", "doritos"]);
+  });
+
+  test("les noms d'une même famille sont équivalents", () => {
+    expect(ids(chercherPromos(index, "Couches", AUJOURDHUI))).toEqual(["changes"]);
+    expect(ids(chercherPromos(index, "shampoing", AUJOURDHUI))).toEqual(["shampooing"]);
+    expect(ids(chercherPromos(index, "Glaces", AUJOURDHUI))).toEqual(["magnum"]);
+  });
+
+  test("les faux amis ne se confondent pas : pâtes et pâté, glace et glacé", () => {
+    expect(ids(chercherPromos(index, "Pâtes", AUJOURDHUI))).toEqual(["pates"]);
+    expect(ids(chercherPromos(index, "pâté", AUJOURDHUI))).toEqual(["pate"]);
+    expect(ids(chercherPromos(index, "Marrons glacés", AUJOURDHUI))).toEqual(["marrons"]);
+  });
+
+  test("dans la recherche, il faut le nom complet de la famille", () => {
+    expect(ids(rechercherPromos(index, "chips", AUJOURDHUI))).toEqual(["lays", "pringles", "doritos"]);
+    expect(ids(rechercherPromos(index, "chi", AUJOURDHUI))).toEqual(["lays"]);
+  });
+
+  test("regroupe les mots : une famille en plusieurs mots compte pour un", () => {
+    expect(regrouper(motsCles("Papier toilette doux")).map(({ mots }) => mots.join(" "))).toEqual(["papier toilette", "dou"]);
+    expect(regrouper(motsCles("Chips paprika"))[0].equivalents).toContainEqual(["pringle"]);
+    expect(regrouper(motsCles("Lait"))).toEqual([{ mots: ["lait"], equivalents: [] }]);
   });
 });
 

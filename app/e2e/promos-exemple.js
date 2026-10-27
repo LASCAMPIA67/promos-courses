@@ -69,6 +69,8 @@ const OFFRES = [
     reduction: "-20 %",
   }),
   offre("laitue", LIDL, { produit: "Laitue", description: "La pièce", prix: 0.79, prix_unitaire: 0.79, unite: "pièce" }),
+  // Pas de « chips » dans le nom : trouvée par la famille « chips ».
+  offre("pringles", LIDL, { produit: "PRINGLES", description: "Le paquet de 165 g", prix: 1.99, ancien_prix: 2.79, reduction: "-28 %" }),
   offre("beurre", LIDL, { produit: "Beurre doux", marque: "PÂTURAGES", prix: 1.99, date_debut: jour(-8), date_fin: jour(-1) }),
   offre("bananes", LIDL, {
     produit: "Bananes",

@@ -30,10 +30,11 @@ export function suivreArticles(db, rappel, enCasErreur) {
   );
 }
 
-export function ajouterArticle(db, uid, article) {
+/** Ajoute un article ; « achete » sert à remettre un article supprimé par erreur depuis le caddie. */
+export function ajouterArticle(db, uid, article, { achete = false } = {}) {
   return addDoc(collection(db, "articles"), {
     ...article,
-    achete: false,
+    achete,
     ajoute_par: uid,
     cree_le: serverTimestamp(),
     modifie_le: serverTimestamp(),

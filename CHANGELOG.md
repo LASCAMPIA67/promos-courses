@@ -20,7 +20,16 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
   « Promos ») ; l'onglet « Promos » permet de chercher un produit ou une marque pendant qu'on tape
   (le début d'un mot suffit), de filtrer par magasin, et d'ajouter une promo à la liste en un geste,
   avec une note qui rappelle le magasin, le prix et la date. Affichage par 30, « Voir plus de promos ».
-- Tests : 6 tests de logique et 2 scénarios réels de plus ; captures d'écran de l'onglet « Promos ».
+- **Supprimer d'un geste** : glisser un article vers la gauche fait apparaître un bouton
+  « Supprimer », comme dans Mail sur l'iPhone ; « Annuler » le remet pendant 6 secondes (même s'il
+  était dans le caddie). La suppression depuis la fiche de l'article reste possible.
+- **Familles de produits** (environ 50) : « Chips » trouve aussi Pringles, Lay's, Doritos… ;
+  « Soda » trouve Coca-Cola, Fanta… ; « Couches » trouve « Changes bébé » Pampers… Dans la liste
+  comme dans l'onglet « Promos » ; les promos qui contiennent le mot écrit passent d'abord.
+- Les faux amis ne se confondent plus : « pâtes » ne trouve pas « pâté », ni « glaces » les
+  « marrons glacés ».
+- Tests : 11 tests de logique et 4 scénarios réels de plus ; captures d'écran de l'onglet « Promos »
+  et du glissement.
 
 ### Sécurité
 

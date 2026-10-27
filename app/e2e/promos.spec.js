@@ -61,6 +61,14 @@ test("les articles en promo sont signalés, avec le détail de chaque promo", as
   await expect(page.locator("#resume")).toHaveText("2 articles à acheter · 1 en promo");
 });
 
+test("« Chips » trouve aussi les marques de chips, comme Pringles", async ({ page, context }) => {
+  await servirPromos(context);
+  await seConnecter(page, COMPTES.un);
+  await ajouter(page, "Chips");
+  await page.getByRole("button", { name: "Voir 1 promo pour Chips" }).click();
+  await expect(page.getByRole("dialog", { name: "Promos pour « Chips »" }).locator(".promo-nom")).toHaveText(["Pringles"]);
+});
+
 test("des promos trop anciennes ou incomplètes sont signalées", async ({ page, context }) => {
   const ilYATroisJours = new Date(Date.now() - 3 * 24 * 3_600_000);
   await servirPromos(context, { miseAJour: ilYATroisJours, etatLeclerc: "erreur" });

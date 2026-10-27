@@ -63,6 +63,48 @@ test("ajouter, cocher, modifier et supprimer des articles", async ({ page }) => 
   await expect(page.locator("#section-caddie")).toBeHidden();
 });
 
+test("glisser un article vers la gauche pour le supprimer, avec « Annuler »", async ({ page }) => {
+  await seConnecter(page, COMPTES.un);
+  await ajouter(page, "Pain");
+  await ajouter(page, "Beurre");
+  await page.getByRole("checkbox", { name: "Beurre : à acheter" }).click();
+  await expect(caddie(page)).toContainText("Beurre");
+
+  // Glisser « Pain » vers la gauche : le bouton « Supprimer » apparaît.
+  const glisser = async (ligne) => {
+    // La liste peut être redessinée à cet instant (confirmation du serveur) : on attend sa position.
+    let boite = null;
+    await expect.poll(async () => (boite = await ligne.boundingBox())).not.toBeNull();
+    const y = boite.y + boite.height / 2;
+    await page.mouse.move(boite.x + boite.width - 40, y);
+    await page.mouse.down();
+    await page.mouse.move(boite.x + boite.width - 180, y, { steps: 10 });
+    await page.mouse.up();
+  };
+  await glisser(aAcheter(page).locator(".article").filter({ hasText: "Pain" }));
+  await page.getByRole("button", { name: "Supprimer Pain" }).click();
+  await expect(aAcheter(page)).not.toContainText("Pain");
+
+  // Supprimé par erreur : « Annuler » le remet.
+  await expect(page.getByText("« Pain » supprimé.")).toBeVisible();
+  await page.getByRole("button", { name: "Annuler" }).click();
+  await expect(aAcheter(page).locator(".nom")).toHaveText(["Pain"]);
+
+  // Depuis le caddie aussi ; l'article revient dans le caddie.
+  await glisser(caddie(page).locator(".article").filter({ hasText: "Beurre" }));
+  await page.getByRole("button", { name: "Supprimer Beurre" }).click();
+  await expect(page.locator("#section-caddie")).toBeHidden();
+  await page.getByRole("button", { name: "Annuler" }).click();
+  await expect(caddie(page)).toContainText("Beurre");
+
+  // Toucher une ligne ouverte la referme, sans ouvrir l'article.
+  await glisser(aAcheter(page).locator(".article").filter({ hasText: "Pain" }));
+  await expect(page.getByRole("button", { name: "Supprimer Pain" })).toBeVisible();
+  await page.getByRole("button", { name: "Modifier Pain" }).click();
+  await expect(page.getByRole("button", { name: "Supprimer Pain" })).toBeHidden();
+  await expect(page.getByRole("dialog", { name: "Modifier l'article" })).toBeHidden();
+});
+
 test("les deux téléphones voient les changements de l'autre en direct", async ({ browser }) => {
   const telephone1 = await (await browser.newContext()).newPage();
   const telephone2 = await (await browser.newContext()).newPage();

@@ -54,6 +54,20 @@ for (const theme of ["light", "dark"]) {
     await page.locator("#ajout-nom").blur();
     await page.screenshot({ path: `${DOSSIER}liste${suffixe}.png` });
 
+    if (theme === "light") {
+      // Glisser un article vers la gauche : le bouton « Supprimer » apparaît.
+      const boite = await page.locator("#liste-a-acheter .article").filter({ hasText: "Beurre doux" }).boundingBox();
+      const y = boite.y + boite.height / 2;
+      await page.mouse.move(boite.x + boite.width - 40, y);
+      await page.mouse.down();
+      await page.mouse.move(boite.x + boite.width - 180, y, { steps: 10 });
+      await page.mouse.up();
+      await expect(page.getByRole("button", { name: "Supprimer Beurre doux" })).toBeVisible();
+      await page.waitForTimeout(300); // fin de l'animation
+      await page.screenshot({ path: `${DOSSIER}glisser.png` });
+      await page.getByRole("button", { name: "Modifier Beurre doux" }).click(); // referme
+    }
+
     await page.getByRole("button", { name: "Voir 2 promos pour Lait demi-écrémé" }).click();
     await expect(page.getByRole("dialog", { name: "Promos pour « Lait demi-écrémé »" })).toBeVisible();
     await page.screenshot({ path: `${DOSSIER}promos${suffixe}.png` });

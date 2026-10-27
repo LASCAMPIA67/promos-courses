@@ -1,6 +1,8 @@
 // Les promos de nos magasins (fichier promos.json, écrit chaque matin par le robot) et leur
 // comparaison avec la liste de courses. Sans Firebase ni réseau : facile à tester.
 
+import { FAMILLES } from "./familles.js";
+
 /** Le fichier promos.json du dépôt, tel que le robot l'enregistre chaque matin. */
 export const URL_PROMOS = "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/main/promos.json";
 
@@ -16,14 +18,21 @@ const MOTS_VIDES = new Set([
   "pour", "sans", "sur", "un", "une", "cl", "kg", "ml",
 ]);
 
+// Mots que seul l'accent distingue d'un autre : « pâté » n'est pas « pâte », « glacé » pas « glace ».
+const FAUX_AMIS = [
+  [/\bpâtés?(?!\p{L})/gu, "patee"],
+  [/\bglacée?s?(?!\p{L})/gu, "glacee"],
+];
+
 /**
  * Mots-clés d'un texte, pour comparer un article de la liste aux produits en promo :
  * « Œufs frais de la ferme » → ["oeuf", "frai", "ferme"].
  * Minuscules, sans accents, sans petits mots ni nombres, et au singulier (s ou x final retiré).
  */
 export function motsCles(texte) {
-  return String(texte ?? "")
-    .toLowerCase()
+  let minuscules = String(texte ?? "").toLowerCase();
+  for (const [motif, remplacement] of FAUX_AMIS) minuscules = minuscules.replace(motif, remplacement);
+  return minuscules
     .replace(/œ/g, "oe")
     .replace(/æ/g, "ae")
     .normalize("NFD")
@@ -48,11 +57,48 @@ export function indexerPromos(donnees) {
   }));
 }
 
+// Les familles de produits, réduites à leurs mots-clés : [{ cles: [[mots]], termes: [[mots]] }].
+let famillesPretes;
+function familles() {
+  famillesPretes ??= FAMILLES.map(({ cles, termes }) => ({
+    cles: cles.map(motsCles).filter((mots) => mots.length),
+    termes: termes.map(motsCles).filter((mots) => mots.length),
+  }));
+  return famillesPretes;
+}
+
+/**
+ * Regroupe les mots cherchés : un mot seul, ou le nom d'une famille (« chips », « papier toilette »)
+ * avec ses équivalents (« pringles », « lay »…). Renvoie [{ mots, equivalents: [[mots]] }], dans
+ * l'ordre de l'article.
+ */
+export function regrouper(motsCherches) {
+  const restants = [...new Set(motsCherches)];
+  const groupes = [];
+  // Les noms de famille les plus longs d'abord : « papier toilette » avant « papier ».
+  const noms = familles()
+    .flatMap((famille) => famille.cles.map((cle) => ({ cle, famille })))
+    .sort((a, b) => b.cle.length - a.cle.length);
+  for (const { cle, famille } of noms) {
+    if (!cle.every((mot) => restants.includes(mot))) continue;
+    const place = restants.indexOf(cle[0]);
+    for (const mot of cle) restants[restants.indexOf(mot)] = null;
+    const equivalents = [...famille.cles, ...famille.termes].filter((mots) => mots.join(" ") !== cle.join(" "));
+    groupes.push({ mots: cle, equivalents, place });
+  }
+  restants.forEach((mot, place) => {
+    if (mot) groupes.push({ mots: [mot], equivalents: [], place });
+  });
+  return groupes.sort((a, b) => a.place - b.place).map(({ mots, equivalents }) => ({ mots, equivalents }));
+}
+
 /**
  * Les promos qui correspondent à un article de la liste : tous les mots de l'article doivent se
- * retrouver dans le nom du produit ou sa marque. Les promos terminées sont écartées.
- * Les plus proches d'abord : celles dont le nom commence par l'article (« Lait demi-écrémé » avant
- * « Chocolat au lait »), celles en cours avant celles à venir, puis les noms les plus courts.
+ * retrouver dans le nom du produit ou sa marque, ou un équivalent de sa famille (« chips » trouve
+ * « Pringles »). Les promos terminées sont écartées.
+ * Les plus proches d'abord : celles qui contiennent les mots de l'article avant celles trouvées par
+ * leur famille, celles dont le nom commence par l'article (« Lait demi-écrémé » avant « Chocolat au
+ * lait »), celles en cours avant celles à venir, puis les noms les plus courts.
  * Renvoie [{ offre, aVenir }].
  */
 export function chercherPromos(index, nom, aujourdhui) {
@@ -61,8 +107,9 @@ export function chercherPromos(index, nom, aujourdhui) {
 
 /**
  * Recherche dans toutes les promos, pendant qu'on tape : chaque mot cherché doit être le début d'un
- * mot du produit ou de sa marque (« fro » trouve « Fromage »). Sans rien à chercher : toutes les
- * promos, celles en cours d'abord. « magasin » : « lidl », « leclerc » ou vide pour les deux.
+ * mot du produit ou de sa marque (« fro » trouve « Fromage »), ou un nom de famille complet
+ * (« chips » trouve aussi « Pringles »). Sans rien à chercher : toutes les promos, celles en cours
+ * d'abord. « magasin » : « lidl », « leclerc » ou vide pour les deux.
  * Même ordre que chercherPromos. Renvoie [{ offre, aVenir }].
  */
 export function rechercherPromos(index, texte, aujourdhui, { magasin = "" } = {}) {
@@ -80,27 +127,45 @@ function toutes(index, aujourdhui) {
     .sort((a, b) => Number(a.aVenir) - Number(b.aVenir));
 }
 
+const egal = (motCherche, mot) => mot === motCherche;
+
 function trouver(index, motsCherches, aujourdhui, correspond) {
-  const mots = [...new Set(motsCherches)];
-  if (!index || mots.length === 0) return [];
+  const groupes = regrouper(motsCherches);
+  if (!index || groupes.length === 0) return [];
   const trouvees = [];
   for (const { offre, motsProduit, motsMarque } of index) {
     if (offre.date_fin && offre.date_fin < aujourdhui) continue;
-    const present = (motCherche) =>
-      motsProduit.some((mot) => correspond(motCherche, mot)) || [...motsMarque].some((mot) => correspond(motCherche, mot));
-    if (!mots.every(present)) continue;
-    const position = motsProduit.findIndex((mot) => correspond(mots[0], mot));
+    const motsOffre = [...motsProduit, ...motsMarque];
+    const contient = (mots, comparer) => mots.every((m) => motsOffre.some((mot) => comparer(m, mot)));
+
+    // Pour chaque groupe : ses propres mots, sinon un équivalent de sa famille (mots entiers).
+    let parFamille = false;
+    let premier = null;
+    const tousTrouves = groupes.every((groupe, i) => {
+      let trouve = contient(groupe.mots, correspond) ? groupe.mots : null;
+      if (!trouve) {
+        trouve = groupe.equivalents.find((mots) => contient(mots, egal)) ?? null;
+        if (trouve) parFamille = true;
+      }
+      if (i === 0) premier = trouve;
+      return trouve !== null;
+    });
+    if (!tousTrouves) continue;
+
+    const position = motsProduit.findIndex((mot) => correspond(premier[0], mot));
     trouvees.push({
       offre,
       aVenir: Boolean(offre.date_debut && offre.date_debut > aujourdhui),
+      parFamille,
       position: position === -1 ? Number.MAX_SAFE_INTEGER : position,
       // Le mot entier avant les mots qui commencent pareil : « Lait » avant « Laitue ».
-      exact: motsProduit.includes(mots[0]) || motsMarque.has(mots[0]),
+      exact: contient(premier, egal),
       longueur: motsProduit.length,
     });
   }
   trouvees.sort(
     (a, b) =>
+      Number(a.parFamille) - Number(b.parFamille) ||
       a.position - b.position ||
       Number(b.exact) - Number(a.exact) ||
       Number(a.aVenir) - Number(b.aVenir) ||

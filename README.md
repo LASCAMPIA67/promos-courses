@@ -102,12 +102,16 @@ Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
 - **Promos** : un article en promo chez Lidl ou Leclerc porte une étiquette « 2 promos ». En la
   touchant, on voit chaque promo : magasin, prix, ancien prix, réduction, prix au kilo, prix par lot,
   carte de fidélité, et jusqu'à quand (ou à partir de quand, pour les promos à venir).
+- **Familles de produits** : « Chips » trouve aussi Pringles, Lay's, Doritos… ; « Soda » trouve
+  Coca-Cola, Fanta… ; « Couches » trouve Pampers… (environ 50 familles).
 - **Toutes les promos** (onglet « Promos ») : chercher un produit ou une marque pendant qu'on tape,
   filtrer par magasin, et ajouter une promo à la liste en un geste (avec une note qui rappelle le
   magasin, le prix et la date).
 - **Promos à jour** : l'appli prévient si le robot n'est pas passé ou si un magasin manque.
 - **Ajout rapide** avec quantité facultative ; un article déjà dans la liste est signalé.
 - **Caddie** : un article coché passe dans « Dans le caddie » ; « Tout retirer » vide le caddie.
+- **Supprimer d'un geste** : glisser un article vers la gauche, comme dans Mail sur l'iPhone
+  (avec « Annuler » en cas d'erreur).
 - **Marche sans réseau** (au fond du magasin) : les changements partent au retour du réseau.
 - **Privée** : seuls nos deux comptes peuvent s'y connecter.
 - **Installable sur l'iPhone**, sans App Store : icône sur l'écran d'accueil, plein écran, mises à
@@ -177,7 +181,7 @@ est décrit par un schéma JSON : [`promos.schema.json`](src/robot_promos/promos
 - **Format vérifié** : avant d'être enregistré, `promos.json` est contrôlé par son schéma JSON.
 - **Tests automatiques** à chaque modification : plus de 50 tests pour le robot (workflow « Tests »),
   15 tests qui vérifient que la liste commune reste réservée à nos deux comptes (« Règles Firebase »),
-  41 tests de logique de l'appli et 13 scénarios réels dans Chrome et Safari, avec deux téléphones
+  46 tests de logique de l'appli et 15 scénarios réels dans Chrome et Safari, avec deux téléphones
   simulés et des promos d'exemple (« Appli »).
   Si un test de l'appli échoue, elle n'est pas publiée.
 - **Alerte** : en cas de problème, un avertissement s'affiche sur la page du lancement (onglet

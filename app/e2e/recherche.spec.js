@@ -24,8 +24,8 @@ test("chercher une promo, filtrer par magasin et l'ajouter à la liste", async (
   await expect(onglet(page, "Promos")).toHaveAttribute("aria-current", "page");
 
   // Sans rien chercher : toutes les promos en cours et à venir (la promo terminée n'y est pas).
-  await expect(page.locator("#etat-recherche")).toHaveText("8 promos en cours et à venir.");
-  await expect(noms(page)).toHaveCount(8);
+  await expect(page.locator("#etat-recherche")).toHaveText("9 promos en cours et à venir.");
+  await expect(noms(page)).toHaveCount(9);
 
   // Pendant qu'on tape : le mot entier d'abord, puis les mots qui commencent pareil.
   await page.getByRole("searchbox", { name: "Chercher une promo" }).fill("lait");
@@ -52,12 +52,12 @@ test("chercher une promo, filtrer par magasin et l'ajouter à la liste", async (
 
 test("beaucoup de promos : on en montre 30, puis plus à la demande", async ({ page, context }) => {
   await context.unroute("**/promos-test.json");
-  await servirPromos(context, { multiplier: 5 }); // 45 promos, dont 40 en cours ou à venir
+  await servirPromos(context, { multiplier: 5 }); // 50 promos, dont 45 en cours ou à venir
   await seConnecter(page, COMPTES.un);
   await onglet(page, "Promos").click();
-  await expect(page.locator("#etat-recherche")).toHaveText("40 promos en cours et à venir.");
+  await expect(page.locator("#etat-recherche")).toHaveText("45 promos en cours et à venir.");
   await expect(noms(page)).toHaveCount(30);
   await page.getByRole("button", { name: "Voir plus de promos" }).click();
-  await expect(noms(page)).toHaveCount(40);
+  await expect(noms(page)).toHaveCount(45);
   await expect(page.getByRole("button", { name: "Voir plus de promos" })).toBeHidden();
 });
