@@ -1,7 +1,7 @@
 {
  "format": 2,
- "mise_a_jour": "2026-10-26T22:36:34+01:00",
- "version_robot": "0.2.0",
+ "mise_a_jour": "2026-10-27T06:59:20+01:00",
+ "version_robot": "0.3.0",
  "magasins": {
   "lidl-lingolsheim": {
    "nom": "Lidl Lingolsheim",
