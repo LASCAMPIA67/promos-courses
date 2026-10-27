@@ -14,6 +14,18 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+### Ajouté
+
+- **Lecture automatique des tickets de caisse** : en ajoutant un ticket, l'appli trouve le magasin,
+  la date et le total et remplit la fenêtre (« Date et total lus sur le ticket : vérifiez. »). Un
+  PDF des applis E.Leclerc ou Lidl Plus est lu aussitôt (son texte, avec PDF.js) ; une photo ou une
+  capture d'écran en quelques secondes, avec [Tesseract.js](https://tesseract.projectnaptha.com) en
+  français. Tout se passe sur le téléphone : rien n'est envoyé ailleurs, et les fichiers de lecture
+  (environ 4 Mo) sont servis par l'appli, téléchargés à la première lecture puis gardés pour marcher
+  sans réseau. Ce qu'on a changé à la main n'est jamais remplacé, on peut enregistrer sans attendre,
+  et la lecture s'arrête si on ferme la fenêtre. Faux totaux (sous-total, remises, TVA) et dates
+  impossibles écartés ; testé sur une photo et un PDF d'exemple, dans Chrome et Safari.
+
 ## [0.9.0] - 2026-10-27
 
 ### Ajouté

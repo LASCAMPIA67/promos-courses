@@ -5,7 +5,7 @@ import { onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword,
 import { registerSW } from "virtual:pwa-register";
 
 import { messageErreur, pluriel, preparerSaisie, trierArticles, trouverDoublon } from "./articles.js";
-import { afficherFichier, nomFichier, partagerFichier, preparerFichier } from "./fichiers.js";
+import { afficherFichier, nomFichier, partagerFichier, preparerFichier, texteDuTicket } from "./fichiers.js";
 import { auth, db } from "./firebase.js";
 import { proposerInstallation } from "./installation.js";
 import {
@@ -54,6 +54,7 @@ import {
   formaterTaille,
   jourEnLettres,
   libelleTicket,
+  lireTicket,
   preparerTicket,
   regrouperParMois,
   trierTickets,
@@ -78,7 +79,7 @@ const etat = {
   tickets: [], // les tickets de caisse (fiches, sans leur fichier)
   arreterTickets: null,
   ticketOuvert: null, // { ticket, blob, liberer } : le ticket affiché en grand
-  ticketEnCours: null, // { ticket, fichier, jeton } : le ticket qu'on ajoute (fichier) ou qu'on corrige (ticket)
+  ticketEnCours: null, // { ticket, fichier, jeton, touches, arret } : le ticket qu'on ajoute (fichier) ou qu'on corrige (ticket)
   articleOuvert: null,
   ligneOuverte: null, // article dont le bouton « Supprimer » est visible (glissé vers la gauche)
   promos: null, // { donnees, index, luesLe }
@@ -977,7 +978,14 @@ let jetonsTicket = 0;
 
 /** La fenêtre du ticket : nouveau (avec son fichier) ou à corriger (sans toucher au fichier). */
 async function ouvrirFormulaireTicket({ fichier = null, ticket = null }) {
-  const enCours = { ticket, fichier: null, jeton: (jetonsTicket += 1) };
+  etat.ticketEnCours?.arret.abort();
+  const enCours = {
+    ticket,
+    fichier: null,
+    jeton: (jetonsTicket += 1),
+    touches: new Set(),
+    arret: new AbortController(),
+  };
   etat.ticketEnCours = enCours;
   $("titre-ajout-ticket").textContent = ticket ? "Modifier le ticket" : "Nouveau ticket";
   const magasin = ticket?.magasin ?? devinerMagasin(fichier?.name);
@@ -987,6 +995,7 @@ async function ouvrirFormulaireTicket({ fichier = null, ticket = null }) {
   $("montant-ticket").value = ticket?.montant != null ? ticket.montant.toFixed(2).replace(".", ",") : "";
   $("note-ticket").value = ticket?.note ?? "";
   afficherMessage($("message-ticket"), "");
+  afficherMessage($("lecture-ticket"), "");
   $("apercu-ticket").hidden = !fichier;
   $("apercu-ticket").replaceChildren(texteDiscret("Préparation du ticket…"));
   $("enregistrer-ticket").disabled = Boolean(fichier);
@@ -1001,6 +1010,7 @@ async function ouvrirFormulaireTicket({ fichier = null, ticket = null }) {
     enCours.fichier = prepare;
     $("apercu-ticket").replaceChildren(apercuTicket(prepare));
     $("enregistrer-ticket").disabled = false;
+    lireLeTicket(enCours);
   } catch (erreur) {
     console.error(erreur);
     if (etat.ticketEnCours?.jeton !== enCours.jeton) return;
@@ -1008,6 +1018,58 @@ async function ouvrirFormulaireTicket({ fichier = null, ticket = null }) {
     afficherMessage($("message-ticket"), erreur.message, "erreur");
   }
 }
+
+/**
+ * Lit le ticket (sur le téléphone) et remplit le magasin, la date et le total trouvés, sans toucher
+ * à ce qu'on a déjà changé à la main. On peut enregistrer sans attendre la fin de la lecture.
+ */
+async function lireLeTicket(enCours) {
+  const encoreOuvert = () => etat.ticketEnCours?.jeton === enCours.jeton;
+  afficherMessage($("lecture-ticket"), "Lecture du ticket…", "info");
+  try {
+    const lu = lireTicket(await texteDuTicket(enCours.fichier, enCours.arret.signal), dateDuJour());
+    if (!encoreOuvert()) return;
+    const remplis = [];
+    if (lu.magasin && !enCours.touches.has("magasin")) {
+      for (const choix of document.querySelectorAll('input[name="magasin"]'))
+        choix.checked = choix.value === lu.magasin;
+      remplis.push("magasin");
+    }
+    if (lu.date && !enCours.touches.has("date")) {
+      $("date-ticket").value = lu.date;
+      remplis.push("date");
+    }
+    if (lu.montant != null && !enCours.touches.has("montant")) {
+      $("montant-ticket").value = lu.montant.toFixed(2).replace(".", ",");
+      remplis.push("total");
+    }
+    afficherMessage(
+      $("lecture-ticket"),
+      remplis.length
+        ? `${enPhrase(remplis)} ${remplis.length > 1 ? "lus" : "lu"} sur le ticket : vérifiez.`
+        : "Rien de lisible sur le ticket : complétez à la main.",
+      remplis.length ? "succes" : "info",
+    );
+  } catch (erreur) {
+    console.warn("Lecture du ticket impossible :", erreur);
+    if (encoreOuvert()) afficherMessage($("lecture-ticket"), "Lecture impossible : complétez à la main.", "info");
+  }
+}
+
+/** ["total", "date"] → « Total et date ». */
+function enPhrase(mots) {
+  const texte = mots.length > 1 ? `${mots.slice(0, -1).join(", ")} et ${mots.at(-1)}` : mots[0];
+  return texte.charAt(0).toUpperCase() + texte.slice(1);
+}
+
+// Ce qu'on change à la main n'est jamais remplacé par la lecture du ticket.
+function noterChampTouche({ target }) {
+  const champ =
+    target.name === "magasin" ? "magasin" : { "date-ticket": "date", "montant-ticket": "montant" }[target.id];
+  if (champ) etat.ticketEnCours?.touches.add(champ);
+}
+$("form-ticket").addEventListener("input", noterChampTouche);
+$("form-ticket").addEventListener("change", noterChampTouche);
 
 function apercuTicket({ octets, apercu }) {
   if (apercu) {
@@ -1053,6 +1115,7 @@ $("form-ticket").addEventListener("submit", (evenement) => {
 });
 
 $("fenetre-ajout-ticket").addEventListener("close", () => {
+  etat.ticketEnCours?.arret.abort(); // la lecture du ticket ne sert plus : on l'arrête
   if (etat.ticketEnCours?.fichier?.apercu) URL.revokeObjectURL(etat.ticketEnCours.fichier.apercu);
   etat.ticketEnCours = null;
   $("apercu-ticket").replaceChildren();

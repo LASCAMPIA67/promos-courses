@@ -59,6 +59,49 @@ export function pdfExemple() {
   return Buffer.from(pdf, "latin1");
 }
 
+/**
+ * Un ticket de caisse fictif, net comme une capture d'écran, à dessiner dans le navigateur :
+ * `page.evaluate(dessinerTicket, { enTete, date })` renvoie l'image PNG en base64.
+ */
+export function dessinerTicket({ enTete = "MAGASIN EXEMPLE", date = "" } = {}) {
+  const toile = document.createElement("canvas");
+  toile.width = 560;
+  toile.height = 900;
+  const dessin = toile.getContext("2d");
+  dessin.fillStyle = "#ffffff";
+  dessin.fillRect(0, 0, toile.width, toile.height);
+  dessin.fillStyle = "#222222";
+  dessin.font = "bold 30px monospace";
+  dessin.textAlign = "center";
+  dessin.fillText(enTete, 280, 70);
+  dessin.font = "22px monospace";
+  dessin.fillText("Ticket fictif pour la documentation", 280, 110);
+  dessin.textAlign = "left";
+  const lignes = [
+    ["LAIT DEMI-ECREME 2 L", "1,78"],
+    ["PAIN COMPLET", "1,65"],
+    ["BANANES 1 KG", "1,29"],
+    ["BEURRE DOUX", "2,49"],
+    ["CAFE MOULU 1 KG", "9,99"],
+    ["PATES SPAGHETTI x2", "1,90"],
+    ["CHOCOLAT AU LAIT", "2,15"],
+    ["YAOURTS NATURE x8", "2,20"],
+  ];
+  lignes.forEach(([produit, prix], rang) => {
+    const y = 190 + rang * 52;
+    dessin.fillText(produit, 40, y);
+    dessin.fillText(prix, 440, y);
+  });
+  dessin.fillRect(40, 640, 480, 3);
+  dessin.font = "bold 30px monospace";
+  dessin.fillText("TOTAL", 40, 700);
+  dessin.fillText("23,45 EUR", 340, 700);
+  dessin.font = "22px monospace";
+  if (date) dessin.fillText(`${date}  14:32`, 40, 770);
+  dessin.fillText("Merci de votre visite", 140, 830);
+  return toile.toDataURL("image/png").split(",")[1];
+}
+
 /** Choisit un fichier comme sur l'iPhone : touche le bouton, puis donne le fichier au sélecteur. */
 export async function choisirFichier(page, bouton, fichier) {
   const [selecteur] = await Promise.all([page.waitForEvent("filechooser"), bouton.click()]);

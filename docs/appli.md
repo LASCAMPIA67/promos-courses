@@ -77,9 +77,15 @@ liste**, sous le caddie, et visibles sur les deux téléphones.
   photo**, de choisir dans la **photothèque** (une capture d'écran, par exemple celle du ticket dans
   l'appli E.Leclerc ou Lidl Plus) ou dans **Fichiers** (le **PDF** du ticket). Après « Tout retirer »
   dans le caddie, l'appli propose aussi d'ajouter le ticket des courses.
-- **Ce qu'on indique** : le magasin (Leclerc d'office, ou Lidl si le nom du fichier le dit), la date
-  des courses (aujourd'hui d'office), et si on veut le montant et une note (« garantie de la
-  cafetière »).
+- **Lu tout seul** : l'appli lit le ticket et remplit le **magasin**, la **date** et le **total**
+  (« Date et total lus sur le ticket : vérifiez. »). Un PDF est lu aussitôt ; une photo en quelques
+  secondes, et on peut enregistrer sans attendre. Ce qu'on a changé à la main n'est jamais remplacé.
+  La lecture se fait **sur le téléphone** : le ticket n'est envoyé nulle part pour être lu. La
+  première lecture d'une photo télécharge l'outil de lecture (environ 4 Mo, une seule fois) ; il
+  marche ensuite sans réseau.
+- **Ce qu'on vérifie** : le magasin (Leclerc d'office, ou Lidl si le nom du fichier ou le ticket le
+  dit), la date des courses (aujourd'hui d'office), et si on veut le montant et une note (« garantie
+  de la cafetière »). Si rien n'est lisible (photo floue, de travers), on complète à la main.
 - **Sous la liste** : les 3 derniers tickets (« Leclerc · mar. 27/10 · 54,30 € ») ; « Voir les 12
   tickets » les montre tous, classés par mois.
 - **En grand** : toucher un ticket l'ouvre (la photo, ou chaque page du PDF) ; on peut zoomer avec
@@ -218,9 +224,10 @@ détails (« sans lactose », « grand format ») vont mieux dans la **note** de
 | [`app/src/articles.js`](../app/src/articles.js) | Règles simples : nettoyage, doublons, tri, messages d'erreur. |
 | [`app/src/rayons.js`](../app/src/rayons.js) | Les rayons du magasin, dans l'ordre, et le rayon de chaque article d'après son nom. |
 | [`app/src/membres.js`](../app/src/membres.js) | Qui a ajouté quoi : couleur et prénom de chacun, date d'ajout en clair. |
-| [`app/src/tickets.js`](../app/src/tickets.js) | Les tickets de caisse : découpage du fichier, montant, date, classement par mois. |
-| [`app/src/fichiers.js`](../app/src/fichiers.js) | Photo allégée avant l'envoi, affichage en grand, partage. |
-| [`app/src/pdf.js`](../app/src/pdf.js) | Affichage des tickets en PDF ([PDF.js](https://mozilla.github.io/pdf.js/), chargé seulement à l'ouverture d'un PDF). |
+| [`app/src/tickets.js`](../app/src/tickets.js) | Les tickets de caisse : découpage du fichier, montant, date, classement par mois, et ce qu'on trouve dans le texte d'un ticket (magasin, date, total). |
+| [`app/src/fichiers.js`](../app/src/fichiers.js) | Photo allégée avant l'envoi, affichage en grand, partage, texte du ticket. |
+| [`app/src/pdf.js`](../app/src/pdf.js) | Affichage et texte des tickets en PDF ([PDF.js](https://mozilla.github.io/pdf.js/), chargé seulement à l'ouverture d'un PDF). |
+| [`app/src/lecture.js`](../app/src/lecture.js) | Lecture d'une photo de ticket sur le téléphone ([Tesseract.js](https://tesseract.projectnaptha.com), en français ; ses fichiers sont servis par l'appli, dans `ocr/`, chargés à la première lecture). |
 | [`app/src/promos.js`](../app/src/promos.js) | Les promos : recherche pour chaque article et dans toutes les promos, dates, prix, fraîcheur des données. |
 | [`app/src/familles.js`](../app/src/familles.js) | Les familles de produits : « chips » → Pringles, Lay's, Doritos… |
 | [`app/src/installation.js`](../app/src/installation.js) | Quand proposer d'installer l'appli sur l'iPhone. |
@@ -239,8 +246,8 @@ que dans Firebase.
 
 | Tests | Ce qu'ils vérifient | Commande |
 |---|---|---|
-| Logique ([`app/tests`](../app/tests)) | Nettoyage des saisies, doublons, tri, messages d'erreur ; couleur et prénom de chacun, date d'ajout en clair ; tickets de caisse (découpage et recollage du fichier, montant, date, magasin deviné, classement par mois, taille des photos) ; recherche des promos (accents, pluriel, mots proches, marques, familles de produits, faux amis, début de mot, filtre par magasin), article créé depuis une promo, où va la réduction (caisse, lot, carte E.Leclerc, Lidl Plus), description sans les prix répétés, Leclerc d'abord, promos terminées ou à venir, dates, prix, fraîcheur des données ; quand proposer l'installation. | `npm test` |
-| Scénarios réels ([`app/e2e`](../app/e2e)) | Un navigateur à la taille d'un iPhone utilise l'appli branchée sur l'**émulateur Firebase** (jamais la vraie base), avec deux comptes et un [fichier de promos d'exemple](../app/e2e/promos-exemple.js) aux dates du jour : connexion refusée, ajout, doublon, cochage, modification, suppression, synchronisation en direct entre deux téléphones, mode hors connexion, refus d'un compte étranger, déconnexion, promo choisie avec « + Ajouter » affichée à droite de l'article (rien pour un article écrit à la main, promo retrouvée pour les articles des versions précédentes, « Promo terminée »), promos anciennes ou incomplètes, promos indisponibles puis retrouvées, conseil d'installation dans Safari sur iPhone, glisser pour supprimer avec « Annuler », « Chips » qui trouve Pringles, promos affichées en écrivant (Leclerc d'abord, ajout d'une promo ou du texte écrit, affichage par 30), prix expliqué (carte E.Leclerc, Lidl Plus), prénom et couleur choisis sur un téléphone et vus sur l'autre (pastille, heure d'ajout), tickets de caisse en photo et en PDF ([fichiers d'exemple](../app/e2e/fichiers-exemple.js) : vus en grand sur l'autre téléphone, corrigés, partagés, supprimés, proposés après « Tout retirer », sans réseau, refusés à un compte étranger). Sur GitHub, ils tournent dans Chrome **et Safari** (WebKit). | `npm run e2e` |
+| Logique ([`app/tests`](../app/tests)) | Nettoyage des saisies, doublons, tri, messages d'erreur ; couleur et prénom de chacun, date d'ajout en clair ; tickets de caisse (découpage et recollage du fichier, montant, date, magasin deviné, classement par mois, taille des photos, total et date lus sur un ticket même mal lu, faux totaux et dates impossibles écartés) ; recherche des promos (accents, pluriel, mots proches, marques, familles de produits, faux amis, début de mot, filtre par magasin), article créé depuis une promo, où va la réduction (caisse, lot, carte E.Leclerc, Lidl Plus), description sans les prix répétés, Leclerc d'abord, promos terminées ou à venir, dates, prix, fraîcheur des données ; quand proposer l'installation. | `npm test` |
+| Scénarios réels ([`app/e2e`](../app/e2e)) | Un navigateur à la taille d'un iPhone utilise l'appli branchée sur l'**émulateur Firebase** (jamais la vraie base), avec deux comptes et un [fichier de promos d'exemple](../app/e2e/promos-exemple.js) aux dates du jour : connexion refusée, ajout, doublon, cochage, modification, suppression, synchronisation en direct entre deux téléphones, mode hors connexion, refus d'un compte étranger, déconnexion, promo choisie avec « + Ajouter » affichée à droite de l'article (rien pour un article écrit à la main, promo retrouvée pour les articles des versions précédentes, « Promo terminée »), promos anciennes ou incomplètes, promos indisponibles puis retrouvées, conseil d'installation dans Safari sur iPhone, glisser pour supprimer avec « Annuler », « Chips » qui trouve Pringles, promos affichées en écrivant (Leclerc d'abord, ajout d'une promo ou du texte écrit, affichage par 30), prix expliqué (carte E.Leclerc, Lidl Plus), prénom et couleur choisis sur un téléphone et vus sur l'autre (pastille, heure d'ajout), tickets de caisse en photo et en PDF ([fichiers d'exemple](../app/e2e/fichiers-exemple.js) : lus tout seuls — date et total — sans changer ce qu'on a choisi, vus en grand sur l'autre téléphone, corrigés, partagés, supprimés, proposés après « Tout retirer », sans réseau, refusés à un compte étranger). Sur GitHub, ils tournent dans Chrome **et Safari** (WebKit). | `npm run e2e` |
 | Accessibilité ([`app/e2e/accessibilite.spec.js`](../app/e2e/accessibilite.spec.js)) | Chaque écran (connexion, liste, recherche, promo, fenêtres, tickets), en mode clair et sombre, vérifié avec [axe](https://github.com/dequelabs/axe-core) selon les règles WCAG 2.2 niveau AA : contrastes, noms lus par VoiceOver, champs… | `npm run e2e` |
 | Rapidité ([Lighthouse](https://developer.chrome.com/docs/lighthouse)) | L'appli construite, mesurée sur un téléphone simulé : rapidité (85 sur 100 au moins), accessibilité (100), bonnes pratiques (95 au moins). Sur GitHub, à chaque modification (rapports gardés 14 jours). | `npm run build && npm run qualite` |
 | Captures d'écran | Régénère les images de cette page dans `docs/captures/`. | `npm run captures` |

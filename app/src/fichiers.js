@@ -102,3 +102,16 @@ export async function partagerFichier(blob, nom) {
   lien.click();
   setTimeout(() => URL.revokeObjectURL(adresse), 60_000);
 }
+
+/**
+ * Le texte d'un ticket préparé par preparerFichier : lu dans le PDF, ou sur la photo (plus long, de
+ * quelques secondes, arrêtée par `signal`). Les outils de lecture ne sont chargés qu'à ce moment-là.
+ */
+export async function texteDuTicket({ octets, type, apercu }, signal) {
+  if (type === PDF) {
+    const { texteDuPdf } = await import("./pdf.js");
+    return texteDuPdf(octets.slice()); // une copie : PDF.js garde celle qu'on lui donne
+  }
+  const { texteDeLaPhoto } = await import("./lecture.js");
+  return texteDeLaPhoto(apercu, signal);
+}

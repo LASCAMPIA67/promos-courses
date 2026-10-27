@@ -132,3 +132,61 @@ export function formaterTaille(octets) {
   if (octets < 1024 * 1024) return `${Math.max(1, Math.round(octets / 1024))} Ko`;
   return `${(octets / 1024 / 1024).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} Mo`;
 }
+
+// ---------------------------------------------------------------------------------------------
+// Lecture automatique : le total, la date et le magasin, trouvés dans le texte du ticket (lu sur la
+// photo, ou dans le PDF).
+
+const MONTANT = /(\d{1,4})\s?[,.]\s?(\d{2})(?!\d)/g;
+
+/** Les lignes qui donnent le total, de la plus sûre à la moins sûre. */
+const LIGNES_TOTAL = [
+  /(net|total)\s*(a|à)\s*payer/i,
+  /\bt[o0]ta[l1i]\b/i,
+  /\bmontant\b/i,
+  /\b(cb|carte bancaire|carte|esp[eè]ces)\b/i,
+];
+
+/** Les « totaux » qui n'en sont pas : sous-total, remises, TVA… */
+const FAUX_TOTAUX = /sous[\s-]?t[o0]tal|total\s*(des\s*)?(remises?|[ée]conomies?|tva|ht|articles?|points?|avantages?)/i;
+
+function montantDeLaLigne(ligne) {
+  const montants = [...ligne.matchAll(MONTANT)].map(([, euros, centimes]) => Number(`${euros}.${centimes}`));
+  return montants.at(-1) ?? null;
+}
+
+/**
+ * Ce qu'on peut lire sur un ticket : { magasin, date, montant }, chacun null s'il n'est pas trouvé.
+ * `aujourdhui` (« 2026-10-27 ») écarte les dates impossibles (futures, ou de plus de deux ans).
+ */
+export function lireTicket(texte, aujourdhui) {
+  const lignes = String(texte ?? "")
+    .split(/\r?\n/)
+    .map((ligne) => ligne.trim())
+    .filter(Boolean);
+  const tout = lignes.join("\n");
+
+  const magasin = /lidl/i.test(tout) ? "lidl" : /leclerc/i.test(tout) ? "leclerc" : null;
+
+  let montant = null;
+  for (const motif of LIGNES_TOTAL) {
+    const rang = lignes.findIndex((ligne) => motif.test(ligne) && !FAUX_TOTAUX.test(ligne));
+    if (rang === -1) continue;
+    // Le montant est sur la ligne, ou juste en dessous quand la lecture l'a renvoyé à la ligne.
+    montant = montantDeLaLigne(lignes[rang]) ?? montantDeLaLigne(lignes[rang + 1] ?? "");
+    if (montant != null && montant > 0 && montant <= MONTANT_MAX) break;
+    montant = null;
+  }
+
+  let date = null;
+  const ilYADeuxAns = `${Number(aujourdhui.slice(0, 4)) - 2}${aujourdhui.slice(4)}`;
+  for (const [, jour, mois, annee] of tout.matchAll(/\b(\d{2})[/.-](\d{2})[/.-](\d{4}|\d{2})\b/g)) {
+    const iso = `${annee.length === 2 ? `20${annee}` : annee}-${mois}-${jour}`;
+    const valide = new Date(`${iso}T12:00`);
+    if (Number.isNaN(valide.getTime()) || valide.getDate() !== Number(jour)) continue;
+    if (iso > aujourdhui || iso < ilYADeuxAns) continue;
+    date = iso;
+    break;
+  }
+  return { magasin, date, montant };
+}

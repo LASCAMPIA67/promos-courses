@@ -9,6 +9,7 @@ import {
   formaterTaille,
   libelleTicket,
   lireMontant,
+  lireTicket,
   preparerTicket,
   regrouperParMois,
   trierTickets,
@@ -101,5 +102,45 @@ describe("affichage des tickets", () => {
     expect(dimensionsReduites(800, 600)).toEqual({ largeur: 800, hauteur: 600 });
     expect(formaterTaille(320_000)).toBe("313 Ko");
     expect(simple(formaterTaille(1_300_000))).toBe("1,2 Mo");
+  });
+});
+
+describe("lireTicket : le total, la date et le magasin, lus sur le ticket", () => {
+  test("ticket E.Leclerc (texte d'un PDF)", () => {
+    const texte = `E.LECLERC GEISPOLSHEIM
+LAIT DEMI ECREME 1L            1,78
+PAIN COMPLET                   1,65
+SOUS-TOTAL                    21,10
+TOTAL REMISES                 -0,60
+TOTAL A PAYER                 23,45 EUR
+CB                            23,45
+27/10/2026 18:42  CAISSE 012`;
+    expect(lireTicket(texte, "2026-10-27")).toEqual({ magasin: "leclerc", date: "2026-10-27", montant: 23.45 });
+  });
+
+  test("ticket Lidl, lu sur une photo (fautes de lecture comprises)", () => {
+    const texte = `LIDL
+Bananes 1,29 B
+Beurre doux 1,99 B
+TOTAI
+12.34
+CB EMV 12,34
+26.10.26 18:05 1234`;
+    expect(lireTicket(texte, "2026-10-27")).toEqual({ magasin: "lidl", date: "2026-10-26", montant: 12.34 });
+  });
+
+  test("sans le mot « total » : la ligne de paiement ; rien de lisible : null", () => {
+    expect(lireTicket("MAGASIN\nCARTE BANCAIRE   8,90 €", "2026-10-27")).toEqual({
+      magasin: null,
+      date: null,
+      montant: 8.9,
+    });
+    expect(lireTicket("", "2026-10-27")).toEqual({ magasin: null, date: null, montant: null });
+  });
+
+  test("les dates impossibles sont écartées : futures, trop anciennes, ou qui n'existent pas", () => {
+    expect(lireTicket("Date 31/02/2026 puis 15/10/2026", "2026-10-27").date).toBe("2026-10-15");
+    expect(lireTicket("Garantie jusqu'au 27/10/2028", "2026-10-27").date).toBeNull();
+    expect(lireTicket("Ticket du 01/01/2020", "2026-10-27").date).toBeNull();
   });
 });

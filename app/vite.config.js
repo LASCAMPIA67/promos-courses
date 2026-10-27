@@ -9,6 +9,40 @@ import { URL_PROMOS } from "./src/promos.js";
 
 const { version } = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8"));
 
+/**
+ * La lecture des tickets (Tesseract.js) : ses fichiers sont servis par l'appli elle-même, dans
+ * « ocr/ », au lieu d'un site extérieur ; rien ne sort du téléphone. Seul le cœur « LSTM » sert,
+ * en trois versions selon ce que sait faire le téléphone ; le français en version légère.
+ */
+const FICHIERS_LECTURE = {
+  "worker.min.js": "tesseract.js/dist/worker.min.js",
+  "tesseract-core-lstm.wasm.js": "tesseract.js-core/tesseract-core-lstm.wasm.js",
+  "tesseract-core-simd-lstm.wasm.js": "tesseract.js-core/tesseract-core-simd-lstm.wasm.js",
+  "tesseract-core-relaxedsimd-lstm.wasm.js": "tesseract.js-core/tesseract-core-relaxedsimd-lstm.wasm.js",
+  "fra.traineddata.gz": "@tesseract.js-data/fra/4.0.0_best_int/fra.traineddata.gz",
+};
+const lireFichierLecture = (nom) => readFileSync(new URL(`./node_modules/${FICHIERS_LECTURE[nom]}`, import.meta.url));
+
+/** Copie ces fichiers dans l'appli construite, et les sert pendant le développement. */
+function fichiersDeLecture() {
+  return {
+    name: "fichiers-de-lecture",
+    generateBundle() {
+      for (const nom of Object.keys(FICHIERS_LECTURE)) {
+        this.emitFile({ type: "asset", fileName: `ocr/${nom}`, source: lireFichierLecture(nom) });
+      }
+    },
+    configureServer(serveur) {
+      serveur.middlewares.use((requete, reponse, suite) => {
+        const nom = requete.url?.match(/\/ocr\/([^/?]+)/)?.[1];
+        if (!nom || !(nom in FICHIERS_LECTURE)) return suite();
+        reponse.setHeader("Content-Type", nom.endsWith(".js") ? "text/javascript" : "application/octet-stream");
+        reponse.end(lireFichierLecture(nom));
+      });
+    },
+  };
+}
+
 export default defineConfig({
   // L'appli est publiée sur https://lascampia67.github.io/promos-courses/
   base: "/promos-courses/",
@@ -21,6 +55,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 800,
   },
   plugins: [
+    fichiersDeLecture(),
     VitePWA({
       registerType: "autoUpdate",
       // L'inscription est faite dans src/main.js, pour vérifier les mises à jour à chaque ouverture.
@@ -53,7 +88,8 @@ export default defineConfig({
         // PDF.js (pour voir les tickets en PDF, 1,7 Mo) n'est pas installé d'avance avec l'appli :
         // il est téléchargé à la première ouverture d'un PDF, puis gardé (voir ci-dessous).
         // Les écrans de démarrage ne servent qu'à l'installation sur l'iPhone : pas besoin de les garder.
-        globIgnores: ["**/assets/pdf*", "**/demarrage/**"],
+        // La lecture des tickets (ocr/, environ 4 Mo) non plus : téléchargée à la première lecture.
+        globIgnores: ["**/assets/pdf*", "**/demarrage/**", "**/ocr/**"],
         // Les promos : toujours les plus récentes quand il y a du réseau, sinon les dernières lues
         // (au fond du magasin, sans réseau, on les a quand même).
         runtimeCaching: [
@@ -61,6 +97,11 @@ export default defineConfig({
             urlPattern: ({ url }) => url.pathname.includes("/assets/pdf"),
             handler: "CacheFirst",
             options: { cacheName: "pdf", expiration: { maxEntries: 4 }, cacheableResponse: { statuses: [200] } },
+          },
+          {
+            urlPattern: ({ url }) => url.pathname.includes("/ocr/"),
+            handler: "CacheFirst",
+            options: { cacheName: "lecture", expiration: { maxEntries: 6 }, cacheableResponse: { statuses: [200] } },
           },
           {
             urlPattern: new RegExp(`^${URL_PROMOS.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")}$`),

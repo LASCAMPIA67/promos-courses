@@ -36,3 +36,20 @@ export async function dessinerPdf(octets, conteneur) {
   conteneur.replaceChildren(...pages);
   return () => tache.destroy();
 }
+
+/** Le texte d'un PDF, ligne par ligne (les tickets des applis des magasins sont du vrai texte). */
+export async function texteDuPdf(octets) {
+  const tache = getDocument({ data: octets, isEvalSupported: false });
+  try {
+    const pdf = await tache.promise;
+    const lignes = [];
+    for (let numero = 1; numero <= Math.min(pdf.numPages, PAGES_MAX); numero += 1) {
+      const { items } = await (await pdf.getPage(numero)).getTextContent();
+      // Chaque morceau de texte, suivi d'un retour à la ligne s'il finit une ligne du ticket.
+      lignes.push(items.map((morceau) => `${morceau.str}${morceau.hasEOL ? "\n" : " "}`).join(""));
+    }
+    return lignes.join("\n");
+  } finally {
+    await tache.destroy();
+  }
+}

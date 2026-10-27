@@ -1218,6 +1218,11 @@ dialog h2 {
   border-radius: 10px;
 }
 
+.lecture-ticket {
+  margin: 0 0 4px;
+  text-align: center;
+}
+
 .apercu-pdf {
   margin: 0;
   padding: 10px 16px;

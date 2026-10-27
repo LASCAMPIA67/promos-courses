@@ -2,7 +2,7 @@
 
 import { expect, test } from "@playwright/test";
 
-import { choisirFichier, pdfExemple, pngExemple } from "./fichiers-exemple.js";
+import { choisirFichier, dessinerTicket, pdfExemple, pngExemple } from "./fichiers-exemple.js";
 import { COMPTES, ajouter, creerComptes, seConnecter, viderLaBase } from "./outils.js";
 
 test.beforeAll(async ({ request }) => {
@@ -88,6 +88,9 @@ test("un ticket en PDF (appli du magasin) : chaque page affichée, et partagé",
   const fenetre = page.getByRole("dialog", { name: "Nouveau ticket" });
   await expect(fenetre.locator(".apercu-pdf")).toHaveText("PDF · 1 Ko");
   await expect(fenetre.getByRole("radio", { name: "Lidl" })).toBeChecked(); // deviné d'après le nom
+  // Le total, lu dans le PDF.
+  await expect(fenetre.getByRole("status")).toHaveText("Total lu sur le ticket : vérifiez.");
+  await expect(fenetre.getByLabel("Montant")).toHaveValue("2,54");
   await fenetre.getByRole("button", { name: "Enregistrer" }).click();
 
   await page.getByRole("button", { name: /^Ouvrir le ticket Lidl · / }).click();
@@ -112,6 +115,33 @@ test("un ticket en PDF (appli du magasin) : chaque page affichée, et partagé",
   await expect
     .poll(() => page.evaluate(() => window.partage))
     .toEqual([`ticket-lidl-${jour}.pdf application/pdf ${pdf.length}`]);
+});
+
+test("la photo du ticket est lue : date et total remplis, sans changer ce qu'on a choisi", async ({ page }) => {
+  test.slow(); // la lecture d'une photo prend quelques secondes
+  await seConnecter(page, COMPTES.un);
+  // Un ticket d'il y a trois jours (la date du jour est déjà proposée d'office).
+  const jour = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+  const image = await page.evaluate(dessinerTicket, { enTete: "LIDL", date: jour.toLocaleDateString("fr-FR") });
+  await choisirFichier(page, boutonAjouter(page), {
+    name: "IMG_0043.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(image, "base64"),
+  });
+  const fenetre = page.getByRole("dialog", { name: "Nouveau ticket" });
+  const lecture = fenetre.getByRole("status");
+  await expect(lecture).toHaveText("Lecture du ticket…");
+
+  // Pendant la lecture, le magasin est choisi à la main : la lecture n'y touche plus.
+  await fenetre.getByRole("radio", { name: "Autre" }).check();
+  await expect(lecture).toHaveText("Date et total lus sur le ticket : vérifiez.", { timeout: 60_000 });
+  await expect(fenetre.getByRole("radio", { name: "Autre" })).toBeChecked();
+  await expect(fenetre.getByLabel("Date des courses")).toHaveValue(jour.toLocaleDateString("sv-SE"));
+  await expect(fenetre.getByLabel("Montant")).toHaveValue("23,45");
+  await fenetre.getByRole("button", { name: "Enregistrer" }).click();
+  await expect(tickets(page)).toContainText("Autre magasin");
+  await expect(tickets(page)).toContainText("23,45 €");
+  await expect(tickets(page)).not.toContainText("envoi en cours");
 });
 
 test("après « Tout retirer », l'appli propose d'ajouter le ticket ; au-delà de 3, « Voir les tickets »", async ({
