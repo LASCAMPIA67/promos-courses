@@ -9,7 +9,7 @@ service cloud.firestore {
     // Seuls les deux comptes du foyer ont accès aux données (identifiants Firebase, non personnels).
     function estDuFoyer() {
       return request.auth != null
-        && request.auth.uid in ['ElRK8CEajUMQmtajHXv5qZVVT6G2', 'U92gcS4EipUUtAP1QOBenzGg8Aj1'];
+        && request.auth.uid in ['ElRK8CEajUMQmtajHXv5qZVVT6G2', 'XABqepPEkHXg8gBon5ljE5XEXOD3'];
     }
 
     // Un texte facultatif de longueur raisonnable.

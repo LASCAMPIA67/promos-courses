@@ -9,7 +9,7 @@ const FIRESTORE = "http://127.0.0.1:8080";
 // Les deux premiers comptes ont les identifiants autorisés par firebase/firestore.rules.
 export const COMPTES = {
   un: { uid: "ElRK8CEajUMQmtajHXv5qZVVT6G2", email: "compte1@exemple.test", motDePasse: "motdepasse-1" },
-  deux: { uid: "U92gcS4EipUUtAP1QOBenzGg8Aj1", email: "compte2@exemple.test", motDePasse: "motdepasse-2" },
+  deux: { uid: "XABqepPEkHXg8gBon5ljE5XEXOD3", email: "compte2@exemple.test", motDePasse: "motdepasse-2" },
   intrus: { uid: "un-autre-compte", email: "intrus@exemple.test", motDePasse: "motdepasse-3" },
 };
 

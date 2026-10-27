@@ -8,7 +8,7 @@ import { assertFails, assertSucceeds, initializeTestEnvironment } from "@firebas
 import { deleteDoc, doc, getDoc, serverTimestamp, setDoc, Timestamp, updateDoc } from "firebase/firestore";
 
 const COMPTE_1 = "ElRK8CEajUMQmtajHXv5qZVVT6G2";
-const COMPTE_2 = "U92gcS4EipUUtAP1QOBenzGg8Aj1";
+const COMPTE_2 = "XABqepPEkHXg8gBon5ljE5XEXOD3";
 const INCONNU = "quelqu-un-d-autre";
 
 let env;
