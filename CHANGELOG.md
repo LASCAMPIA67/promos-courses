@@ -14,6 +14,8 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+## [0.6.0] - 2026-10-27
+
 ### Ajouté
 
 - **Appli 0.6 : les promos en écrivant.** En écrivant un article, les promos qui correspondent
@@ -154,7 +156,8 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 - Version antérieure à la mise en place des publications : pas de page « Release » (voir le lien
   ci-dessous vers son enregistrement d'origine).
 
-[Non publié]: https://github.com/lascampia67/promos-courses/compare/v0.5.0...HEAD
+[Non publié]: https://github.com/lascampia67/promos-courses/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/lascampia67/promos-courses/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/lascampia67/promos-courses/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/lascampia67/promos-courses/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/lascampia67/promos-courses/compare/v0.2.0...v0.3.0
