@@ -98,6 +98,10 @@ Les versions suivent le [versionnage sémantique](https://semver.org/lang/fr/).
 
 On peut aussi publier en poussant soi-même une étiquette (`git tag -a vX.Y.Z` puis
 `git push origin vX.Y.Z`), ou à la main : onglet **Actions** → **Publication** → **Run workflow**.
+Lancé à la main pour une version déjà publiée, il remet à jour ses notes à partir du CHANGELOG.
+
+Dans les notes de version, les liens relatifs (`docs/appli.md`…) sont transformés en liens vers les
+fichiers de cette version, pour qu'ils marchent sur la page de la version.
 
 ## Signaler un problème ou proposer une idée
 

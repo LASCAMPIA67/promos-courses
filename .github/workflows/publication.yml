@@ -1,7 +1,8 @@
 # Crée une « Release » GitHub (avec son étiquette vX.Y.Z) :
 # - automatiquement, quand le numéro de version change dans src/robot_promos/__init__.py ;
 # - quand on pousse une étiquette de version (ex. v0.2.0) ;
-# - à la main (bouton « Run workflow »), par exemple pour publier une ancienne version.
+# - à la main (bouton « Run workflow »), par exemple pour publier une ancienne version, ou pour
+#   remettre à jour les notes d'une version déjà publiée.
 # Les notes de version sont reprises de la section correspondante du fichier CHANGELOG.md.
 name: Publication
 
@@ -53,12 +54,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           if gh release view "$ETIQUETTE" > /dev/null 2>&1; then
-            echo "La version $ETIQUETTE est déjà publiée : rien à faire."
+            echo "La version $ETIQUETTE est déjà publiée."
             echo "DEJA_PUBLIEE=1" >> "$GITHUB_ENV"
           fi
 
       - name: Extraire les notes de version du CHANGELOG
-        if: env.DEJA_PUBLIEE != '1'
+        if: env.DEJA_PUBLIEE != '1' || github.event_name == 'workflow_dispatch'
         run: |
           version="${ETIQUETTE#v}"
           awk -v v="$version" '
@@ -70,6 +71,9 @@ jobs:
             echo "::error::Aucune section « ## [$version] » dans CHANGELOG.md"
             exit 1
           fi
+          # Les liens relatifs (docs/appli.md…) ne marchent pas sur la page de la version :
+          # ils pointent vers les fichiers tels qu'ils étaient dans cette version.
+          perl -pi -e 's{\]\((?!https?://|#|mailto:)([^)]+)\)}{](https://github.com/$ENV{GITHUB_REPOSITORY}/blob/$ENV{ETIQUETTE}/$1)}g' notes.md
           cat notes.md
 
       - name: Créer la publication
@@ -78,3 +82,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           CIBLE: ${{ inputs.cible || github.sha }}
         run: gh release create "$ETIQUETTE" --target "$CIBLE" --title "Version ${ETIQUETTE#v}" --notes-file notes.md
+
+      - name: Remettre à jour les notes d'une version déjà publiée
+        if: env.DEJA_PUBLIEE == '1' && github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release edit "$ETIQUETTE" --notes-file notes.md

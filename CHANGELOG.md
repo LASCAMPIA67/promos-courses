@@ -27,6 +27,11 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 - Tests : 20 tests de logique et 3 scénarios réels de plus (promos d'exemple aux dates du jour).
 - Captures d'écran des promos (modes clair et sombre).
 
+### Modifié
+
+- Notes des versions : les liens vers la documentation marchent sur la page de chaque version, et
+  le workflow « Publication » lancé à la main remet à jour les notes d'une version déjà publiée.
+
 ## [0.3.0] - 2026-10-27
 
 ### Ajouté
