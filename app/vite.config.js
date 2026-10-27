@@ -44,6 +44,10 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // Une nouvelle version remplace l'ancienne tout de suite, sans attendre que tous les onglets
+        // soient fermés (l'inscription faite dans src/main.js ne l'active pas d'elle-même).
+        skipWaiting: true,
+        clientsClaim: true,
         navigateFallback: "index.html",
         globPatterns: ["**/*.{js,css,html,png,svg,webmanifest}"],
         // Les promos : toujours les plus récentes quand il y a du réseau, sinon les dernières lues
