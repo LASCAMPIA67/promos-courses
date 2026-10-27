@@ -9,13 +9,13 @@ GitHub Pages à l'adresse :
 Seuls nos deux comptes peuvent s'y connecter et voir la liste (voir
 [liste-commune.md](liste-commune.md)).
 
-| Connexion | Liste | Promos d'un article | Modifier un article | Mode sombre |
-|---|---|---|---|---|
-| ![Écran de connexion](captures/connexion.png) | ![Liste de courses avec les articles en promo](captures/liste.png) | ![Les promos du lait chez Lidl et Leclerc](captures/promos.png) | ![Modifier un article](captures/modifier.png) | ![Promos en mode sombre](captures/promos-sombre.png) |
+| Connexion | Liste | Promos d'un article | Toutes les promos | Modifier un article | Mode sombre |
+|---|---|---|---|---|---|
+| ![Écran de connexion](captures/connexion.png) | ![Liste de courses avec les articles en promo](captures/liste.png) | ![Les promos du lait chez Lidl et Leclerc](captures/promos.png) | ![Recherche « lait » dans toutes les promos](captures/recherche.png) | ![Modifier un article](captures/modifier.png) | ![Recherche en mode sombre](captures/recherche-sombre.png) |
 
 Les captures sont faites avec des promos d'exemple.
 
-## Ce qu'elle sait faire (version 0.5)
+## Ce qu'elle sait faire (version 0.6)
 
 - **Se connecter** avec son e-mail et son mot de passe (une seule fois : la connexion reste active).
   Lien « Mot de passe oublié ? » pour recevoir un e-mail de changement de mot de passe.
@@ -30,6 +30,7 @@ Les captures sont faites avec des promos d'exemple.
 - **Sans réseau** (au fond du magasin) : tout continue de marcher ; un bandeau jaune le signale et
   les changements partent dès que le réseau revient.
 - **Voir les promos** de chaque article (voir ci-dessous).
+- **Chercher dans toutes les promos** et en ajouter une à la liste (onglet « Promos », voir ci-dessous).
 - **S'installer sur l'iPhone** : dans Safari, un encadré vert explique comment l'ajouter à l'écran
   d'accueil (« Plus tard » le cache pour 14 jours). Voir [installation-iphone.md](installation-iphone.md).
 - **Se mettre à jour toute seule** : à chaque ouverture, elle vérifie si une nouvelle version est
@@ -51,6 +52,20 @@ Lingolsheim et d'E.Leclerc Geispolsheim. L'appli lit ce fichier et le compare à
   officiel ;
 - les promos les plus proches de l'article viennent d'abord : pour « Lait », « Lait demi-écrémé »
   passe avant « Chocolat au lait ».
+
+### Chercher dans toutes les promos (onglet « Promos »)
+
+La barre en bas de l'écran passe de la **Liste** aux **Promos**. L'onglet « Promos » montre toutes
+les promos en cours et à venir des deux magasins :
+
+- **chercher** : les résultats s'affichent pendant qu'on tape, et le début d'un mot suffit
+  (« fro » trouve « Fromage », « nute » trouve les produits Nutella) ; les mots entiers passent
+  d'abord (« lait » montre « Lait demi-écrémé » avant « Laitue ») ;
+- **filtrer** par magasin : **Tous**, **Lidl** ou **Leclerc** ;
+- **ajouter à la liste** : le bouton « + Ajouter à la liste » ajoute le produit, avec une **note**
+  qui rappelle le magasin, le prix et la date (« Promo Lidl : 0,89 € · Jusqu'au samedi 31 octobre ») ;
+  s'il est déjà dans la liste, le bouton l'indique (« ✓ Dans la liste ») ;
+- les promos s'affichent par 30 ; « Voir plus de promos » montre les suivantes.
 
 ### Bien nommer ses articles
 
@@ -85,7 +100,7 @@ détails (« sans lactose », « grand format ») vont mieux dans la **note** de
 | [`app/src/main.js`](../app/src/main.js) | Le fonctionnement des écrans. |
 | [`app/src/liste.js`](../app/src/liste.js) | Lecture et modification de la liste dans Firebase. |
 | [`app/src/articles.js`](../app/src/articles.js) | Règles simples : nettoyage, doublons, tri, messages d'erreur. |
-| [`app/src/promos.js`](../app/src/promos.js) | Les promos : recherche pour chaque article, dates, prix, fraîcheur des données. |
+| [`app/src/promos.js`](../app/src/promos.js) | Les promos : recherche pour chaque article et dans toutes les promos, dates, prix, fraîcheur des données. |
 | [`app/src/installation.js`](../app/src/installation.js) | Quand proposer d'installer l'appli sur l'iPhone. |
 | [`app/src/firebase.js`](../app/src/firebase.js) | Connexion au projet Firebase (et à l'émulateur pour les tests). |
 | [`app/src/style.css`](../app/src/style.css) | L'apparence (iPhone, mode sombre). |
@@ -100,8 +115,8 @@ que dans Firebase.
 
 | Tests | Ce qu'ils vérifient | Commande |
 |---|---|---|
-| Logique ([`app/tests`](../app/tests)) | Nettoyage des saisies, doublons, tri, messages d'erreur ; recherche des promos (accents, pluriel, mots proches, marques), promos terminées ou à venir, dates, prix, fraîcheur des données ; quand proposer l'installation. | `npm test` |
-| Scénarios réels ([`app/e2e`](../app/e2e)) | Un navigateur à la taille d'un iPhone utilise l'appli branchée sur l'**émulateur Firebase** (jamais la vraie base), avec deux comptes et un [fichier de promos d'exemple](../app/e2e/promos-exemple.js) aux dates du jour : connexion refusée, ajout, doublon, cochage, modification, suppression, synchronisation en direct entre deux téléphones, mode hors connexion, refus d'un compte étranger, déconnexion, étiquettes et détail des promos, promos anciennes ou incomplètes, promos indisponibles puis retrouvées, conseil d'installation dans Safari sur iPhone. Sur GitHub, ils tournent dans Chrome **et Safari** (WebKit). | `npm run e2e` |
+| Logique ([`app/tests`](../app/tests)) | Nettoyage des saisies, doublons, tri, messages d'erreur ; recherche des promos (accents, pluriel, mots proches, marques, début de mot, filtre par magasin), article créé depuis une promo, promos terminées ou à venir, dates, prix, fraîcheur des données ; quand proposer l'installation. | `npm test` |
+| Scénarios réels ([`app/e2e`](../app/e2e)) | Un navigateur à la taille d'un iPhone utilise l'appli branchée sur l'**émulateur Firebase** (jamais la vraie base), avec deux comptes et un [fichier de promos d'exemple](../app/e2e/promos-exemple.js) aux dates du jour : connexion refusée, ajout, doublon, cochage, modification, suppression, synchronisation en direct entre deux téléphones, mode hors connexion, refus d'un compte étranger, déconnexion, étiquettes et détail des promos, promos anciennes ou incomplètes, promos indisponibles puis retrouvées, conseil d'installation dans Safari sur iPhone, recherche dans toutes les promos (filtre, ajout à la liste, affichage par 30). Sur GitHub, ils tournent dans Chrome **et Safari** (WebKit). | `npm run e2e` |
 | Captures d'écran | Régénère les images de cette page dans `docs/captures/`. | `npm run captures` |
 
 Commandes à lancer dans le dossier `app/` (Node.js 22 et Java 21 nécessaires), après `npm ci`.

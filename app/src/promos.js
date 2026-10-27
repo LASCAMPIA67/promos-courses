@@ -56,28 +56,69 @@ export function indexerPromos(donnees) {
  * Renvoie [{ offre, aVenir }].
  */
 export function chercherPromos(index, nom, aujourdhui) {
-  const mots = [...new Set(motsCles(nom))];
+  return trouver(index, motsCles(nom), aujourdhui, (motCherche, mot) => mot === motCherche);
+}
+
+/**
+ * Recherche dans toutes les promos, pendant qu'on tape : chaque mot cherché doit être le début d'un
+ * mot du produit ou de sa marque (« fro » trouve « Fromage »). Sans rien à chercher : toutes les
+ * promos, celles en cours d'abord. « magasin » : « lidl », « leclerc » ou vide pour les deux.
+ * Même ordre que chercherPromos. Renvoie [{ offre, aVenir }].
+ */
+export function rechercherPromos(index, texte, aujourdhui, { magasin = "" } = {}) {
+  const mots = motsCles(texte);
+  const resultats = mots.length
+    ? trouver(index, mots, aujourdhui, (motCherche, mot) => mot.startsWith(motCherche))
+    : toutes(index, aujourdhui);
+  return magasin ? resultats.filter(({ offre }) => offre.source === magasin) : resultats;
+}
+
+function toutes(index, aujourdhui) {
+  return (index ?? [])
+    .filter(({ offre }) => !offre.date_fin || offre.date_fin >= aujourdhui)
+    .map(({ offre }) => ({ offre, aVenir: Boolean(offre.date_debut && offre.date_debut > aujourdhui) }))
+    .sort((a, b) => Number(a.aVenir) - Number(b.aVenir));
+}
+
+function trouver(index, motsCherches, aujourdhui, correspond) {
+  const mots = [...new Set(motsCherches)];
   if (!index || mots.length === 0) return [];
   const trouvees = [];
   for (const { offre, motsProduit, motsMarque } of index) {
     if (offre.date_fin && offre.date_fin < aujourdhui) continue;
-    if (!mots.every((mot) => motsProduit.includes(mot) || motsMarque.has(mot))) continue;
-    const position = motsProduit.indexOf(mots[0]);
+    const present = (motCherche) =>
+      motsProduit.some((mot) => correspond(motCherche, mot)) || [...motsMarque].some((mot) => correspond(motCherche, mot));
+    if (!mots.every(present)) continue;
+    const position = motsProduit.findIndex((mot) => correspond(mots[0], mot));
     trouvees.push({
       offre,
       aVenir: Boolean(offre.date_debut && offre.date_debut > aujourdhui),
       position: position === -1 ? Number.MAX_SAFE_INTEGER : position,
+      // Le mot entier avant les mots qui commencent pareil : « Lait » avant « Laitue ».
+      exact: motsProduit.includes(mots[0]) || motsMarque.has(mots[0]),
       longueur: motsProduit.length,
     });
   }
   trouvees.sort(
     (a, b) =>
       a.position - b.position ||
+      Number(b.exact) - Number(a.exact) ||
       Number(a.aVenir) - Number(b.aVenir) ||
       a.longueur - b.longueur ||
       (a.offre.prix ?? Infinity) - (b.offre.prix ?? Infinity),
   );
   return trouvees.map(({ offre, aVenir }) => ({ offre, aVenir }));
+}
+
+/**
+ * L'article à ajouter à la liste depuis une promo : le nom du produit, et une note qui rappelle
+ * où et à quel prix (« Promo Lidl : 0,89 € · Jusqu'au mardi 28 octobre »).
+ */
+export function articleDepuisPromo(offre, aujourdhui) {
+  const nom = joliNom(offre.produit).slice(0, 100).trim();
+  const prix = offre.prix != null ? formaterPrix(offre.prix) : offre.reduction;
+  const morceaux = [`Promo ${enseigne(offre)}${prix ? ` : ${prix}` : ""}`, periode(offre, aujourdhui)].filter(Boolean);
+  return { nom, note: morceaux.join(" · ").slice(0, 200) };
 }
 
 // ---------------------------------------------------------------------------------------------

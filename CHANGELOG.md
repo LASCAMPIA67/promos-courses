@@ -14,6 +14,14 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+### Ajouté
+
+- **Appli 0.6 : toutes les promos dans l'appli.** Barre d'onglets en bas de l'écran (« Liste » et
+  « Promos ») ; l'onglet « Promos » permet de chercher un produit ou une marque pendant qu'on tape
+  (le début d'un mot suffit), de filtrer par magasin, et d'ajouter une promo à la liste en un geste,
+  avec une note qui rappelle le magasin, le prix et la date. Affichage par 30, « Voir plus de promos ».
+- Tests : 6 tests de logique et 2 scénarios réels de plus ; captures d'écran de l'onglet « Promos ».
+
 ### Sécurité
 
 - La clé Firebase de l'appli ne marche plus que depuis l'adresse de l'appli (et la page « Mot de

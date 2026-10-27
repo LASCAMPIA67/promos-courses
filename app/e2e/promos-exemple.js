@@ -113,14 +113,20 @@ const OFFRES = [
   }),
 ];
 
-/** Le fichier d'exemple ; « miseAJour » : passage du robot, « etatLeclerc » : ok, partiel ou erreur. */
-export function promosExemple({ miseAJour = new Date(), etatLeclerc = "ok" } = {}) {
+/**
+ * Le fichier d'exemple ; « miseAJour » : passage du robot, « etatLeclerc » : ok, partiel ou erreur,
+ * « multiplier » : chaque promo répétée ce nombre de fois (pour avoir beaucoup de promos).
+ */
+export function promosExemple({ miseAJour = new Date(), etatLeclerc = "ok", multiplier = 1 } = {}) {
+  const offres = Array.from({ length: multiplier }, (_, n) =>
+    OFFRES.map((o) => (n === 0 ? o : { ...o, id: `${o.id}-${n + 1}` })),
+  ).flat();
   const source = (id, magasin, nom, etat) => ({
     id,
     magasin,
     nom,
     etat,
-    nb_offres: OFFRES.filter((o) => o.source === id).length,
+    nb_offres: offres.filter((o) => o.source === id).length,
     remarque: null,
     catalogues: [],
   });
@@ -136,7 +142,7 @@ export function promosExemple({ miseAJour = new Date(), etatLeclerc = "ok" } = {
       source("lidl", "lidl-lingolsheim", "Prospectus Lidl France", "ok"),
       source("leclerc", "leclerc-geispolsheim", "Catalogues E.Leclerc Geispolsheim", etatLeclerc),
     ],
-    offres: OFFRES,
+    offres,
   };
 }
 

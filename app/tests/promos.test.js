@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import {
+  articleDepuisPromo,
   chercherPromos,
   dateDuJour,
   formaterJour,
@@ -15,6 +16,7 @@ import {
   periode,
   phraseSource,
   phrasesFraicheur,
+  rechercherPromos,
   resumePromos,
   sourcesEnDifficulte,
 } from "../src/promos.js";
@@ -110,6 +112,49 @@ describe("chercherPromos", () => {
   test("rien à chercher : rien de trouvé", () => {
     expect(chercherPromos(index, "  2 kg ", AUJOURDHUI)).toEqual([]);
     expect(chercherPromos(null, "Lait", AUJOURDHUI)).toEqual([]);
+  });
+});
+
+describe("rechercherPromos", () => {
+  const index = indexerPromos(donnees());
+
+  test("trouve pendant qu'on tape : le début d'un mot suffit", () => {
+    expect(ids(rechercherPromos(index, "lai", AUJOURDHUI))).toEqual(["laitue", "lait", "lait-uht", "chocolat"]);
+    // Le mot entier d'abord : « Lait », puis « Laitue ».
+    expect(ids(rechercherPromos(index, "lait", AUJOURDHUI))).toEqual(["lait", "lait-uht", "laitue", "chocolat"]);
+    expect(ids(rechercherPromos(index, "choco", AUJOURDHUI))).toEqual(["chocolat"]);
+    expect(ids(rechercherPromos(index, "nute", AUJOURDHUI))).toEqual(["nutella"]);
+  });
+
+  test("tous les mots cherchés doivent y être", () => {
+    expect(ids(rechercherPromos(index, "lait ecr", AUJOURDHUI))).toEqual(["lait", "lait-uht"]);
+    expect(ids(rechercherPromos(index, "lait coco", AUJOURDHUI))).toEqual([]);
+  });
+
+  test("filtre par magasin, sans les promos terminées", () => {
+    expect(ids(rechercherPromos(index, "lait", AUJOURDHUI, { magasin: "leclerc" }))).toEqual(["lait-uht", "chocolat"]);
+    expect(ids(rechercherPromos(index, "lait", AUJOURDHUI, { magasin: "lidl" }))).toEqual(["lait", "laitue"]);
+    expect(rechercherPromos(index, "beurre", AUJOURDHUI)).toEqual([]);
+  });
+
+  test("rien à chercher : toutes les promos, celles en cours d'abord", () => {
+    expect(ids(rechercherPromos(index, "  ", AUJOURDHUI))).toEqual(["chocolat", "lait", "laitue", "nutella", "oeufs", "lait-uht"]);
+    expect(ids(rechercherPromos(index, "", AUJOURDHUI, { magasin: "leclerc" }))).toEqual(["chocolat", "lait-uht"]);
+    expect(rechercherPromos(null, "lait", AUJOURDHUI)).toEqual([]);
+  });
+});
+
+describe("articleDepuisPromo", () => {
+  test("nom du produit, et une note qui dit où, combien et jusqu'à quand", () => {
+    const article = articleDepuisPromo(offre({ produit: "LAIT DEMI-ÉCRÉMÉ UHT", source: "leclerc", prix: 6.12 }), AUJOURDHUI);
+    expect(article.nom).toBe("Lait demi-écrémé UHT");
+    expect(simple(article.note)).toBe("Promo Leclerc : 6,12 € · Jusqu'à demain");
+  });
+
+  test("sans prix, la réduction ; promo à venir ; nom trop long raccourci", () => {
+    const gamme = offre({ produit: "Tous les produits BIO", prix: null, reduction: "-34 %", date_debut: "2026-10-29" });
+    expect(simple(articleDepuisPromo(gamme, AUJOURDHUI).note)).toBe("Promo Lidl : -34 % · À partir du jeudi 29 octobre");
+    expect(articleDepuisPromo(offre({ produit: "x".repeat(150) }), AUJOURDHUI).nom).toHaveLength(100);
   });
 });
 

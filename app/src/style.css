@@ -114,6 +114,11 @@ textarea {
   padding: 0 16px calc(24px + env(safe-area-inset-bottom));
 }
 
+/* Place pour la barre d'onglets en bas de l'écran. */
+#appli {
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
+}
+
 .ecran-centre {
   min-height: 100dvh;
   display: grid;
@@ -726,13 +731,146 @@ dialog h2 {
   font-size: 0.88rem;
 }
 
+.promo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  margin-top: 6px;
+}
+
 .lien-catalogue {
-  justify-self: start;
-  padding: 6px 0 0;
+  padding: 6px 0;
   color: var(--accent);
   font-size: 0.9rem;
   font-weight: 600;
   text-decoration: none;
+}
+
+.bouton-ajouter {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--sur-accent);
+  font-size: 0.92rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.bouton-ajouter:active {
+  background: var(--accent-fonce);
+}
+
+.bouton-ajouter:disabled {
+  background: var(--accent-doux);
+  color: var(--accent-fonce);
+  cursor: default;
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* Onglet « Promos » : recherche */
+
+.recherche {
+  position: relative;
+  margin: 4px 0 10px;
+}
+
+.recherche svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--discret);
+  pointer-events: none;
+}
+
+.recherche input {
+  padding-left: 44px;
+  background: var(--surface);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.filtres {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.filtre {
+  min-height: 38px;
+  padding: 6px 16px;
+  border: 1px solid var(--bordure);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filtre[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--sur-accent);
+}
+
+.etat-recherche {
+  margin: 0 4px 10px;
+}
+
+.resultats {
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  box-shadow: var(--ombre);
+  overflow: hidden;
+}
+
+.resultats:empty {
+  display: none;
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* Barre d'onglets, en bas de l'écran */
+
+.onglets {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 6px max(16px, calc((100% - 640px) / 2)) calc(6px + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--fond) 88%, transparent);
+  backdrop-filter: saturate(1.4) blur(14px);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px);
+  border-top: 1px solid var(--bordure);
+}
+
+.onglet {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  min-height: 50px;
+  padding: 4px;
+  border: 0;
+  background: none;
+  color: var(--discret);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.onglet svg {
+  width: 26px;
+  height: 26px;
+}
+
+.onglet[aria-current="page"] {
+  color: var(--accent);
 }
 
 .note-promos {
