@@ -64,7 +64,9 @@ flowchart LR
     C[("📝 Liste de courses commune<br/>Firebase, privée")] <--> A
 ```
 
-1. **Chaque matin à 5 h 47** (heure de Paris), GitHub lance le robot tout seul.
+1. **Chaque matin à 5 h 47** (heure de Paris), GitHub lance le robot tout seul. Si GitHub l'oublie
+   (cela arrive quand ses serveurs sont surchargés), des rattrapages sont prévus à 8 h 17 et 12 h 37 :
+   ils ne font rien si le robot est déjà passé dans la journée.
 2. Le robot regarde la liste des catalogues de chaque magasin. Il ne relit un catalogue que **s'il a
    changé** depuis la veille.
 3. Il en extrait chaque promo : produit, marque, prix, ancien prix, réduction, prix au kilo,
@@ -162,6 +164,8 @@ est décrit par un schéma JSON : [`promos.schema.json`](src/robot_promos/promos
   promos de la veille encore valables sont conservées.
 - **Si toutes les sources sont en panne**, `promos.json` n'est pas modifié (on garde le précédent).
 - **Pannes passagères** : le robot réessaie automatiquement deux fois en attendant un peu.
+- **Lancement oublié par GitHub** : rattrapages à 8 h 17 et 12 h 37, sans jamais faire plus d'un
+  passage par jour sur les sites.
 - **Format vérifié** : avant d'être enregistré, `promos.json` est contrôlé par son schéma JSON.
 - **Tests automatiques** à chaque modification : plus de 50 tests pour le robot (workflow « Tests »),
   15 tests qui vérifient que la liste commune reste réservée à nos deux comptes (« Règles Firebase »),

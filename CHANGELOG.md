@@ -29,6 +29,9 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ### Modifié
 
+- Robot : rattrapages à 8 h 17 et 12 h 37 (heure de Paris) si GitHub n'a pas lancé le robot à 5 h 47,
+  comme le 27/10/2026. Un lancement programmé ne fait rien si le robot a déjà été lancé dans la
+  journée, à la main ou par un autre horaire : toujours un seul passage par jour sur les sites.
 - Notes des versions : les liens vers la documentation marchent sur la page de chaque version, et
   le workflow « Publication » lancé à la main remet à jour les notes d'une version déjà publiée.
 
