@@ -189,7 +189,9 @@ est décrit par un schéma JSON : [`promos.schema.json`](src/robot_promos/promos
 - Rien n'est contourné (captcha, connexion…). Une seule exception, décidée le 26/10/2026 et expliquée
   dans [docs/sources.md](docs/sources.md#eleclerc-geispolsheim) : le service des catalogues Leclerc
   demande d'indiquer qu'on vient de sa visionneuse officielle.
-- Aucune donnée personnelle ni clé secrète dans ce dépôt public.
+- Aucune donnée personnelle ni clé secrète dans ce dépôt public. La clé Firebase de l'appli, visible
+  comme dans toute appli web, ne marche que depuis l'adresse de l'appli
+  (voir [docs/liste-commune.md](docs/liste-commune.md#la-clé-de-lappli-limitée-à-son-adresse)).
 
 ## Dépannage
 

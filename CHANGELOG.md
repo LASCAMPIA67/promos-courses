@@ -14,6 +14,12 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+### Sécurité
+
+- La clé Firebase de l'appli ne marche plus que depuis l'adresse de l'appli (et la page « Mot de
+  passe oublié » de Firebase) : réglage fait dans la console Google Cloud et vérifié, documenté dans
+  [docs/liste-commune.md](docs/liste-commune.md#la-clé-de-lappli-limitée-à-son-adresse).
+
 ## [0.5.0] - 2026-10-27
 
 ### Ajouté

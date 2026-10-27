@@ -65,7 +65,10 @@ npm run e2e         # scénarios réels, deux comptes, émulateur Firebase (Play
 npm run captures    # régénère les captures d'écran de docs/captures/
 ```
 
-Attention : `npm run dev` lance l'appli sur l'ordinateur branchée sur la **vraie** base Firebase.
+Attention : `npm run dev` lance l'appli sur l'ordinateur branchée sur la **vraie** base Firebase. La
+clé de l'appli ne marchant que depuis son adresse publique, il faut d'abord autoriser
+`http://localhost:5173/*` (voir [docs/liste-commune.md](docs/liste-commune.md#la-clé-de-lappli-limitée-à-son-adresse)) ;
+les tests, eux, utilisent l'émulateur et n'en ont pas besoin.
 Une fois sur `main`, le workflow « Appli » teste l'appli puis la publie sur GitHub Pages.
 
 ## Organisation du code

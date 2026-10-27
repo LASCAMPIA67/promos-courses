@@ -19,7 +19,27 @@ Elle n'est **pas** stockée dans ce dépôt (il est public) mais dans une base d
 
 Les informations de connexion de l'appli au projet (`firebaseConfig`, dont la clé `apiKey`) **ne sont
 pas secrètes** : toute appli web Firebase les montre. La sécurité repose sur les **règles d'accès**,
-qui n'autorisent que les deux comptes du foyer.
+qui n'autorisent que les deux comptes du foyer, et, en plus, sur la limite de la clé ci-dessous.
+
+### La clé de l'appli, limitée à son adresse
+
+Depuis le 27/10/2026, la clé (« Browser key (auto created by Firebase) ») ne marche **que depuis
+l'adresse de l'appli** : une autre page web qui la recopierait est refusée par Google.
+
+| Réglage | Valeur |
+|---|---|
+| Où | [Console Google Cloud → Identifiants](https://console.cloud.google.com/apis/credentials?project=promos-courses) → la clé → « Restrictions relatives aux applications » |
+| Type | « Sites Web » |
+| Sites autorisés | `https://lascampia67.github.io/*` (l'appli) et `https://promos-courses.firebaseapp.com/*` (la page « Mot de passe oublié » de Firebase) |
+| Restrictions relatives aux API | Inchangées (seulement les services Firebase, réglage d'origine) |
+
+Vérifié le 27/10/2026 : une demande de connexion venant d'un autre site, ou sans adresse d'origine,
+reçoit « 403 Requests from referer … are blocked » ; celles de l'appli passent normalement.
+
+Si l'adresse de l'appli change un jour, il faut l'ajouter ici, sinon plus personne ne pourra se
+connecter. Pour faire tourner l'appli sur un ordinateur avec la vraie base (`npm run dev`), il faut
+ajouter temporairement `http://localhost:5173/*` (ou utiliser l'émulateur, voir
+[CONTRIBUTING.md](../CONTRIBUTING.md)).
 
 ## Les données
 

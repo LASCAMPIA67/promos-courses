@@ -2,7 +2,7 @@
 //
 // Ces informations ne sont pas secrètes : toute appli web Firebase les montre. La sécurité repose
 // sur les règles d'accès (firebase/firestore.rules), qui réservent les données aux deux comptes du
-// foyer. Voir docs/liste-commune.md.
+// foyer, et sur la clé, qui ne marche que depuis l'adresse de l'appli. Voir docs/liste-commune.md.
 
 import { initializeApp } from "firebase/app";
 import { browserLocalPersistence, connectAuthEmulator, indexedDBLocalPersistence, initializeAuth } from "firebase/auth";
