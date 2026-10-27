@@ -37,8 +37,10 @@ import {
   phraseSource,
   phrasesFraicheur,
   rechercherPromos,
+  periodeCourte,
   resumeDescription,
   sourcesEnDifficulte,
+  typePromo,
 } from "./promos.js";
 import {
   MAGASINS_TICKET,
@@ -263,10 +265,13 @@ function ligneArticle(article, promos = []) {
 }
 
 function boutonPromos(article, promos) {
+  // Sous l'étiquette, le type de la meilleure promo : « -60 % sur le 2e », « -20 % en caisse »…
+  const { offre, aVenir } = promos[0];
+  const type = [typePromo(offre), aVenir ? periodeCourte(offre, dateDuJour()) : null].filter(Boolean).join(" · ");
   const bouton = document.createElement("button");
   bouton.type = "button";
   bouton.className = "bouton-promos";
-  bouton.setAttribute("aria-label", `Voir ${pluriel(promos.length, "promo")} pour ${article.nom}`);
+  bouton.setAttribute("aria-label", `Voir ${pluriel(promos.length, "promo")} pour ${article.nom} : ${type}`);
   const pastille = document.createElement("span");
   pastille.className = "pastille";
   pastille.innerHTML =
@@ -274,7 +279,10 @@ function boutonPromos(article, promos) {
     '<path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z" />' +
     '<circle cx="7.5" cy="7.5" r="1.2" /></svg>';
   pastille.append(pluriel(promos.length, "promo"));
-  bouton.append(pastille);
+  const legende = document.createElement("span");
+  legende.className = "type-promo";
+  legende.textContent = type;
+  bouton.append(pastille, legende);
   bouton.addEventListener("click", () => ouvrirPromos(article, promos));
   return bouton;
 }

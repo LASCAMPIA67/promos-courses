@@ -28,7 +28,11 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 - Tickets gardés dans Firestore, sur l'offre gratuite (collection `tickets`, fichier découpé en
   morceaux de moins de 1 Mio), jamais dans ce dépôt : voir
   [docs/liste-commune.md](docs/liste-commune.md#collection-tickets--les-tickets-de-caisse).
-- Tests : 9 tests de logique, 6 tests des règles et 5 scénarios réels de plus ; captures.
+- **Le type de promo dans la liste** : sous l'étiquette « 2 promos », en petit, le type de la
+  meilleure promo, sans avoir à l'ouvrir : « -60 % sur le 2e », « -20 % en caisse », « 30 % sur la
+  carte », « -25 % avec la carte », « -23 % Lidl Plus », ou le prix ; « dès le 29 oct. » pour une
+  promo à venir.
+- Tests : 12 tests de logique, 6 tests des règles et 5 scénarios réels de plus ; captures.
 
 ### Sécurité
 

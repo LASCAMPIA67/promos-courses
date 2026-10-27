@@ -26,6 +26,9 @@ test("les articles en promo sont signalés, avec le détail de chaque promo", as
   await expect(ligne(page, "Lait").first().getByRole("button", { name: "Voir 3 promos pour Lait" })).toBeVisible();
   await expect(ligne(page, "Beurre").locator(".bouton-promos")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Voir 1 promo pour Laitue" })).toBeVisible();
+  // Sous l'étiquette, le type de la meilleure promo, sans avoir à l'ouvrir.
+  await expect(ligne(page, "Lait").first().locator(".type-promo")).toHaveText(/^-50 % sur le 2e · dès le \d/);
+  await expect(ligne(page, "Laitue").locator(".type-promo")).toHaveText("0,79 €");
 
   // Le détail : les plus proches d'abord, Leclerc avant Lidl.
   await page.getByRole("button", { name: "Voir 3 promos pour Lait" }).click();
@@ -71,6 +74,8 @@ test("le prix dit clairement où va la réduction : carte E.Leclerc ou Lidl Plus
   await seConnecter(page, COMPTES.un);
   await ajouter(page, "Pain complet");
   await ajouter(page, "Bananes");
+  await expect(ligne(page, "Pain complet").locator(".type-promo")).toHaveText("30 % sur la carte");
+  await expect(ligne(page, "Bananes").locator(".type-promo")).toHaveText("-23 % Lidl Plus");
 
   await page.getByRole("button", { name: "Voir 1 promo pour Pain complet" }).click();
   const pain = page.getByRole("dialog", { name: "Promos pour « Pain complet »" }).locator(".promo");

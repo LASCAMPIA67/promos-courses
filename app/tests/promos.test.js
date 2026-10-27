@@ -22,6 +22,7 @@ import {
   regrouper,
   resumeDescription,
   sourcesEnDifficulte,
+  typePromo,
 } from "../src/promos.js";
 
 // Les espaces insécables des nombres et des dates françaises deviennent de simples espaces.
@@ -299,6 +300,43 @@ describe("explicationPrix : où va la réduction", () => {
 
   test("sans réduction : le prix du catalogue", () => {
     expect(explicationPrix(offre({ prix: 12.49 }))).toMatchObject({ genre: "aucun", avantage: null });
+  });
+});
+
+describe("typePromo : le type de promo, en quelques mots, pour la liste", () => {
+  const type = (champs) => simple(typePromo(offre(champs)));
+
+  test("en prenant plusieurs : la réduction du lot", () => {
+    const lot = { quantite: 2, prix: 3.15, prix_unitaire: 2.76 };
+    expect(type({ source: "leclerc", prix: 2.25, reduction: "-60 % sur le 2e", lot })).toBe("-60 % sur le 2e");
+    expect(type({ source: "leclerc", prix: 0.95, reduction: "2 + 1 offert", lot })).toBe("2 + 1 offert");
+    expect(type({ source: "leclerc", prix: 0.95, lot })).toBe("En prenant plusieurs");
+  });
+
+  test("en caisse, avec la carte, sur la carte E.Leclerc, avec Lidl Plus", () => {
+    expect(type({ source: "leclerc", prix: 2.15, ancien_prix: 2.69, reduction: "-20 %" })).toBe("-20 % en caisse");
+    expect(type({ prix: 0.75, ancien_prix: 1 })).toBe("-25 % en caisse"); // calculé d'après l'ancien prix
+    expect(type({ source: "leclerc", prix: 5.25, ancien_prix: 7, reduction: "-25 %", carte_fidelite: true })).toBe(
+      "-25 % avec la carte",
+    );
+    expect(
+      type({
+        source: "leclerc",
+        prix: 2.76,
+        ancien_prix: 3.95,
+        reduction: "30 % en Ticket E.Leclerc",
+        carte_fidelite: true,
+      }),
+    ).toBe("30 % sur la carte");
+    expect(type({ prix: 1.29, ancien_prix: 1.69, reduction: "-23 % avec Lidl Plus", carte_fidelite: true })).toBe(
+      "-23 % Lidl Plus",
+    );
+    expect(type({ prix: 0.99, carte_fidelite: true })).toBe("Prix Lidl Plus");
+  });
+
+  test("sans réduction particulière : le prix", () => {
+    expect(type({ prix: 12.49 })).toBe("12,49 €");
+    expect(type({ prix: null })).toBe("Prix du catalogue");
   });
 });
 

@@ -452,6 +452,35 @@ export function explicationPrix(offre) {
 }
 
 /**
+ * Le type de promo, en quelques mots, pour la liste : « -60 % sur le 2e », « -20 % en caisse »,
+ * « 30 % sur la carte », « -23 % Lidl Plus »… ; sans réduction particulière, le prix.
+ */
+export function typePromo(offre) {
+  const reduction = (offre.reduction ?? "").replace(/\s*avec Lidl Plus$/i, "").trim();
+  const { genre } = explicationPrix(offre);
+  // Sans réduction écrite, le pourcentage d'après l'ancien prix.
+  const pourcentage =
+    reduction ||
+    (offre.ancien_prix > 0 && offre.prix != null ? `-${Math.round((1 - offre.prix / offre.ancien_prix) * 100)} %` : "");
+  switch (genre) {
+    case "carte-leclerc": {
+      const detail = reduction.replace(/\s*en Ticket E\.Leclerc/i, "");
+      return detail ? `${detail} sur la carte` : "Sur la carte E.Leclerc";
+    }
+    case "lidl-plus":
+      return pourcentage ? `${pourcentage} Lidl Plus` : "Prix Lidl Plus";
+    case "lot":
+      return reduction || "En prenant plusieurs";
+    case "carte-caisse":
+      return pourcentage ? `${pourcentage} avec la carte` : "Avec la carte E.Leclerc";
+    case "caisse":
+      return pourcentage ? `${pourcentage} en caisse` : "Prix réduit";
+    default:
+      return offre.prix != null ? formaterPrix(offre.prix) : "Prix du catalogue";
+  }
+}
+
+/**
  * La description d'une promo sans ce qui répète le prix (prix au kilo, « Par 2 : … », « au lieu
  * de … ») : « 4 tranches. 140 g.Le kg : 11,36 €.Par 2 (280 g) : 2,38 € au lieu de 3,18 € » →
  * « 4 tranches · 140 g ».

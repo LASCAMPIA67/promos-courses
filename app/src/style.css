@@ -570,10 +570,22 @@ svg {
   flex: 0 0 auto;
   display: grid;
   place-items: center;
-  padding: 0 12px 0 4px;
+  align-content: center;
+  gap: 3px;
+  max-width: 132px;
+  padding: 6px 12px 6px 4px;
   border: 0;
   background: none;
   cursor: pointer;
+}
+
+/* Sous l'étiquette : le type de promo, en petit (« -60 % sur le 2e »). */
+.type-promo {
+  color: var(--promo);
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
 }
 
 .pastille {

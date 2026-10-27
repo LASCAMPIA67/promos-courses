@@ -88,7 +88,11 @@ liste**, sous le caddie, et visibles sur les deux téléphones.
 Chaque matin, le robot range dans [`promos.json`](../promos.json) toutes les promos de Lidl
 Lingolsheim et d'E.Leclerc Geispolsheim. L'appli lit ce fichier et le compare à la liste :
 
-- un article **à acheter** qui est en promo porte une étiquette orange **« 2 promos »** ;
+- un article **à acheter** qui est en promo porte une étiquette orange **« 2 promos »**, et dessous,
+  en petit, le **type de la meilleure promo**, sans avoir à l'ouvrir : « -60 % sur le 2e » (en
+  prenant plusieurs), « -20 % en caisse », « 30 % sur la carte » (Ticket E.Leclerc), « -25 % avec
+  la carte », « -23 % Lidl Plus », ou le prix s'il n'y a pas de réduction particulière ; « dès le
+  29 oct. » s'ajoute pour une promo qui n'a pas encore commencé ;
 - en touchant l'étiquette, on voit **chaque promo** : le magasin (Lidl en jaune, Leclerc en bleu), le
   produit et sa marque, l'essentiel de sa description (« 272 g · Goût nature… », sans les prix
   répétés), le prix et le prix au kilo, **jusqu'à quand** elle dure, et **où va la réduction** (voir
