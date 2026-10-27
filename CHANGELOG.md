@@ -14,6 +14,28 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+### Ajouté
+
+- **Appli 0.7 : qui a ajouté quoi, et quand.** Une pastille de couleur à côté de chaque article
+  dit qui l'a ajouté ; dessous, la date et l'heure d'ajout (« aujourd'hui 13:38 », « hier 08:05 »,
+  « jeu. 09:15 », « 12/10 09:15 »). La fenêtre d'un article le rappelle (« Ajouté par …, … »).
+- **Mon compte** : chacun écrit son prénom et choisit sa couleur parmi six, avec une légende qui
+  rappelle qui a quelle couleur. Les fiches sont dans Firebase (nouvelle collection `membres`),
+  jamais dans ce dépôt ; sans fiche, une couleur est donnée d'office.
+- Tests : 5 tests de logique, 4 tests des règles et 1 scénario réel de plus ; capture « Mon compte ».
+
+### Modifié
+
+- **Moins de texte, l'essentiel seulement** : plus de phrase sous « Liste de courses » (nombre
+  d'articles et de promos) ; en bas, une seule ligne discrète « Promos : aujourd'hui à 5 h 48 ·
+  v0.7.0 » ; explications des prix, messages et note d'une promo ajoutée raccourcis
+  (« Lidl · 0,89 € · jusqu'au 31 oct. ») ; le résumé en haut des promos d'un article est retiré.
+
+### Sécurité
+
+- Règles d'accès : la collection `membres` n'accepte que le prénom (1 à 30 caractères) et une des
+  six couleurs, et chacun ne peut écrire que sa propre fiche.
+
 ## [0.6.0] - 2026-10-27
 
 ### Ajouté

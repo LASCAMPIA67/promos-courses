@@ -3,19 +3,29 @@
 
 import { expect, test } from "@playwright/test";
 
-import { COMPTES, creerComptes, viderLaBase } from "./outils.js";
+import { COMPTES, creerComptes, seConnecter, viderLaBase } from "./outils.js";
 import { servirPromos } from "./promos-exemple.js";
 
 const COMPTE = COMPTES.un;
+const AUTRE = COMPTES.deux;
 const DOSSIER = new URL("../../docs/captures/", import.meta.url).pathname;
 
 test.skip(!process.env.CAPTURES, "captures seulement à la demande (CAPTURES=1)");
 test.use({ deviceScaleFactor: 2 });
 
 test.beforeAll(async ({ request }) => {
-  await creerComptes(request, [COMPTE]);
+  await creerComptes(request, [COMPTE, AUTRE]);
   await viderLaBase(request);
 });
+
+/** Donne un prénom (fictif) et une couleur au compte connecté sur cette page. */
+async function choisirFiche(page, prenom, couleur) {
+  await page.getByRole("button", { name: "Mon compte" }).click();
+  const fenetre = page.getByRole("dialog", { name: "Mon compte" });
+  await fenetre.getByLabel("Prénom").fill(prenom);
+  await fenetre.getByRole("radio", { name: couleur }).check();
+  return fenetre;
+}
 
 for (const theme of ["light", "dark"]) {
   test(`captures en mode ${theme === "light" ? "clair" : "sombre"}`, async ({ page, context }) => {
@@ -32,20 +42,31 @@ for (const theme of ["light", "dark"]) {
     await expect(page.getByRole("heading", { name: "Liste de courses" })).toBeVisible();
 
     if (theme === "light") {
-      const formulaire = page.locator("#form-ajout");
-      for (const [nom, quantite] of [
-        ["Lait demi-écrémé", "2 L"],
-        ["Pain complet", ""],
-        ["Bananes", "1 kg"],
-        ["Beurre doux", ""],
-        ["Café moulu", ""],
-        ["Pâtes", "2"],
+      // Deux personnes, deux couleurs : une partie des articles est ajoutée depuis l'autre compte.
+      const autre = await (await page.context().browser().newContext({ baseURL: test.info().project.use.baseURL })).newPage();
+      await servirPromos(autre.context());
+      await seConnecter(autre, AUTRE);
+      await (await choisirFiche(autre, "Alex", "Orange")).getByRole("button", { name: "Enregistrer" }).click();
+      const fenetre = await choisirFiche(page, "Camille", "Vert");
+      await expect(page.locator("#legende-membres")).toContainText("Alex");
+      await page.screenshot({ path: `${DOSSIER}compte.png` });
+      await fenetre.getByRole("button", { name: "Enregistrer" }).click();
+
+      for (const [nom, quantite, qui] of [
+        ["Lait demi-écrémé", "2 L", page],
+        ["Pain complet", "", autre],
+        ["Bananes", "1 kg", page],
+        ["Beurre doux", "", autre],
+        ["Café moulu", "", page],
+        ["Pâtes", "2", autre],
       ]) {
+        const formulaire = qui.locator("#form-ajout");
         await formulaire.getByLabel("Article à ajouter").fill(nom);
         await formulaire.getByLabel("Quantité (facultatif)").fill(quantite);
         await formulaire.getByRole("button", { name: "Ajouter l'article" }).click();
         await expect(page.locator("#liste-a-acheter")).toContainText(nom);
       }
+      await autre.context().close();
       await page.getByRole("checkbox", { name: "Café moulu : à acheter" }).click();
       await page.getByRole("checkbox", { name: "Pâtes : à acheter" }).click();
     }
@@ -75,7 +96,7 @@ for (const theme of ["light", "dark"]) {
 
     // En écrivant un article : les promos qui correspondent.
     await page.getByLabel("Article à ajouter").fill("lait");
-    await expect(page.locator("#etat-recherche")).toContainText("4 promos pour « lait »");
+    await expect(page.locator("#etat-recherche")).toHaveText("4 promos");
     await page.getByLabel("Article à ajouter").blur();
     await page.screenshot({ path: `${DOSSIER}recherche${suffixe}.png` });
     await page.getByRole("button", { name: "Effacer" }).click();

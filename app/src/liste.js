@@ -1,5 +1,5 @@
 // Lecture et modification de la liste de courses commune dans Firestore.
-// Forme des données : docs/liste-commune.md (collection « articles »).
+// Forme des données : docs/liste-commune.md (collections « articles » et « membres »).
 
 import {
   addDoc,
@@ -9,6 +9,7 @@ import {
   doc,
   onSnapshot,
   serverTimestamp,
+  setDoc,
   updateDoc,
   writeBatch,
 } from "firebase/firestore";
@@ -56,6 +57,20 @@ export function modifierArticle(db, id, { nom, quantite, note }) {
 
 export function supprimerArticle(db, id) {
   return deleteDoc(doc(db, "articles", id));
+}
+
+/** Suit les fiches des membres du foyer (prénom et couleur) : `rappel` reçoit { uid: fiche }. */
+export function suivreMembres(db, rappel, enCasErreur) {
+  return onSnapshot(
+    collection(db, "membres"),
+    (instantane) => rappel(Object.fromEntries(instantane.docs.map((d) => [d.id, d.data()]))),
+    enCasErreur,
+  );
+}
+
+/** Enregistre sa propre fiche : { prenom, couleur }. */
+export function enregistrerMembre(db, uid, fiche) {
+  return setDoc(doc(db, "membres", uid), fiche);
 }
 
 /** Retire d'un coup tous les articles déjà dans le caddie. */

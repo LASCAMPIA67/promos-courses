@@ -44,6 +44,21 @@ service cloud.firestore {
         && request.resource.data.cree_le == resource.data.cree_le;
     }
 
+    // Le prénom et la couleur de chacun, pour savoir qui a ajouté quel article (une fiche par
+    // compte, que seul son propriétaire peut écrire).
+    function membreValide(m) {
+      return m.keys().hasAll(['prenom', 'couleur'])
+        && m.keys().hasOnly(['prenom', 'couleur'])
+        && m.prenom is string && m.prenom.size() > 0 && m.prenom.size() <= 30
+        && m.couleur in ['vert', 'bleu', 'violet', 'rose', 'orange', 'jaune'];
+    }
+
+    match /membres/{membre} {
+      allow read: if estDuFoyer();
+      allow create, update: if estDuFoyer() && membre == request.auth.uid && membreValide(request.resource.data);
+      allow delete: if estDuFoyer() && membre == request.auth.uid;
+    }
+
     // Réglages communs du foyer (cartes de fidélité, magasins préférés…).
     match /reglages/{reglage} {
       allow read, write: if estDuFoyer();

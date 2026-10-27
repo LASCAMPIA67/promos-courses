@@ -14,13 +14,13 @@ import {
   joliNom,
   motsCles,
   periode,
+  periodeCourte,
   phraseSource,
   prixUnitaire,
   phrasesFraicheur,
   rechercherPromos,
   regrouper,
   resumeDescription,
-  resumePromos,
   sourcesEnDifficulte,
 } from "../src/promos.js";
 
@@ -212,19 +212,19 @@ describe("explicationPrix : où va la réduction", () => {
   test("Ticket E.Leclerc : on paie le prix plein, la réduction revient sur la carte", () => {
     const e = texte(explicationPrix(offre({ source: "leclerc", prix: 2.76, ancien_prix: 3.95, reduction: "30 % en Ticket E.Leclerc", carte_fidelite: true })));
     expect(e).toMatchObject({ genre: "carte-leclerc", prix: "3,95 €", mention: "en caisse", barre: null });
-    expect(e.avantage).toBe("1,19 € (30 %) reviennent sur la carte E.Leclerc, à dépenser plus tard : revient à 2,76 €.");
+    expect(e.avantage).toBe("1,19 € (30 %) rendus sur la carte · revient à 2,76 €");
   });
 
   test("réduction immédiate : déjà déduite en caisse, ancien prix barré", () => {
     const e = texte(explicationPrix(offre({ source: "leclerc", prix: 2.15, ancien_prix: 2.69, reduction: "-20 %" })));
     expect(e).toMatchObject({ genre: "caisse", prix: "2,15 €", mention: "en caisse", barre: "2,69 €" });
-    expect(e.avantage).toBe("-20 %, déjà déduit du prix affiché.");
+    expect(e.avantage).toBe("-20 %, déjà déduit");
   });
 
   test("réduction réservée à la carte E.Leclerc, mais en caisse", () => {
     const e = texte(explicationPrix(offre({ source: "leclerc", prix: 5.25, ancien_prix: 7, reduction: "-25 %", carte_fidelite: true })));
     expect(e.genre).toBe("carte-caisse");
-    expect(e.avantage).toBe("-25 %, déjà déduit du prix affiché, sur présentation de la carte.");
+    expect(e.avantage).toBe("-25 %, déjà déduit");
   });
 
   test("lot : le prix à l'unité, et le prix en prenant plusieurs", () => {
@@ -232,19 +232,20 @@ describe("explicationPrix : où va la réduction", () => {
     const e = texte(explicationPrix(offre({ source: "leclerc", prix: 2.55, prix_unitaire: 9.38, unite: "kg", reduction: "-60 % sur le 2e", lot })));
     expect(e).toMatchObject({ genre: "lot", prix: "2,55 €", mention: "l'unité" });
     expect(simple(e.unitaire)).toBe("9,38 €/kg");
-    expect(e.avantage).toBe("-60 % sur le 2e : 3,57 € les 2 (6,56 €/kg), en caisse.");
+    expect(e.avantage).toBe("-60 % sur le 2e : 3,57 € les 2 (6,56 €/kg)");
     // Un prix de lot douteux n'est pas affiché.
     const douteux = offre({ prix: 8.69, reduction: "-50 % sur le 2e", lot: { quantite: 2, prix: 8.69, prix_unitaire: null } });
-    expect(explicationPrix(douteux).avantage).toBe("-50 % sur le 2e, en caisse.");
+    expect(explicationPrix(douteux).avantage).toBe("-50 % sur le 2e");
   });
 
   test("Lidl Plus : le prix avec l'appli, et sans", () => {
     const e = texte(explicationPrix(offre({ prix: 1.99, ancien_prix: 2.49, reduction: "-20 % avec Lidl Plus", carte_fidelite: true })));
     expect(e).toMatchObject({ genre: "lidl-plus", prix: "1,99 €", mention: "avec Lidl Plus" });
-    expect(e.avantage).toBe("Prix avec l'appli Lidl Plus, à scanner en caisse (sans l'appli : 2,49 €).");
+    expect(e.avantage).toBe("Sans l'appli : 2,49 €");
+    expect(explicationPrix(offre({ prix: 0.99, carte_fidelite: true })).avantage).toBe("À scanner en caisse");
     const lot = { quantite: 2, prix: 3.59, prix_unitaire: 8.98 };
     const enLot = texte(explicationPrix(offre({ prix: 2.39, reduction: "-50 % sur le 2e avec Lidl Plus", carte_fidelite: true, lot })));
-    expect(enLot.avantage).toBe("Avec l'appli Lidl Plus, -50 % sur le 2e : 3,59 € les 2.");
+    expect(enLot.avantage).toBe("-50 % sur le 2e : 3,59 € les 2");
   });
 
   test("sans réduction : le prix du catalogue", () => {
@@ -274,15 +275,15 @@ describe("resumeDescription", () => {
 });
 
 describe("articleDepuisPromo", () => {
-  test("nom du produit, et une note qui dit où, combien et jusqu'à quand", () => {
+  test("nom du produit, et une note courte : où, combien, jusqu'à quand", () => {
     const article = articleDepuisPromo(offre({ produit: "LAIT DEMI-ÉCRÉMÉ UHT", source: "leclerc", prix: 6.12 }), AUJOURDHUI);
     expect(article.nom).toBe("Lait demi-écrémé UHT");
-    expect(simple(article.note)).toBe("Promo Leclerc : 6,12 € · Jusqu'à demain");
+    expect(simple(article.note)).toBe("Leclerc · 6,12 € · jusqu'au 28 oct.");
   });
 
   test("sans prix, la réduction ; promo à venir ; nom trop long raccourci", () => {
     const gamme = offre({ produit: "Tous les produits BIO", prix: null, reduction: "-34 %", date_debut: "2026-10-29" });
-    expect(simple(articleDepuisPromo(gamme, AUJOURDHUI).note)).toBe("Promo Lidl : -34 % · À partir du jeudi 29 octobre");
+    expect(simple(articleDepuisPromo(gamme, AUJOURDHUI).note)).toBe("Lidl · -34 % · dès le 29 oct.");
     expect(articleDepuisPromo(offre({ produit: "x".repeat(150) }), AUJOURDHUI).nom).toHaveLength(100);
   });
 });
@@ -307,6 +308,12 @@ describe("dates", () => {
     expect(periode(offre({ date_debut: null, date_fin: null }), AUJOURDHUI)).toBe("");
   });
 
+  test("période en court, pour la note d'un article", () => {
+    expect(simple(periodeCourte(offre({ date_fin: "2026-10-31" }), AUJOURDHUI))).toBe("jusqu'au 31 oct.");
+    expect(simple(periodeCourte(offre({ date_debut: "2026-11-01", date_fin: "2026-11-07" }), AUJOURDHUI))).toBe("dès le 1er nov.");
+    expect(periodeCourte(offre({ date_debut: null, date_fin: null }), AUJOURDHUI)).toBe("");
+  });
+
   test("moment du passage du robot", () => {
     const maintenant = new Date(2026, 9, 27, 9, 0);
     expect(simple(formaterMoment(new Date(2026, 9, 27, 5, 48), maintenant))).toBe("aujourd'hui à 5 h 48");
@@ -325,14 +332,14 @@ describe("dates", () => {
   test("phrases sur la date des promos", () => {
     const maintenant = new Date(2026, 9, 27, 21, 0);
     const recentes = phrasesFraicheur(new Date(2026, 9, 27, 5, 48).toISOString(), maintenant);
-    expect(simple(recentes.info)).toBe("Promos Lidl et Leclerc lues par le robot aujourd'hui à 5 h 48.");
+    expect(simple(recentes.info)).toBe("Promos : aujourd'hui à 5 h 48");
     expect(recentes.alerte).toBe("");
     expect(simple(phrasesFraicheur(new Date(2026, 9, 26, 5, 48).toISOString(), maintenant).alerte)).toBe(
-      "Les promos datent d'hier à 5 h 48 : le robot n'est pas passé depuis, elles ont pu changer.",
+      "Promos d'hier à 5 h 48 : elles ont pu changer.",
     );
     const anciennes = phrasesFraicheur(new Date(2026, 9, 24, 5, 48).toISOString(), maintenant);
-    expect(simple(anciennes.info)).toBe("Promos Lidl et Leclerc lues par le robot le samedi 24 octobre à 5 h 48.");
-    expect(simple(anciennes.alerte)).toMatch(/^Les promos datent du samedi 24 octobre à 5 h 48 :/);
+    expect(simple(anciennes.info)).toBe("Promos : samedi 24 octobre à 5 h 48");
+    expect(simple(anciennes.alerte)).toBe("Promos du samedi 24 octobre à 5 h 48 : elles ont pu changer.");
     expect(phrasesFraicheur("???", maintenant).alerte).toMatch(/inconnue/);
   });
 });
@@ -360,12 +367,6 @@ describe("affichage", () => {
     expect(prixUnitaire(offre({ prix: 1 }))).toBeNull();
   });
 
-  test("résumé par magasin", () => {
-    const index = indexerPromos(donnees());
-    expect(resumePromos(chercherPromos(index, "Lait", AUJOURDHUI))).toBe("3 promos : 2 chez Leclerc, 1 chez Lidl");
-    expect(resumePromos(chercherPromos(index, "Laitue", AUJOURDHUI))).toBe("1 promo chez Lidl");
-  });
-
   test("magasins dont les promos sont incomplètes", () => {
     const fichier = {
       magasins: { "leclerc-geispolsheim": { nom: "E.Leclerc Geispolsheim" } },
@@ -379,11 +380,7 @@ describe("affichage", () => {
   });
 
   test("explication du problème d'un magasin", () => {
-    expect(phraseSource({ nom: "E.Leclerc Geispolsheim", etat: "erreur" })).toBe(
-      "Les promos d'E.Leclerc Geispolsheim n'ont pas pu être mises à jour : ce sont celles du passage précédent.",
-    );
-    expect(phraseSource({ nom: "Lidl Lingolsheim", etat: "partiel" })).toBe(
-      "Une partie des promos de Lidl Lingolsheim n'a pas pu être mise à jour.",
-    );
+    expect(phraseSource({ nom: "E.Leclerc Geispolsheim", etat: "erreur" })).toBe("Promos E.Leclerc Geispolsheim pas à jour.");
+    expect(phraseSource({ nom: "Lidl Lingolsheim", etat: "partiel" })).toBe("Promos Lidl Lingolsheim incomplètes.");
   });
 });

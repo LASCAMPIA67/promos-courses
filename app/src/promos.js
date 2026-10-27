@@ -186,14 +186,13 @@ function trouver(index, motsCherches, aujourdhui, correspond) {
 }
 
 /**
- * L'article à ajouter à la liste depuis une promo : le nom du produit, et une note qui rappelle
- * où et à quel prix (« Promo Lidl : 0,89 € · Jusqu'au mardi 28 octobre »).
+ * L'article à ajouter à la liste depuis une promo : le nom du produit, et une note courte qui
+ * rappelle où, combien (le prix payé en caisse) et jusqu'à quand (« Leclerc · 2,25 € · jusqu'au 7 nov. »).
  */
 export function articleDepuisPromo(offre, aujourdhui) {
   const nom = joliNom(offre.produit).slice(0, 100).trim();
-  const prix = offre.prix != null ? formaterPrix(offre.prix) : offre.reduction;
-  const morceaux = [`Promo ${enseigne(offre)}${prix ? ` : ${prix}` : ""}`, periode(offre, aujourdhui)].filter(Boolean);
-  return { nom, note: morceaux.join(" · ").slice(0, 200) };
+  const prix = explicationPrix(offre).prix ?? offre.reduction;
+  return { nom, note: [enseigne(offre), prix, periodeCourte(offre, aujourdhui)].filter(Boolean).join(" · ").slice(0, 200) };
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -223,6 +222,22 @@ export function formaterJour(dateOuIso) {
   const date = typeof dateOuIso === "string" ? versDate(dateOuIso) : dateOuIso;
   const texte = JOUR.format(date);
   return date.getDate() === 1 ? texte.replace(/\b1\b/, "1er") : texte;
+}
+
+const JOUR_COURT = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short" });
+
+/** « 7 nov. », « 1er nov. ». */
+function jourCourt(iso) {
+  const date = versDate(iso);
+  const texte = JOUR_COURT.format(date);
+  return date.getDate() === 1 ? texte.replace(/\b1\b/, "1er") : texte;
+}
+
+/** La période en court, pour une note : « jusqu'au 7 nov. », « dès le 29 oct. ». */
+export function periodeCourte(offre, aujourdhui) {
+  const { date_debut: debut, date_fin: fin } = offre;
+  if (debut && debut > aujourdhui) return `dès le ${jourCourt(debut)}`;
+  return fin ? `jusqu'au ${jourCourt(fin)}` : "";
 }
 
 /** Quand profiter de la promo : « Jusqu'au mardi 28 octobre », « À partir de demain »… */
@@ -261,13 +276,13 @@ export function fraicheur(miseAJour, maintenant = new Date()) {
  */
 export function phrasesFraicheur(miseAJour, maintenant = new Date()) {
   const { date, ancienne } = fraicheur(miseAJour, maintenant);
-  if (!date) return { info: "", alerte: "La date des promos est inconnue : elles ont pu changer." };
+  if (!date) return { info: "", alerte: "Date des promos inconnue : elles ont pu changer." };
   const moment = formaterMoment(date, maintenant);
   const relatif = /^(aujourd'hui|hier)/.test(moment);
   const depuis = relatif ? `d'${moment}` : `du ${moment}`;
   return {
-    info: `Promos Lidl et Leclerc lues par le robot ${relatif ? moment : `le ${moment}`}.`,
-    alerte: ancienne ? `Les promos datent ${depuis} : le robot n'est pas passé depuis, elles ont pu changer.` : "",
+    info: `Promos : ${moment}`,
+    alerte: ancienne ? `Promos ${depuis} : elles ont pu changer.` : "",
   };
 }
 
@@ -283,10 +298,7 @@ export function sourcesEnDifficulte(donnees) {
  * passage précédent (voir le README, « Fiabilité »).
  */
 export function phraseSource({ nom, etat }) {
-  const de = /^[aeiouyéèêàâîôûh]/i.test(nom) ? `d'${nom}` : `de ${nom}`;
-  return etat === "partiel"
-    ? `Une partie des promos ${de} n'a pas pu être mise à jour.`
-    : `Les promos ${de} n'ont pas pu être mises à jour : ce sont celles du passage précédent.`;
+  return etat === "partiel" ? `Promos ${nom} incomplètes.` : `Promos ${nom} pas à jour.`;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -361,8 +373,8 @@ export function explicationPrix(offre) {
       unitaire: null,
       avantage:
         rendu != null
-          ? `${euros(rendu)} (${detail}) reviennent sur la carte E.Leclerc, à dépenser plus tard : revient à ${euros(offre.prix)}${auKilo}.`
-          : `${detail} reviennent sur la carte E.Leclerc (Ticket E.Leclerc), à dépenser plus tard.`,
+          ? `${euros(rendu)} (${detail}) rendus sur la carte · revient à ${euros(offre.prix)}${auKilo}`
+          : `${detail} rendus sur la carte`,
     };
   }
   if (offre.source === "lidl" && offre.carte_fidelite) {
@@ -373,8 +385,10 @@ export function explicationPrix(offre) {
       barre: null,
       unitaire: prixUnitaire(offre),
       avantage: offre.lot
-        ? `Avec l'appli Lidl Plus, ${reduction} : ${lot}.`
-        : `Prix avec l'appli Lidl Plus, à scanner en caisse${offre.ancien_prix != null ? ` (sans l'appli : ${euros(offre.ancien_prix)})` : ""}.`,
+        ? `${reduction}${lot ? ` : ${lot}` : ""}`
+        : offre.ancien_prix != null
+          ? `Sans l'appli : ${euros(offre.ancien_prix)}`
+          : "À scanner en caisse",
     };
   }
   if (offre.lot) {
@@ -384,7 +398,7 @@ export function explicationPrix(offre) {
       mention: offre.prix != null ? "l'unité" : null,
       barre: null,
       unitaire: prixUnitaire(offre),
-      avantage: `${reduction}${lot ? ` : ${lot}` : ""}, en caisse${offre.carte_fidelite ? ", sur présentation de la carte" : ""}.`,
+      avantage: `${reduction}${lot ? ` : ${lot}` : ""}`,
     };
   }
   if (offre.ancien_prix != null || reduction) {
@@ -395,7 +409,7 @@ export function explicationPrix(offre) {
       mention: offre.prix != null ? "en caisse" : null,
       barre: euros(offre.ancien_prix),
       unitaire: prixUnitaire(offre),
-      avantage: `${reduction ? `${reduction}, d` : "D"}éjà déduit du prix affiché${carte ? ", sur présentation de la carte" : ""}.`,
+      avantage: `${reduction ? `${reduction}, d` : "D"}éjà déduit`,
     };
   }
   return { genre: "aucun", prix: euros(offre.prix), mention: null, barre: null, unitaire: prixUnitaire(offre), avantage: null };
@@ -433,13 +447,4 @@ export function prixUnitaire(offre) {
   const { prix_unitaire: montant, unite, prix } = offre;
   if (montant == null || !unite || montant === prix) return null;
   return formaterPrixUnitaire(montant, unite);
-}
-
-/** « 3 promos : 2 chez Lidl, 1 chez Leclerc ». */
-export function resumePromos(promos) {
-  const parEnseigne = new Map();
-  for (const { offre } of promos) parEnseigne.set(enseigne(offre), (parEnseigne.get(enseigne(offre)) ?? 0) + 1);
-  const total = `${promos.length} promo${promos.length > 1 ? "s" : ""}`;
-  if (parEnseigne.size < 2) return `${total} chez ${[...parEnseigne.keys()][0] ?? "nos magasins"}`;
-  return `${total} : ${[...parEnseigne].map(([nom, nombre]) => `${nombre} chez ${nom}`).join(", ")}`;
 }

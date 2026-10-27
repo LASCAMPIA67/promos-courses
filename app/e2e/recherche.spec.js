@@ -26,9 +26,7 @@ test("en écrivant un article, les promos s'affichent ; on en ajoute une, ou ce 
 
   // « lait » : les promos trouvées remplacent la liste, Leclerc d'abord, le mot entier avant « Laitue ».
   await champ(page).fill("lait");
-  await expect(page.locator("#etat-recherche")).toHaveText(
-    "4 promos pour « lait », Leclerc d'abord. Touchez + pour ajouter « lait » tel quel.",
-  );
+  await expect(page.locator("#etat-recherche")).toHaveText("4 promos");
   await expect(noms(page)).toHaveText([
     "Lait demi-écrémé UHT LACTEL",
     "Lait demi-écrémé MILSANI",
@@ -41,17 +39,15 @@ test("en écrivant un article, les promos s'affichent ; on en ajoute une, ou ce 
   await page.getByRole("button", { name: "Ajouter Lait demi-écrémé à la liste" }).click();
   await expect(page.getByRole("button", { name: "Lait demi-écrémé : déjà dans la liste" })).toBeDisabled();
 
-  // Effacer : la liste revient, avec l'article et une note qui rappelle où et à quel prix.
+  // Effacer : la liste revient, avec l'article et une note courte : où, à quel prix, jusqu'à quand.
   await page.getByRole("button", { name: "Effacer" }).click();
   await expect(page.locator("#suggestions")).toBeHidden();
   await expect(aAcheter(page).locator(".nom")).toHaveText(["Lait demi-écrémé"]);
-  await expect(aAcheter(page).locator(".details")).toContainText("Promo Lidl : 0,89 € · Jusqu'au");
+  await expect(aAcheter(page).locator(".details")).toContainText("Lidl · 0,89 € · jusqu'au");
 
   // Aucune promo : « OK » sur le clavier l'ajoute quand même.
   await champ(page).fill("xyz");
-  await expect(page.locator("#etat-recherche")).toHaveText(
-    "Aucune promo pour « xyz ». Touchez + pour l'ajouter quand même à la liste.",
-  );
+  await expect(page.locator("#etat-recherche")).toHaveText("Aucune promo · + pour l'ajouter");
   await champ(page).press("Enter");
   await expect(champ(page)).toHaveValue("");
   await expect(aAcheter(page).locator(".nom")).toHaveText(["Lait demi-écrémé", "xyz"]);
@@ -62,7 +58,7 @@ test("beaucoup de promos : on en montre 30, puis plus à la demande", async ({ p
   await servirPromos(context, { multiplier: 10 }); // 40 promos pour « lait »
   await seConnecter(page, COMPTES.un);
   await champ(page).fill("lait");
-  await expect(page.locator("#etat-recherche")).toContainText("40 promos pour « lait »");
+  await expect(page.locator("#etat-recherche")).toHaveText("40 promos");
   await expect(noms(page)).toHaveCount(30);
   await page.getByRole("button", { name: "Voir plus de promos" }).click();
   await expect(noms(page)).toHaveCount(40);

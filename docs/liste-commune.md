@@ -57,6 +57,19 @@ Un document par article, pour que deux modifications en même temps ne se gênen
 | `cree_le` | date du serveur | oui | Date d'ajout (ne peut plus changer ensuite). |
 | `modifie_le` | date du serveur | oui | Date de la dernière modification. |
 
+### Collection `membres` : qui est qui
+
+Un document par compte, dont l'identifiant est celui du compte. Il sert aux **pastilles de couleur**
+de la liste (qui a ajouté quoi). Les prénoms ne sont **que dans Firebase**, jamais dans ce dépôt.
+
+| Champ | Type | Obligatoire | Signification |
+|---|---|---|---|
+| `prenom` | texte (1 à 30 caractères) | oui | Le prénom affiché : « Ajouté par … ». |
+| `couleur` | `vert`, `violet`, `bleu`, `orange`, `rose` ou `jaune` | oui | La couleur de ses articles. |
+
+Chacun ne peut écrire que **sa propre** fiche ; les deux comptes peuvent lire les deux fiches. Sans
+fiche, un compte a une couleur donnée d'office et s'appelle « vous » ou « l'autre compte ».
+
 ### Collection `reglages` : réglages communs
 
 Pour les préférences du foyer (cartes de fidélité, magasins préférés…). Son contenu sera défini avec
@@ -69,6 +82,7 @@ Elles se trouvent dans [`firebase/firestore.rules`](../firebase/firestore.rules)
 - seuls les deux comptes du foyer peuvent lire ou modifier quoi que ce soit ;
 - un article a toujours la bonne forme (champs connus, longueurs raisonnables, dates du serveur) ;
 - on ne peut pas ajouter un article au nom de l'autre, ni changer son auteur ou sa date d'ajout ;
+- chacun ne modifie que sa propre fiche `membres` (prénom et couleur), toujours de la bonne forme ;
 - toute autre collection est fermée.
 
 ### Les mettre en place ou les modifier

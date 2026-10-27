@@ -27,8 +27,8 @@ test("ajouter, cocher, modifier et supprimer des articles", async ({ page }) => 
   await ajouter(page, "Lait demi-écrémé", "2 L");
   await ajouter(page, "Pain");
   await expect(aAcheter(page).locator(".nom")).toHaveText(["Lait demi-écrémé", "Pain"]);
-  await expect(aAcheter(page)).toContainText("2 L");
-  await expect(page.locator("#resume")).toHaveText("2 articles à acheter");
+  // Sous le nom : quand il a été ajouté, puis la quantité.
+  await expect(aAcheter(page).locator(".details").first()).toHaveText(/^aujourd'hui \d\d:\d\d · 2 L$/);
 
   // Un doublon est signalé au lieu d'être ajouté.
   await ajouter(page, "lait demi ecreme");
@@ -135,6 +135,42 @@ test("sans réseau, l'appli continue de marcher et envoie tout au retour du rés
   await telephone1.context().setOffline(false);
   await expect(aAcheter(telephone2)).toContainText("Œufs");
   await expect(telephone1.getByText("Hors connexion")).toBeHidden();
+
+  await telephone1.context().close();
+  await telephone2.context().close();
+});
+
+test("chacun choisit son prénom et sa couleur : l'autre téléphone voit qui a ajouté quoi", async ({ browser }) => {
+  const telephone1 = await (await browser.newContext()).newPage();
+  const telephone2 = await (await browser.newContext()).newPage();
+  await seConnecter(telephone1, COMPTES.un);
+  await seConnecter(telephone2, COMPTES.deux);
+
+  // Sans prénom, l'enregistrement est refusé avec un message clair.
+  await telephone1.getByRole("button", { name: "Mon compte" }).click();
+  const compte = telephone1.getByRole("dialog", { name: "Mon compte" });
+  await compte.getByLabel("Prénom").fill(" ");
+  await compte.getByRole("button", { name: "Enregistrer" }).click();
+  await expect(compte.getByRole("alert")).toHaveText("Écrivez votre prénom.");
+
+  await compte.getByLabel("Prénom").fill("Camille");
+  await compte.getByRole("radio", { name: "Rose" }).check();
+  await compte.getByRole("button", { name: "Enregistrer" }).click();
+  await expect(compte).toBeHidden();
+
+  // Sur l'autre téléphone : la pastille rose et l'heure d'ajout à côté de l'article.
+  await ajouter(telephone1, "Pommes");
+  const ligne = aAcheter(telephone2).locator(".article").filter({ hasText: "Pommes" });
+  await expect(ligne.locator(".pastille-membre")).toHaveAttribute("data-couleur", "rose");
+  await expect(ligne.locator(".details")).toHaveText(/^aujourd'hui \d\d:\d\d$/);
+  await telephone2.getByRole("button", { name: /^Modifier Pommes, ajouté par Camille aujourd'hui/ }).click();
+  await expect(telephone2.locator("#auteur-article")).toHaveText(/^Ajouté par Camille, aujourd'hui \d\d:\d\d$/);
+  await telephone2.getByRole("button", { name: "Annuler" }).click();
+
+  // Et dans « Mon compte », la légende des couleurs.
+  await telephone2.getByRole("button", { name: "Mon compte" }).click();
+  await expect(telephone2.locator("#legende-membres")).toContainText("Camille");
+  await expect(telephone2.locator("#legende-membres .pastille-membre[data-couleur='rose']")).toHaveCount(1);
 
   await telephone1.context().close();
   await telephone2.context().close();

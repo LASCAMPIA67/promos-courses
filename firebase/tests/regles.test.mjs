@@ -140,6 +140,35 @@ describe("modifier ou supprimer un article", () => {
   });
 });
 
+describe("membres : prénom et couleur de chacun", () => {
+  const fiche = { prenom: "Compte un", couleur: "vert" };
+
+  test("chacun écrit sa propre fiche, et le foyer peut lire les deux", async () => {
+    await assertSucceeds(setDoc(doc(base(COMPTE_1), `membres/${COMPTE_1}`), fiche));
+    await assertSucceeds(getDoc(doc(base(COMPTE_2), `membres/${COMPTE_1}`)));
+    await assertSucceeds(updateDoc(doc(base(COMPTE_1), `membres/${COMPTE_1}`), { couleur: "bleu" }));
+    await assertSucceeds(deleteDoc(doc(base(COMPTE_1), `membres/${COMPTE_1}`)));
+  });
+
+  test("on ne peut pas écrire la fiche de l'autre", async () => {
+    await assertFails(setDoc(doc(base(COMPTE_2), `membres/${COMPTE_1}`), fiche));
+  });
+
+  test("la fiche est contrôlée : prénom court, couleur connue, rien d'autre", async () => {
+    const ma = (champs) => setDoc(doc(base(COMPTE_1), `membres/${COMPTE_1}`), champs);
+    await assertFails(ma({ prenom: "", couleur: "vert" }));
+    await assertFails(ma({ prenom: "x".repeat(31), couleur: "vert" }));
+    await assertFails(ma({ prenom: "Compte un", couleur: "#ff0000" }));
+    await assertFails(ma({ prenom: "Compte un" }));
+    await assertFails(ma({ ...fiche, email: "compte@exemple.test" }));
+  });
+
+  test("un autre compte Firebase ne peut ni lire ni écrire les fiches", async () => {
+    await assertFails(setDoc(doc(base(INCONNU), `membres/${INCONNU}`), fiche));
+    await assertFails(getDoc(doc(base(INCONNU), `membres/${COMPTE_1}`)));
+  });
+});
+
 describe("réglages", () => {
   test("le foyer peut lire et écrire ses réglages, pas les autres", async () => {
     await assertSucceeds(setDoc(doc(base(COMPTE_1), "reglages/foyer"), { lidl_plus: true }));

@@ -45,10 +45,7 @@
     <!-- La liste de courses, et les promos trouvées pendant qu'on tape -->
     <div id="appli" class="ecran" hidden>
       <header class="entete">
-        <div>
-          <h1>Liste de courses</h1>
-          <p id="resume" class="discret" aria-live="polite"></p>
-        </div>
+        <h1>Liste de courses</h1>
         <button type="button" id="bouton-compte" class="bouton-icone" aria-label="Mon compte">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" /></svg>
         </button>
@@ -99,10 +96,7 @@
         <section aria-labelledby="titre-a-acheter">
           <h2 id="titre-a-acheter" class="cache">À acheter</h2>
           <ul id="liste-a-acheter" class="liste"></ul>
-          <div id="liste-vide" class="vide" hidden>
-            <p class="vide-titre">La liste est vide</p>
-            <p class="discret">Ajoutez un article ci-dessus : il apparaîtra aussitôt sur l'autre téléphone.</p>
-          </div>
+          <p id="liste-vide" class="vide" hidden>La liste est vide</p>
         </section>
 
         <section id="section-caddie" aria-labelledby="titre-caddie" hidden>
@@ -115,8 +109,8 @@
       </main>
 
       <footer class="pied discret">
-        <p id="info-promos"></p>
-        <p>Version <span id="version"></span></p>
+        <span id="info-promos"></span>
+        <span>v<span id="version"></span></span>
       </footer>
 
       <div id="annulation" class="annulation" role="status" hidden>
@@ -130,6 +124,7 @@
     <dialog id="fenetre-article" aria-labelledby="titre-fenetre-article">
       <form id="form-article" method="dialog" novalidate>
         <h2 id="titre-fenetre-article">Modifier l'article</h2>
+        <p id="auteur-article" class="discret"></p>
         <label for="modif-nom">Nom</label>
         <input id="modif-nom" maxlength="100" required autocapitalize="sentences" />
         <label for="modif-quantite">Quantité <span class="discret">(facultatif)</span></label>
@@ -150,27 +145,38 @@
       <div class="entete-fenetre">
         <div>
           <h2 id="titre-fenetre-promos">Promos</h2>
-          <p id="resume-promos" class="discret"></p>
         </div>
         <button type="button" class="bouton-icone" data-fermer aria-label="Fermer">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
         </button>
       </div>
       <ul id="liste-promos" class="promos"></ul>
-      <p class="discret note-promos">
-        Les promos viennent des catalogues de Lidl Lingolsheim et E.Leclerc Geispolsheim. Vérifiez en
-        magasin : prix et disponibilité peuvent varier.
-      </p>
     </dialog>
 
     <!-- Mon compte -->
     <dialog id="fenetre-compte" aria-labelledby="titre-fenetre-compte">
-      <h2 id="titre-fenetre-compte">Mon compte</h2>
-      <p>Connecté avec <strong id="email-compte"></strong></p>
-      <div class="actions">
-        <button type="button" class="bouton" data-fermer>Fermer</button>
-        <button type="button" id="deconnexion" class="bouton danger">Se déconnecter</button>
-      </div>
+      <form id="form-compte" method="dialog" novalidate>
+        <h2 id="titre-fenetre-compte">Mon compte</h2>
+        <p id="email-compte" class="discret"></p>
+        <label for="prenom">Prénom</label>
+        <input id="prenom" maxlength="30" autocomplete="given-name" autocapitalize="words" />
+        <fieldset class="couleurs">
+          <legend>Couleur de mes articles</legend>
+          <label><input type="radio" name="couleur" value="vert" /><span class="pastille-membre" data-couleur="vert"></span><span class="cache">Vert</span></label>
+          <label><input type="radio" name="couleur" value="violet" /><span class="pastille-membre" data-couleur="violet"></span><span class="cache">Violet</span></label>
+          <label><input type="radio" name="couleur" value="bleu" /><span class="pastille-membre" data-couleur="bleu"></span><span class="cache">Bleu</span></label>
+          <label><input type="radio" name="couleur" value="orange" /><span class="pastille-membre" data-couleur="orange"></span><span class="cache">Orange</span></label>
+          <label><input type="radio" name="couleur" value="rose" /><span class="pastille-membre" data-couleur="rose"></span><span class="cache">Rose</span></label>
+          <label><input type="radio" name="couleur" value="jaune" /><span class="pastille-membre" data-couleur="jaune"></span><span class="cache">Jaune</span></label>
+        </fieldset>
+        <p id="legende-membres" class="legende discret"></p>
+        <p id="message-compte" class="message" role="alert" hidden></p>
+        <div class="actions">
+          <button type="button" class="bouton" data-fermer>Fermer</button>
+          <button type="submit" class="bouton principal">Enregistrer</button>
+        </div>
+        <button type="button" id="deconnexion" class="lien danger">Se déconnecter</button>
+      </form>
     </dialog>
 
     <!-- Confirmation -->

@@ -7,7 +7,17 @@ import { registerSW } from "virtual:pwa-register";
 import { messageErreur, pluriel, preparerSaisie, trierArticles, trouverDoublon } from "./articles.js";
 import { auth, db } from "./firebase.js";
 import { proposerInstallation } from "./installation.js";
-import { ajouterArticle, cocherArticle, modifierArticle, supprimerArticle, suivreArticles, viderLeCaddie } from "./liste.js";
+import {
+  ajouterArticle,
+  cocherArticle,
+  enregistrerMembre,
+  modifierArticle,
+  suivreArticles,
+  suivreMembres,
+  supprimerArticle,
+  viderLeCaddie,
+} from "./liste.js";
+import { couleurDe, formaterAjout, nomDe, preparerFiche } from "./membres.js";
 import {
   URL_PROMOS,
   articleDepuisPromo,
@@ -22,7 +32,6 @@ import {
   phrasesFraicheur,
   rechercherPromos,
   resumeDescription,
-  resumePromos,
   sourcesEnDifficulte,
 } from "./promos.js";
 
@@ -37,6 +46,8 @@ const etat = {
   utilisateur: null,
   articles: [],
   arreterSuivi: null,
+  membres: {}, // { uid: { prenom, couleur } } : qui est qui, pour les pastilles de couleur
+  arreterMembres: null,
   articleOuvert: null,
   ligneOuverte: null, // article dont le bouton « Supprimer » est visible (glissé vers la gauche)
   promos: null, // { donnees, index, luesLe }
@@ -63,8 +74,11 @@ function afficherMessage(element, texte, genre = "info") {
 onAuthStateChanged(auth, (utilisateur) => {
   etat.utilisateur = utilisateur;
   etat.arreterSuivi?.();
+  etat.arreterMembres?.();
   etat.arreterSuivi = null;
+  etat.arreterMembres = null;
   etat.articles = [];
+  etat.membres = {};
   if (!utilisateur) {
     $("ajout-nom").value = "";
     dessinerSuggestions();
@@ -83,6 +97,16 @@ onAuthStateChanged(auth, (utilisateur) => {
       mettreAJourBandeau(depuisLeTelephone);
     },
     signalerErreur,
+  );
+  etat.arreterMembres = suivreMembres(
+    db,
+    (membres) => {
+      etat.membres = membres;
+      dessinerListe();
+      dessinerLegende();
+    },
+    // Sans les fiches (règles pas encore publiées, réseau…), les pastilles prennent une couleur d'office.
+    (erreur) => console.warn("Fiches des membres indisponibles :", erreur),
   );
 });
 
@@ -140,10 +164,6 @@ function dessinerListe() {
   $("liste-vide").hidden = aAcheter.length > 0;
   $("section-caddie").hidden = dansLeCaddie.length === 0;
   $("titre-caddie").textContent = `Dans le caddie (${dansLeCaddie.length})`;
-  const enPromo = [...promos.values()].filter((p) => p.length > 0).length;
-  $("resume").textContent = aAcheter.length
-    ? `${pluriel(aAcheter.length, "article")} à acheter${enPromo ? ` · ${enPromo} en promo` : ""}`
-    : "Rien à acheter";
   dessinerEtatPromos();
 }
 
@@ -165,15 +185,18 @@ function ligneArticle(article, promos = []) {
     cocherArticle(db, article).catch(signalerErreur);
   });
 
+  // Le nom, la pastille de celui qui l'a ajouté, puis quand, la quantité et la note.
+  const auteur = auteurDe(article);
   const contenu = document.createElement("button");
   contenu.type = "button";
   contenu.className = "texte";
-  contenu.setAttribute("aria-label", `Modifier ${article.nom}`);
+  contenu.setAttribute("aria-label", `Modifier ${article.nom}, ajouté par ${[auteur.nom, auteur.quand].filter(Boolean).join(" ")}`);
   const nom = document.createElement("span");
   nom.className = "nom";
   nom.textContent = article.nom;
+  nom.append(pastilleMembre(auteur.couleur));
   contenu.append(nom);
-  const details = [article.quantite, article.note].filter(Boolean).join(" · ");
+  const details = [auteur.quand, article.quantite, article.note].filter(Boolean).join(" · ");
   if (details) {
     const sousTitre = document.createElement("span");
     sousTitre.className = "details";
@@ -285,7 +308,7 @@ function dessinerEtatPromos() {
   const alertes = [];
   let info = "";
   if (etat.promosIndisponibles) {
-    alertes.push("Promos indisponibles pour le moment (pas de réseau ?). La liste, elle, marche normalement.");
+    alertes.push("Promos indisponibles (pas de réseau ?).");
   } else if (etat.promos) {
     const phrases = phrasesFraicheur(etat.promos.donnees.mise_a_jour);
     info = phrases.info;
@@ -299,7 +322,6 @@ function dessinerEtatPromos() {
 function ouvrirPromos(article, promos) {
   const aujourdhui = dateDuJour();
   $("titre-fenetre-promos").textContent = `Promos pour « ${article.nom} »`;
-  $("resume-promos").textContent = resumePromos(promos);
   $("liste-promos").replaceChildren(...promos.map(({ offre, aVenir }) => cartePromo(offre, aVenir, aujourdhui)));
   $("fenetre-promos").showModal();
   $("liste-promos").scrollTop = 0;
@@ -389,10 +411,7 @@ function dessinerSuggestions() {
   const aujourdhui = dateDuJour();
   const resultats = rechercherPromos(index, texte, aujourdhui);
   const n = resultats.length;
-  $("etat-recherche").textContent =
-    n === 0
-      ? `Aucune promo pour « ${texte} ». Touchez + pour l'ajouter quand même à la liste.`
-      : `${n} promo${n > 1 ? "s" : ""} pour « ${texte} », Leclerc d'abord. Touchez + pour ajouter « ${texte} » tel quel.`;
+  $("etat-recherche").textContent = n === 0 ? "Aucune promo · + pour l'ajouter" : pluriel(n, "promo");
   $("resultats").replaceChildren(
     ...resultats
       .slice(0, etat.recherche.nombre)
@@ -527,6 +546,33 @@ registerSW({
 });
 
 // ---------------------------------------------------------------------------------------------
+// Qui a ajouté quel article, et quand
+
+/** Les comptes connus : le mien, ceux qui ont une fiche et ceux qui ont ajouté un article. */
+function uidsConnus() {
+  return [
+    ...new Set([etat.utilisateur?.uid, ...Object.keys(etat.membres), ...etat.articles.map((a) => a.ajoute_par)]),
+  ].filter(Boolean);
+}
+
+function auteurDe(article) {
+  const uid = article.ajoute_par;
+  return {
+    nom: nomDe(uid, etat.membres, etat.utilisateur?.uid),
+    couleur: couleurDe(uid, etat.membres, uidsConnus()),
+    quand: formaterAjout(article.cree_le?.toDate?.()),
+  };
+}
+
+function pastilleMembre(couleur) {
+  const pastille = document.createElement("span");
+  pastille.className = "pastille-membre";
+  pastille.dataset.couleur = couleur;
+  pastille.setAttribute("aria-hidden", "true");
+  return pastille;
+}
+
+// ---------------------------------------------------------------------------------------------
 // Glisser un article vers la gauche pour le supprimer, comme dans Mail sur l'iPhone
 
 const LARGEUR_SUPPRIMER = 88; // en pixels, comme dans style.css
@@ -657,6 +703,11 @@ function proposerAnnulation(texte, annuler) {
 
 function ouvrirArticle(article) {
   etat.articleOuvert = article;
+  const auteur = auteurDe(article);
+  $("auteur-article").replaceChildren(
+    pastilleMembre(auteur.couleur),
+    [`Ajouté par ${auteur.nom}`, auteur.quand].filter(Boolean).join(", "),
+  );
   $("modif-nom").value = article.nom;
   $("modif-quantite").value = article.quantite ?? "";
   $("modif-note").value = article.note ?? "";
@@ -695,7 +746,51 @@ $("supprimer-article").addEventListener("click", async () => {
 // ---------------------------------------------------------------------------------------------
 // Compte, confirmations, état du réseau
 
-$("bouton-compte").addEventListener("click", () => $("fenetre-compte").showModal());
+$("bouton-compte").addEventListener("click", () => {
+  const moi = etat.utilisateur.uid;
+  $("prenom").value = etat.membres[moi]?.prenom ?? "";
+  const couleur = couleurDe(moi, etat.membres, uidsConnus());
+  for (const choix of document.querySelectorAll('input[name="couleur"]')) choix.checked = choix.value === couleur;
+  dessinerLegende();
+  afficherMessage($("message-compte"), "");
+  $("fenetre-compte").showModal();
+});
+
+/** Sous les couleurs, qui a quelle couleur : « ● Camille  ● vous ». */
+function dessinerLegende() {
+  if (!etat.utilisateur) return;
+  const uids = uidsConnus();
+  $("legende-membres").replaceChildren(
+    ...uids.map((uid) => {
+      const membre = document.createElement("span");
+      membre.append(pastilleMembre(couleurDe(uid, etat.membres, uids)), nomDe(uid, etat.membres, etat.utilisateur.uid));
+      return membre;
+    }),
+  );
+}
+
+$("form-compte").addEventListener("submit", (evenement) => {
+  evenement.preventDefault();
+  const { fiche, erreur } = preparerFiche({
+    prenom: $("prenom").value,
+    couleur: document.querySelector('input[name="couleur"]:checked')?.value,
+  });
+  if (erreur) {
+    afficherMessage($("message-compte"), erreur, "erreur");
+    return;
+  }
+  // Comme pour les articles, on n'attend pas le serveur : sans réseau, la fiche part plus tard.
+  enregistrerMembre(db, etat.utilisateur.uid, fiche).catch((erreurFirebase) => {
+    // Refusée : les règles d'accès publiées dans Firebase n'ont pas encore la partie « membres ».
+    if (erreurFirebase?.code === "permission-denied") {
+      console.error(erreurFirebase);
+      afficherMessage($("bandeau"), "Prénom et couleur non enregistrés : règles Firebase à mettre à jour.", "erreur");
+    } else {
+      signalerErreur(erreurFirebase);
+    }
+  });
+  $("fenetre-compte").close();
+});
 
 $("deconnexion").addEventListener("click", async () => {
   $("fenetre-compte").close();
@@ -740,7 +835,7 @@ function mettreAJourBandeau(depuisLeTelephone = false) {
   const bandeau = $("bandeau");
   if (bandeau.dataset.genre === "erreur" && !bandeau.hidden) return;
   if (!navigator.onLine) {
-    afficherMessage(bandeau, "Hors connexion : vos changements seront envoyés dès le retour du réseau.", "hors-ligne");
+    afficherMessage(bandeau, "Hors connexion : envoi au retour du réseau.", "hors-ligne");
   } else if (depuisLeTelephone && etat.articles.some((a) => a.enAttente)) {
     afficherMessage(bandeau, "Synchronisation en cours…", "info");
   } else {

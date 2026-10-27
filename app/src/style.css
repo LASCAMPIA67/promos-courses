@@ -18,6 +18,12 @@
   --attention: #7a5800;
   --promo: #b4410e;
   --promo-doux: #fdebe0;
+  --membre-vert: #2e9e5b;
+  --membre-violet: #8e5bd8;
+  --membre-bleu: #2f7de1;
+  --membre-orange: #ef7d22;
+  --membre-rose: #e0508f;
+  --membre-jaune: #e2b100;
   --rayon: 14px;
   --ombre: 0 1px 2px rgb(0 0 0 / 0.05), 0 6px 20px rgb(0 0 0 / 0.05);
   --police: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
@@ -41,6 +47,12 @@
     --attention: #f2cf73;
     --promo: #ffa66e;
     --promo-doux: #3d2416;
+    --membre-vert: #4cc47e;
+    --membre-violet: #b08cf0;
+    --membre-bleu: #6aa8ff;
+    --membre-orange: #ff9f4f;
+    --membre-rose: #ff7fb5;
+    --membre-jaune: #f5cd3d;
     --ombre: none;
   }
 }
@@ -593,25 +605,134 @@ svg {
 }
 
 .vide {
+  margin: 0;
   text-align: center;
-  padding: 36px 16px;
+  padding: 32px 16px;
+  color: var(--discret);
   border: 1.5px dashed var(--bordure);
   border-radius: var(--rayon);
 }
 
-.vide-titre {
-  font-weight: 650;
-  margin: 0 0 4px;
-}
-
+/* Tout en bas : la date des promos et la version, sur une ligne. */
 .pied {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 14px;
   margin-top: 28px;
-  text-align: center;
   font-size: 0.8rem;
 }
 
-.pied p {
-  margin: 2px 0;
+.pied span:empty {
+  display: none;
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* Qui a ajouté l'article : une pastille de couleur par personne */
+
+.pastille-membre {
+  --couleur: var(--membre-vert);
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  margin-left: 8px;
+  border-radius: 50%;
+  background: var(--couleur);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--couleur) 22%, transparent);
+  vertical-align: 0.1em;
+}
+
+.pastille-membre[data-couleur="violet"] {
+  --couleur: var(--membre-violet);
+}
+
+.pastille-membre[data-couleur="bleu"] {
+  --couleur: var(--membre-bleu);
+}
+
+.pastille-membre[data-couleur="orange"] {
+  --couleur: var(--membre-orange);
+}
+
+.pastille-membre[data-couleur="rose"] {
+  --couleur: var(--membre-rose);
+}
+
+.pastille-membre[data-couleur="jaune"] {
+  --couleur: var(--membre-jaune);
+}
+
+#auteur-article .pastille-membre {
+  margin: 0 4px 0 0;
+}
+
+/* Le choix de sa couleur dans « Mon compte » : de grosses pastilles à toucher. */
+.couleurs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.couleurs legend {
+  padding: 0;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.couleurs label {
+  position: relative;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+}
+
+.couleurs input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.couleurs .pastille-membre {
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  box-shadow: none;
+  transition: box-shadow 0.15s;
+}
+
+.couleurs input:checked + .pastille-membre {
+  box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--couleur);
+}
+
+.couleurs input:focus-visible + .pastille-membre {
+  outline: 2px solid var(--texte);
+  outline-offset: 6px;
+}
+
+.legende {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 6px;
+}
+
+.legende .pastille-membre {
+  margin: 0 6px 0 0;
 }
 
 /* ------------------------------------------------------------------------------------------ */
@@ -835,12 +956,6 @@ dialog h2 {
   font-size: 0.9rem;
   font-weight: 600;
   text-decoration: none;
-}
-
-.note-promos {
-  padding: 12px 20px calc(18px + env(safe-area-inset-bottom));
-  border-top: 1px solid var(--bordure);
-  font-size: 0.8rem;
 }
 
 .bouton-ajouter {

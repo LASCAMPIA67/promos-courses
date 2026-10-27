@@ -96,9 +96,11 @@ Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
 
 | Liste | Promos d'un article | En écrivant un article | Mode sombre |
 |---|---|---|---|
-| ![Liste de courses avec les articles en promo](docs/captures/liste.png) | ![Les promos du lait chez Lidl et Leclerc](docs/captures/promos.png) | ![Recherche « lait » dans toutes les promos](docs/captures/recherche.png) | ![Mode sombre](docs/captures/liste-sombre.png) |
+| ![Liste de courses : une pastille de couleur par personne et l'heure d'ajout](docs/captures/liste.png) | ![Les promos du lait chez Lidl et Leclerc](docs/captures/promos.png) | ![Recherche « lait » dans toutes les promos](docs/captures/recherche.png) | ![Mode sombre](docs/captures/liste-sombre.png) |
 
 - **Liste commune** : ce que l'un ajoute, coche ou supprime apparaît aussitôt sur l'autre téléphone.
+- **Qui et quand** : une pastille de couleur à côté de chaque article dit qui l'a ajouté (chacun
+  choisit son prénom et sa couleur dans « Mon compte ») ; dessous, la date et l'heure d'ajout.
 - **Promos** : un article en promo chez Lidl ou Leclerc porte une étiquette « 2 promos ». En la
   touchant, on voit chaque promo : magasin, prix, prix au kilo, jusqu'à quand (ou à partir de quand)
   et, en clair, **où va la réduction** : déjà déduite en caisse, en prenant plusieurs, rendue sur la
@@ -108,7 +110,7 @@ Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
   Coca-Cola, Fanta… ; « Couches » trouve Pampers… (environ 50 familles).
 - **Les promos en écrivant** : en écrivant un article, les promos qui correspondent s'affichent
   aussitôt ; « + » ajoute ce qu'on a écrit (même sans promo), ou on ajoute une promo d'un geste (avec
-  une note qui rappelle le magasin, le prix et la date).
+  une note courte : « Lidl · 0,89 € · jusqu'au 31 oct. »).
 - **Promos à jour** : l'appli prévient si le robot n'est pas passé ou si un magasin manque.
 - **Ajout rapide** avec quantité facultative ; un article déjà dans la liste est signalé.
 - **Caddie** : un article coché passe dans « Dans le caddie » ; « Tout retirer » vide le caddie.
