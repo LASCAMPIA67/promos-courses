@@ -99,8 +99,9 @@ Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
 | ![Liste de courses : une pastille de couleur par personne et l'heure d'ajout](docs/captures/liste.png) | ![Les promos du lait chez Lidl et Leclerc](docs/captures/promos.png) | ![Recherche « lait » dans toutes les promos](docs/captures/recherche.png) | ![Mode sombre](docs/captures/liste-sombre.png) |
 
 - **Liste commune** : ce que l'un ajoute, coche ou supprime apparaît aussitôt sur l'autre téléphone.
-- **Qui et quand** : une pastille de couleur à côté de chaque article dit qui l'a ajouté (chacun
-  choisit son prénom et sa couleur dans « Mon compte ») ; dessous, la date et l'heure d'ajout.
+- **Qui et quand** : une petite pastille de couleur sous le rond à cocher dit qui a ajouté l'article
+  (chacun choisit son prénom et sa couleur dans « Mon compte ») ; sous le nom, la date et l'heure
+  d'ajout.
 - **Promos** : un article en promo chez Lidl ou Leclerc porte une étiquette « 2 promos ». En la
   touchant, on voit chaque promo : magasin, prix, prix au kilo, jusqu'à quand (ou à partir de quand)
   et, en clair, **où va la réduction** : déjà déduite en caisse, en prenant plusieurs, rendue sur la

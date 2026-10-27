@@ -184,9 +184,11 @@ function ligneArticle(article, promos = []) {
   caseACocher.addEventListener("click", () => {
     cocherArticle(db, article).catch(signalerErreur);
   });
-
-  // Le nom, la pastille de celui qui l'a ajouté, puis quand, la quantité et la note.
+  // Sous le rond : la pastille de celui qui a ajouté l'article.
   const auteur = auteurDe(article);
+  caseACocher.append(pastilleMembre(auteur.couleur));
+
+  // Le nom, puis quand il a été ajouté, la quantité et la note.
   const contenu = document.createElement("button");
   contenu.type = "button";
   contenu.className = "texte";
@@ -197,7 +199,6 @@ function ligneArticle(article, promos = []) {
   const nom = document.createElement("span");
   nom.className = "nom";
   nom.textContent = article.nom;
-  nom.append(pastilleMembre(auteur.couleur));
   contenu.append(nom);
   const details = [auteur.quand, article.quantite, article.note].filter(Boolean).join(" · ");
   if (details) {

@@ -16,9 +16,9 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ### Ajouté
 
-- **Appli 0.7 : qui a ajouté quoi, et quand.** Une pastille de couleur à côté de chaque article
-  dit qui l'a ajouté ; dessous, la date et l'heure d'ajout (« aujourd'hui 13:38 », « hier 08:05 »,
-  « jeu. 09:15 », « 12/10 09:15 »). La fenêtre d'un article le rappelle (« Ajouté par …, … »).
+- **Appli 0.7 : qui a ajouté quoi, et quand.** Une petite pastille de couleur, sous le rond à
+  cocher, dit qui a ajouté l'article (même si son nom est long) ; sous le nom, la date et l'heure
+  d'ajout (« aujourd'hui 13:38 », « hier 08:05 », « jeu. 09:15 », « 12/10 09:15 »). La fenêtre d'un article le rappelle (« Ajouté par …, … »).
 - **Mon compte** : chacun écrit son prénom et choisit sa couleur parmi six, avec une légende qui
   rappelle qui a quelle couleur. Les fiches sont dans Firebase (nouvelle collection `membres`),
   jamais dans ce dépôt ; sans fiche, une couleur est donnée d'office.

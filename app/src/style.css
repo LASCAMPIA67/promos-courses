@@ -498,12 +498,25 @@ svg {
 }
 
 .case {
+  position: relative;
   flex: 0 0 56px;
   display: grid;
   place-items: center;
   border: 0;
   background: none;
   cursor: pointer;
+}
+
+/* La pastille de celui qui a ajouté l'article, juste sous le rond (qui reste bien centré). */
+.case .pastille-membre {
+  position: absolute;
+  top: calc(50% + 17px);
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  margin: 0;
+  box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--couleur) 22%, transparent);
+  transform: translateX(-50%);
 }
 
 .case svg {

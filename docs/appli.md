@@ -24,8 +24,8 @@ Les captures sont faites avec des promos d'exemple et des prénoms fictifs (Cami
   (même écrit différemment : « Lait demi-écrémé » = « lait demi ecreme »).
 - **Cocher** un article (le rond à gauche) : il passe dans « Dans le caddie ». Le décocher le remet
   dans la liste.
-- **Qui l'a ajouté, et quand** : à côté du nom, une **pastille de couleur** dit qui a ajouté
-  l'article ; dessous, la date et l'heure d'ajout (« aujourd'hui 13:38 », « hier 08:05 »,
+- **Qui l'a ajouté, et quand** : sous le rond à cocher, une petite **pastille de couleur** dit qui
+  a ajouté l'article ; sous le nom, la date et l'heure d'ajout (« aujourd'hui 13:38 », « hier 08:05 »,
   « jeu. 09:15 » cette semaine, « 12/10 09:15 » avant), puis la quantité et la note.
 - **Mon compte** (le bonhomme en haut à droite) : chacun écrit son **prénom** et choisit **sa
   couleur** parmi six ; la légende dessous rappelle qui a quelle couleur. Tant qu'un compte n'a pas
