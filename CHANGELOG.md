@@ -14,6 +14,8 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+## [0.7.0] - 2026-10-27
+
 ### Ajouté
 
 - **Appli 0.7 : qui a ajouté quoi, et quand.** Une petite pastille de couleur, sous le rond à
@@ -187,7 +189,8 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 - Version antérieure à la mise en place des publications : pas de page « Release » (voir le lien
   ci-dessous vers son enregistrement d'origine).
 
-[Non publié]: https://github.com/lascampia67/promos-courses/compare/v0.6.0...HEAD
+[Non publié]: https://github.com/lascampia67/promos-courses/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/lascampia67/promos-courses/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/lascampia67/promos-courses/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/lascampia67/promos-courses/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/lascampia67/promos-courses/compare/v0.3.0...v0.4.0
