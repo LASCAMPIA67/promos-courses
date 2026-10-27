@@ -44,10 +44,10 @@ quotidien.
 | 1 | Choisir les magasins | ✅ Fait |
 | 2 | Tester les sources de promos | ✅ Fait |
 | 3 | Créer le robot qui récupère les promos | ✅ Fait et validé (version 0.2.0) |
-| 4 | Créer l'appli (liste de courses commune + comparaison aux promos) | 🚧 En cours : liste commune en test (version 0.3) ; comparaison avec les promos à venir |
+| 4 | Créer l'appli (liste de courses commune + comparaison aux promos) | 🚧 En cours : liste commune validée (version 0.3.0) ; comparaison avec les promos en préparation |
 | 5 | L'installer sur nos deux iPhones | ⏳ À faire |
 
-Dernière mise à jour de ce tableau : 26/10/2026. Le détail des évolutions est dans le
+Dernière mise à jour de ce tableau : 27/10/2026. Le détail des évolutions est dans le
 [journal des versions](CHANGELOG.md).
 
 ## Comment ça marche

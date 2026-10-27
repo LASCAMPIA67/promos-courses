@@ -14,6 +14,8 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+## [0.3.0] - 2026-10-27
+
 ### Ajouté
 
 - Liste de courses commune : projet Firebase (offre gratuite Spark), règles d'accès Firestore
@@ -29,8 +31,10 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 ### Modifié
 
 - Les versions courtes (« express ») des catalogues Leclerc sont signalées dans leur nom.
-- Outils GitHub mis à jour : `actions/checkout` v7 et `actions/setup-python` v7 (proposé par Dependabot).
-- README : étape 3 validée, section « Licence » (aucune licence : tous droits réservés).
+- Outils GitHub mis à jour (proposés par Dependabot) : `actions/checkout` v7, `actions/setup-python` v7,
+  `actions/setup-node` v7, `actions/setup-java` v6, `actions/upload-artifact` v7,
+  `actions/upload-pages-artifact` v5, `actions/deploy-pages` v5 et `@playwright/test` 1.64.1.
+- README : étapes 3 et 4.1 validées, section « Licence » (aucune licence : tous droits réservés).
 
 ## [0.2.0] - 2026-10-26
 
@@ -73,6 +77,7 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 - Version antérieure à la mise en place des publications : pas de page « Release » (voir le lien
   ci-dessous vers son enregistrement d'origine).
 
-[Non publié]: https://github.com/lascampia67/promos-courses/compare/v0.2.0...HEAD
+[Non publié]: https://github.com/lascampia67/promos-courses/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/lascampia67/promos-courses/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/lascampia67/promos-courses/compare/ad703c7...v0.2.0
 [0.1.0]: https://github.com/lascampia67/promos-courses/commit/ad703c7
