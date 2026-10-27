@@ -11,6 +11,10 @@ import { servirPromos } from "./promos-exemple.js";
 
 const REGLES = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
+// Sans animations (réglage « Réduire les animations ») : sinon axe peut mesurer les couleurs d'un
+// écran ou d'une fenêtre en plein fondu, encore à moitié transparents.
+test.use({ reducedMotion: "reduce" });
+
 /** Les problèmes trouvés par axe, en clair : « color-contrast : .periode (2) ». */
 async function problemes(page) {
   const { violations } = await new AxeBuilder({ page }).withTags(REGLES).analyze();
