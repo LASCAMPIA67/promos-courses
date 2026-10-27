@@ -14,6 +14,8 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+## [0.5.0] - 2026-10-27
+
 ### Ajouté
 
 - **Appli 0.5 : prête à installer sur l'iPhone.** Dans Safari sur iPhone ou iPad, un encadré explique
@@ -25,6 +27,11 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 - **Version en test publiée automatiquement** dans les « Releases » comme pré-version
   (« Version X.Y.Z (en test) »), remise à jour à chaque changement ; elle devient la version
   définitive (« Latest ») une fois validée. Badge « en test » dans le README.
+
+### Modifié
+
+- README : les cinq étapes du projet sont faites et validées ; l'appli est installée sur nos deux
+  iPhones.
 
 ## [0.4.0] - 2026-10-27
 
@@ -112,7 +119,8 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 - Version antérieure à la mise en place des publications : pas de page « Release » (voir le lien
   ci-dessous vers son enregistrement d'origine).
 
-[Non publié]: https://github.com/lascampia67/promos-courses/compare/v0.4.0...HEAD
+[Non publié]: https://github.com/lascampia67/promos-courses/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/lascampia67/promos-courses/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/lascampia67/promos-courses/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/lascampia67/promos-courses/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/lascampia67/promos-courses/compare/ad703c7...v0.2.0
