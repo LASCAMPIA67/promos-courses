@@ -28,7 +28,7 @@ test("ajouter, cocher, modifier et supprimer des articles", async ({ page }) => 
   await ajouter(page, "Pain");
   await expect(aAcheter(page).locator(".nom")).toHaveText(["Lait demi-écrémé", "Pain"]);
   // Sous le nom : quand il a été ajouté, puis la quantité.
-  await expect(aAcheter(page).locator(".details").first()).toHaveText(/^aujourd'hui \d\d:\d\d · 2 L$/);
+  await expect(aAcheter(page).locator(".details").first()).toHaveText(/^\d\d:\d\d · 2 L$/);
 
   // Un doublon est signalé au lieu d'être ajouté.
   await ajouter(page, "lait demi ecreme");
@@ -162,9 +162,9 @@ test("chacun choisit son prénom et sa couleur : l'autre téléphone voit qui a 
   await ajouter(telephone1, "Pommes");
   const ligne = aAcheter(telephone2).locator(".article").filter({ hasText: "Pommes" });
   await expect(ligne.locator(".pastille-membre")).toHaveAttribute("data-couleur", "rose");
-  await expect(ligne.locator(".details")).toHaveText(/^aujourd'hui \d\d:\d\d$/);
+  await expect(ligne.locator(".details")).toHaveText(/^\d\d:\d\d$/);
   await telephone2.getByRole("button", { name: /^Modifier Pommes, ajouté par Camille aujourd'hui/ }).click();
-  await expect(telephone2.locator("#auteur-article")).toHaveText(/^Ajouté par Camille, aujourd'hui \d\d:\d\d$/);
+  await expect(telephone2.locator("#auteur-article")).toHaveText(/^Ajouté par Camille aujourd'hui à \d\d:\d\d$/);
   await telephone2.getByRole("button", { name: "Annuler" }).click();
 
   // Et dans « Mon compte », la légende des couleurs.

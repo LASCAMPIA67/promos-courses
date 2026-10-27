@@ -838,10 +838,11 @@ dialog h2 {
   padding: 0;
 }
 
+/* Une promo se lit de haut en bas : magasin et dates, produit, taille, prix, type de promo. */
 .promo {
   display: grid;
   gap: 3px;
-  padding: 14px 20px;
+  padding: 12px 16px;
 }
 
 .promo + .promo {
@@ -857,13 +858,13 @@ dialog h2 {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 2px;
+  margin-bottom: 1px;
 }
 
 .enseigne {
   padding: 2px 8px;
   border-radius: 6px;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 750;
 }
 
@@ -880,123 +881,117 @@ dialog h2 {
 
 .periode {
   color: var(--discret);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   text-align: right;
 }
 
 .promo[data-a-venir] .periode {
   color: var(--info);
-  font-weight: 600;
+  font-weight: 650;
 }
 
 .promo-nom {
   font-weight: 600;
+  line-height: 1.25;
   overflow-wrap: anywhere;
 }
 
 .promo-marque {
   color: var(--discret);
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.72rem;
+  font-weight: 650;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  white-space: nowrap;
 }
 
+/* La taille et les variantes, sur une seule ligne. */
 .promo-description {
   color: var(--discret);
-  font-size: 0.88rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  font-size: 0.85rem;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.promo-ligne-prix {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 2px;
 }
 
 .promo-prix {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 4px 10px;
-  margin-top: 4px !important;
+  gap: 2px 8px;
 }
 
 .prix {
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 750;
 }
 
-.mention,
 .ancien-prix,
 .prix-unitaire {
   color: var(--discret);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
-/* L'encadré qui dit où va la réduction : en caisse (vert), sur la carte E.Leclerc (bleu),
-   avec l'appli Lidl Plus (jaune). */
-.avantage {
-  display: grid;
-  gap: 1px;
-  margin-top: 4px !important;
-  padding: 8px 12px;
-  border-radius: 10px;
-  border-left: 4px solid var(--accent);
-  background: var(--accent-doux);
-  font-size: 0.9rem;
-}
-
-.avantage-titre {
-  font-size: 0.78rem;
-  font-weight: 750;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--accent-fonce);
-}
-
-.avantage[data-genre="carte-leclerc"],
-.avantage[data-genre="carte-caisse"] {
-  border-left-color: #0066b3;
-  background: var(--info-doux);
-}
-
-.avantage[data-genre="carte-leclerc"] .avantage-titre,
-.avantage[data-genre="carte-caisse"] .avantage-titre {
-  color: var(--info);
-}
-
-.avantage[data-genre="lidl-plus"] {
-  border-left-color: #ffd500;
-  background: var(--attention-doux);
-}
-
-.avantage[data-genre="lidl-plus"] .avantage-titre {
-  color: var(--attention);
-}
-
-.promo-actions {
+/* Le type de promo, d'une couleur selon l'endroit où va la réduction : en caisse (vert), sur la
+   carte E.Leclerc (bleu), avec l'appli Lidl Plus (jaune). */
+.promo-bas {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px 16px;
-  margin-top: 6px;
+  gap: 4px 10px;
+  margin-top: 2px;
+  font-size: 0.85rem;
+}
+
+.type {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--accent-doux);
+  color: var(--accent-fonce);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.type[data-genre="carte-leclerc"],
+.type[data-genre="carte-caisse"] {
+  background: var(--info-doux);
+  color: var(--info);
+}
+
+.type[data-genre="lidl-plus"] {
+  background: var(--attention-doux);
+  color: var(--attention);
+}
+
+.detail {
+  color: var(--discret);
 }
 
 .lien-catalogue {
-  padding: 6px 0;
+  flex: 0 0 auto;
+  padding: 8px 0;
   color: var(--accent);
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   font-weight: 600;
   text-decoration: none;
 }
 
 .bouton-ajouter {
-  min-height: 40px;
-  padding: 8px 14px;
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 6px 14px;
   border: 0;
-  border-radius: 10px;
+  border-radius: 999px;
   background: var(--accent);
   color: var(--sur-accent);
-  font-size: 0.92rem;
+  font-size: 0.88rem;
   font-weight: 650;
   cursor: pointer;
 }

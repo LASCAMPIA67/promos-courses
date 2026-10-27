@@ -39,8 +39,8 @@ const memeJour = (a, b) => a.toDateString() === b.toDateString();
 const JOUR_COURT = new Intl.DateTimeFormat("fr-FR", { weekday: "short" });
 
 /**
- * Quand un article a été ajouté, en court : « aujourd'hui 13:38 », « hier 18:02 », « lun. 09:15 »
- * (cette semaine), « 12/10 09:15 » (avant).
+ * Quand un article a été ajouté, en court, comme dans Messages : « 13:38 » (aujourd'hui),
+ * « hier 18:02 », « lun. 09:15 » (cette semaine), « 12/10 09:15 » (avant).
  */
 export function formaterAjout(date, maintenant = new Date()) {
   if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "";
@@ -50,7 +50,7 @@ export function formaterAjout(date, maintenant = new Date()) {
   const ilYASixJours = new Date(maintenant);
   ilYASixJours.setDate(ilYASixJours.getDate() - 6);
   ilYASixJours.setHours(0, 0, 0, 0);
-  if (memeJour(date, maintenant)) return `aujourd'hui ${heure}`;
+  if (memeJour(date, maintenant)) return heure;
   if (memeJour(date, veille)) return `hier ${heure}`;
   if (date >= ilYASixJours && date <= maintenant) return `${JOUR_COURT.format(date)} ${heure}`;
   return `${deux(date.getDate())}/${deux(date.getMonth() + 1)} ${heure}`;

@@ -112,7 +112,7 @@ Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
   Coca-Cola, Fanta… ; « Couches » trouve Pampers… (environ 50 familles).
 - **Les promos en écrivant** : en écrivant un article, les promos qui correspondent s'affichent
   aussitôt ; « + » ajoute ce qu'on a écrit (même sans promo), ou on ajoute une promo d'un geste (avec
-  une note courte : « Lidl · 0,89 € · jusqu'au 31 oct. »).
+  une note courte : « Lidl · 0,89 € »).
 - **Promos à jour** : l'appli prévient si le robot n'est pas passé ou si un magasin manque.
 - **Ajout rapide** avec quantité facultative ; un article déjà dans la liste est signalé.
 - **Caddie** : un article coché passe dans « Dans le caddie » ; « Tout retirer » vide le caddie.

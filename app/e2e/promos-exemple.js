@@ -138,6 +138,17 @@ const OFFRES = [
     reduction: "2 + 1 offert",
     lot: { quantite: 3, prix: 1.9, prix_unitaire: 1.27 },
   }),
+  // Une même promo « au choix », que le catalogue donne en deux offres : l'appli n'en montre qu'une.
+  ...["SHAMPOOING", "SHAMPOOING PURIFIANT"].map((produit, rang) =>
+    offre(`shampooing-${rang + 1}`, LECLERC, {
+      produit,
+      marque: "LE PETIT MARSEILLAIS",
+      description: "Au choix : Douceur & Éclat, Nutrition, Purifiant. 2 x 300 ml (600 ml)",
+      prix: 2.24,
+      ancien_prix: 3.73,
+      reduction: "-40 %",
+    }),
+  ),
 ];
 
 /**
@@ -146,7 +157,8 @@ const OFFRES = [
  */
 export function promosExemple({ miseAJour = new Date(), etatLeclerc = "ok", multiplier = 1 } = {}) {
   const offres = Array.from({ length: multiplier }, (_, n) =>
-    OFFRES.map((o) => (n === 0 ? o : { ...o, id: `${o.id}-${n + 1}` })),
+    // Chaque copie a un prix un peu différent : ce sont de vraies promos distinctes, pas des variantes.
+    OFFRES.map((o) => (n === 0 ? o : { ...o, id: `${o.id}-${n + 1}`, prix: o.prix + n / 100 })),
   ).flat();
   const source = (id, magasin, nom, etat) => ({
     id,

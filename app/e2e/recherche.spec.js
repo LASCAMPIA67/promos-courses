@@ -39,11 +39,11 @@ test("en écrivant un article, les promos s'affichent ; on en ajoute une, ou ce 
   await page.getByRole("button", { name: "Ajouter Lait demi-écrémé à la liste" }).click();
   await expect(page.getByRole("button", { name: "Lait demi-écrémé : déjà dans la liste" })).toBeDisabled();
 
-  // Effacer : la liste revient, avec l'article et une note courte : où, à quel prix, jusqu'à quand.
+  // Effacer : la liste revient, avec l'article et une note courte : où et à quel prix.
   await page.getByRole("button", { name: "Effacer" }).click();
   await expect(page.locator("#suggestions")).toBeHidden();
   await expect(aAcheter(page).locator(".nom")).toHaveText(["Lait demi-écrémé"]);
-  await expect(aAcheter(page).locator(".details")).toContainText("Lidl · 0,89 € · jusqu'au");
+  await expect(aAcheter(page).locator(".details")).toHaveText(/^\d\d:\d\d · Lidl · 0,89 €$/);
 
   // Aucune promo : « OK » sur le clavier l'ajoute quand même.
   await champ(page).fill("xyz");

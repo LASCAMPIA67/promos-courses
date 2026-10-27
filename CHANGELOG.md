@@ -32,7 +32,21 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
   meilleure promo, sans avoir à l'ouvrir : « -60 % sur le 2e », « -20 % en caisse », « 30 % sur la
   carte », « -25 % avec la carte », « -23 % Lidl Plus », ou le prix ; « dès le 29 oct. » pour une
   promo à venir.
-- Tests : 12 tests de logique, 6 tests des règles et 5 scénarios réels de plus ; captures.
+- Tests : 15 tests de logique, 6 tests des règles et 6 scénarios réels de plus ; captures.
+
+### Modifié
+
+- **Plus de doublons** : une même promo déclinée en plusieurs produits (« Au choix : Douceur,
+  Nutrition, Purifiant… »), que le catalogue Leclerc donne en plusieurs offres, n'est montrée qu'une
+  fois, dans la liste comme pendant qu'on écrit.
+- **Fiches de promo plus compactes**, rangées pour se lire d'un coup d'œil : magasin et dates
+  (« Jusqu'au sam. 31 oct. », « Dès jeu. 29 oct. »), produit, taille sur une ligne, prix (avec
+  « + Ajouter » ou « Catalogue » à droite), puis le type de promo dans une pastille de couleur
+  (« -40 % en caisse », « 30 % sur la carte »…) et le détail utile (« 9,18 € les 2 », « revient à
+  1,65 € »). Les grands encadrés et les mentions répétées sont retirés.
+- **Liste allégée** : l'heure d'ajout seule pour aujourd'hui (« 13:38 ») ; la note d'une promo
+  ajoutée ne garde que le magasin et le prix (« Lidl · 0,89 € »), y compris pour les notes écrites
+  par les versions précédentes.
 
 ### Sécurité
 

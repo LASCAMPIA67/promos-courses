@@ -37,7 +37,7 @@ describe("formaterAjout", () => {
   const maintenant = new Date(2026, 9, 27, 13, 40); // mardi 27 octobre
 
   test("aujourd'hui, hier, cette semaine, avant", () => {
-    expect(formaterAjout(new Date(2026, 9, 27, 13, 38), maintenant)).toBe("aujourd'hui 13:38");
+    expect(formaterAjout(new Date(2026, 9, 27, 13, 38), maintenant)).toBe("13:38");
     expect(formaterAjout(new Date(2026, 9, 26, 8, 5), maintenant)).toBe("hier 08:05");
     expect(formaterAjout(new Date(2026, 9, 22, 9, 15), maintenant)).toBe("jeu. 09:15");
     expect(formaterAjout(new Date(2026, 9, 12, 9, 15), maintenant)).toBe("12/10 09:15");

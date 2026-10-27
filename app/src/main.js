@@ -33,6 +33,7 @@ import {
   explicationPrix,
   indexerPromos,
   joliNom,
+  noteCourte,
   periode,
   phraseSource,
   phrasesFraicheur,
@@ -230,13 +231,13 @@ function ligneArticle(article, promos = []) {
   contenu.className = "texte";
   contenu.setAttribute(
     "aria-label",
-    `Modifier ${article.nom}, ajouté par ${[auteur.nom, auteur.quand].filter(Boolean).join(" ")}`,
+    `Modifier ${article.nom}, ajouté par ${[auteur.nom, auteur.quandEnClair].filter(Boolean).join(" ")}`,
   );
   const nom = document.createElement("span");
   nom.className = "nom";
   nom.textContent = article.nom;
   contenu.append(nom);
-  const details = [auteur.quand, article.quantite, article.note].filter(Boolean).join(" · ");
+  const details = [auteur.quand, article.quantite, noteCourte(article.note)].filter(Boolean).join(" · ");
   if (details) {
     const sousTitre = document.createElement("span");
     sousTitre.className = "details";
@@ -382,15 +383,10 @@ function element(balise, classe, texte) {
   return el;
 }
 
-// Ce que dit l'encadré sous le prix, selon l'endroit où va la réduction (voir explicationPrix).
-const TITRES_AVANTAGE = {
-  caisse: "Réduction en caisse",
-  lot: "En prenant plusieurs",
-  "carte-caisse": "Avec la carte E.Leclerc",
-  "carte-leclerc": "Sur la carte E.Leclerc",
-  "lidl-plus": "Avec l'appli Lidl Plus",
-};
-
+/**
+ * Une promo, rangée pour se lire d'un coup d'œil : le magasin et jusqu'à quand ; le produit ; sa
+ * taille ; le prix ; le type de promo (couleur selon l'endroit où va la réduction) et le détail utile.
+ */
 function cartePromo(offre, aVenir, aujourdhui, { avecAjout = false } = {}) {
   const carte = element("li", "promo");
   carte.toggleAttribute("data-a-venir", aVenir);
@@ -409,36 +405,38 @@ function cartePromo(offre, aVenir, aujourdhui, { avecAjout = false } = {}) {
   const description = resumeDescription(offre.description);
   if (description) carte.append(element("p", "promo-description", description));
 
-  // Le prix, et en clair où va la réduction : en caisse, sur la carte E.Leclerc ou avec Lidl Plus.
+  // Le prix payé en caisse, l'ancien prix, le prix au kilo ; à droite, le bouton pour l'ajouter.
   const explication = explicationPrix(offre);
+  const lignePrix = element("div", "promo-ligne-prix");
   const prix = element("p", "promo-prix");
   if (explication.prix) prix.append(element("strong", "prix", explication.prix));
-  if (explication.mention) prix.append(element("span", "mention", explication.mention));
   if (explication.barre) {
     prix.append(element("span", "cache", " au lieu de "), element("s", "ancien-prix", explication.barre));
   }
   if (explication.unitaire) prix.append(element("span", "prix-unitaire", explication.unitaire));
-  if (prix.childElementCount) carte.append(prix);
-  if (explication.avantage) {
-    const avantage = element("p", "avantage");
-    avantage.dataset.genre = explication.genre;
-    avantage.append(
-      element("strong", "avantage-titre", TITRES_AVANTAGE[explication.genre]),
-      element("span", null, explication.avantage),
-    );
-    carte.append(avantage);
-  }
-
-  const actions = element("div", "promo-actions");
-  if (avecAjout) actions.append(boutonAjouter(offre, aujourdhui));
-  if (/^https:\/\//.test(offre.lien ?? "")) {
-    const lien = element("a", "lien-catalogue", "Voir dans le catalogue");
+  lignePrix.append(prix);
+  // À droite : « + Ajouter » pendant qu'on écrit un article ; sinon, le lien vers le catalogue.
+  if (avecAjout) {
+    lignePrix.append(boutonAjouter(offre));
+  } else if (/^https:\/\//.test(offre.lien ?? "")) {
+    const lien = element("a", "lien-catalogue", "Catalogue");
     lien.href = offre.lien;
     lien.target = "_blank";
     lien.rel = "noopener noreferrer";
-    actions.append(lien);
+    lien.setAttribute("aria-label", `Voir ${joliNom(offre.produit)} dans le catalogue`);
+    lignePrix.append(lien);
   }
-  if (actions.childElementCount) carte.append(actions);
+  carte.append(lignePrix);
+
+  // Le type de promo (« -60 % sur le 2e », « 30 % sur la carte »…) et le détail utile.
+  if (explication.genre !== "aucun") {
+    const bas = element("div", "promo-bas");
+    const type = element("span", "type", typePromo(offre));
+    type.dataset.genre = explication.genre;
+    bas.append(type);
+    if (explication.detail) bas.append(element("span", "detail", explication.detail));
+    carte.append(bas);
+  }
   return carte;
 }
 
@@ -496,18 +494,18 @@ $("plus-de-resultats").addEventListener("click", () => {
 });
 
 /** « Ajouter à la liste », ou « Dans la liste » si l'article y est déjà. */
-function boutonAjouter(offre, aujourdhui) {
+function boutonAjouter(offre) {
   const bouton = element("button", "bouton-ajouter");
   bouton.type = "button";
-  bouton.dataset.nom = articleDepuisPromo(offre, aujourdhui).nom;
+  bouton.dataset.nom = articleDepuisPromo(offre).nom;
   mettreAJourBoutonAjout(bouton);
   bouton.addEventListener("click", () => {
-    const { article, erreur } = preparerSaisie(articleDepuisPromo(offre, dateDuJour()));
+    const { article, erreur } = preparerSaisie(articleDepuisPromo(offre));
     if (erreur) return;
     // Comme pour l'ajout dans la liste : sans réseau, l'article part plus tard.
     ajouterArticle(db, etat.utilisateur.uid, article).catch(signalerErreur);
     bouton.disabled = true;
-    bouton.textContent = "✓ Ajouté à la liste";
+    bouton.textContent = "✓ Ajouté";
   });
   return bouton;
 }
@@ -516,7 +514,7 @@ function mettreAJourBoutonAjout(bouton) {
   const nom = bouton.dataset.nom;
   const dejaDansLaListe = Boolean(trouverDoublon(etat.articles, nom));
   bouton.disabled = dejaDansLaListe;
-  bouton.textContent = dejaDansLaListe ? "✓ Dans la liste" : "+ Ajouter à la liste";
+  bouton.textContent = dejaDansLaListe ? "✓ Dans la liste" : "+ Ajouter";
   bouton.setAttribute("aria-label", dejaDansLaListe ? `${nom} : déjà dans la liste` : `Ajouter ${nom} à la liste`);
 }
 
@@ -608,10 +606,13 @@ function uidsConnus() {
 
 function auteurDe(article) {
   const uid = article.ajoute_par;
+  const quand = formaterAjout(article.cree_le?.toDate?.());
   return {
     nom: nomDe(uid, etat.membres, etat.utilisateur?.uid),
     couleur: couleurDe(uid, etat.membres, uidsConnus()),
-    quand: formaterAjout(article.cree_le?.toDate?.()),
+    quand,
+    // Pour la fenêtre de l'article et VoiceOver : « aujourd'hui à 13:38 » plutôt que « 13:38 ».
+    quandEnClair: /^\d\d:\d\d$/.test(quand) ? `aujourd'hui à ${quand}` : quand,
   };
 }
 
@@ -769,7 +770,7 @@ function ouvrirArticle(article) {
   const auteur = auteurDe(article);
   $("auteur-article").replaceChildren(
     pastilleMembre(auteur.couleur),
-    [`Ajouté par ${auteur.nom}`, auteur.quand].filter(Boolean).join(", "),
+    [`Ajouté par ${auteur.nom}`, auteur.quandEnClair].filter(Boolean).join(" "),
   );
   $("modif-nom").value = article.nom;
   $("modif-quantite").value = article.quantite ?? "";

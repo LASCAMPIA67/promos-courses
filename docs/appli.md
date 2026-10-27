@@ -25,7 +25,7 @@ Les captures sont faites avec des promos d'exemple et des prénoms fictifs (Cami
 - **Cocher** un article (le rond à gauche) : il passe dans « Dans le caddie ». Le décocher le remet
   dans la liste.
 - **Qui l'a ajouté, et quand** : sous le rond à cocher, une petite **pastille de couleur** dit qui
-  a ajouté l'article ; sous le nom, la date et l'heure d'ajout (« aujourd'hui 13:38 », « hier 08:05 »,
+  a ajouté l'article ; sous le nom, la date et l'heure d'ajout (« 13:38 » aujourd'hui, « hier 08:05 »,
   « jeu. 09:15 » cette semaine, « 12/10 09:15 » avant), puis la quantité et la note.
 - **Mon compte** (le bonhomme en haut à droite) : chacun écrit son **prénom** et choisit **sa
   couleur** parmi six ; la légende dessous rappelle qui a quelle couleur. Tant qu'un compte n'a pas
@@ -93,28 +93,36 @@ Lingolsheim et d'E.Leclerc Geispolsheim. L'appli lit ce fichier et le compare à
   prenant plusieurs), « -20 % en caisse », « 30 % sur la carte » (Ticket E.Leclerc), « -25 % avec
   la carte », « -23 % Lidl Plus », ou le prix s'il n'y a pas de réduction particulière ; « dès le
   29 oct. » s'ajoute pour une promo qui n'a pas encore commencé ;
-- en touchant l'étiquette, on voit **chaque promo** : le magasin (Lidl en jaune, Leclerc en bleu), le
-  produit et sa marque, l'essentiel de sa description (« 272 g · Goût nature… », sans les prix
-  répétés), le prix et le prix au kilo, **jusqu'à quand** elle dure, et **où va la réduction** (voir
-  ci-dessous) ; les promos **à venir** (catalogue de la semaine suivante) sont en bleu avec « À partir
-  du… » ; le lien « Voir dans le catalogue » ouvre le catalogue officiel ;
+- en touchant l'étiquette, on voit **chaque promo**, rangée pour se lire d'un coup d'œil :
+  1. le magasin (Lidl en jaune, Leclerc en bleu) et **jusqu'à quand** elle dure (« Jusqu'au sam.
+     31 oct. », « Dernier jour ») ; une promo **à venir** (catalogue de la semaine suivante) est en
+     bleu (« Dès jeu. 29 oct. ») ;
+  2. le produit et sa marque ;
+  3. sa taille, sur une ligne (« 2 x 300 ml », sans les prix répétés) ;
+  4. le prix payé en caisse, l'ancien prix barré, le prix au kilo, et à droite « Catalogue », qui
+     ouvre le catalogue officiel ;
+  5. le **type de promo**, dans une pastille de couleur, et le détail utile (voir ci-dessous) ;
+- une même promo déclinée en plusieurs produits (« Au choix : Douceur, Nutrition, Purifiant… »), que
+  le catalogue donne en plusieurs offres, n'est montrée **qu'une fois** ;
 - les promos les plus proches de l'article viennent d'abord : pour « Lait », « Lait demi-écrémé »
   passe avant « Chocolat au lait » ; à pertinence égale, **Leclerc passe avant Lidl** (notre magasin
   principal).
 
 ### Comprendre le prix : où va la réduction
 
-Sous le prix, un encadré de couleur dit en clair comment marche la réduction :
+Sous le prix, une pastille de couleur donne le type de promo, suivie du détail utile. Le gros prix
+est toujours celui **payé en caisse**.
 
-| Encadré | Ce que ça veut dire | Exemple |
+| Pastille | Ce que ça veut dire | Détail à côté |
 |---|---|---|
-| 🟩 **Réduction en caisse** | Le prix affiché est déjà réduit ; l'ancien prix est barré. | « -15 %, déjà déduit » |
-| 🟩 **En prenant plusieurs** | Le gros prix est celui d'un seul ; la réduction se fait en caisse en prenant le lot. | « -50 % sur le 2e : 9,18 € les 2 (0,77 €/L) » |
-| 🟦 **Sur la carte E.Leclerc** | Ticket E.Leclerc : on paie le prix affiché en caisse ; une partie revient sur la carte, à dépenser plus tard. | « 0,70 € (30 %) rendus sur la carte · revient à 1,65 € » |
-| 🟦 **Avec la carte E.Leclerc** | Réduction en caisse, réservée aux porteurs de la carte. | « -25 %, déjà déduit » |
-| 🟨 **Avec l'appli Lidl Plus** | Le prix affiché est celui avec l'appli Lidl Plus, à scanner en caisse. | « Sans l'appli : 2,49 € » |
+| 🟩 **-15 % en caisse** | Le prix affiché est déjà réduit ; l'ancien prix est barré. | |
+| 🟩 **-50 % sur le 2e**, **2 + 1 offert** | Le gros prix est celui d'un seul ; la réduction se fait en caisse en prenant le lot. | « 9,18 € les 2 (0,77 €/L) » |
+| 🟦 **30 % sur la carte** | Ticket E.Leclerc : on paie le prix affiché en caisse ; une partie revient sur la carte, à dépenser plus tard. | « revient à 1,65 € » |
+| 🟦 **-25 % avec la carte** | Réduction en caisse, réservée aux porteurs de la carte E.Leclerc. | |
+| 🟨 **-23 % Lidl Plus** | Le prix affiché est celui avec l'appli Lidl Plus, à scanner en caisse. | « sans l'appli : 2,49 € » |
 
-Sans encadré : c'est le prix du catalogue, sans réduction particulière.
+Sans pastille : c'est le prix du catalogue, sans réduction particulière. Le même type de promo est
+écrit en petit sous l'étiquette « 2 promos » de la liste.
 
 ### Les promos en écrivant un article
 
@@ -125,8 +133,9 @@ le champ, à la place de la liste (la croix ✕ efface et fait revenir la liste)
   « nute » trouve les produits Nutella) ; les mots entiers passent d'abord (« lait » montre « Lait
   demi-écrémé » avant « Laitue »), et Leclerc avant Lidl ;
 - **« + »** ou **« OK »** sur le clavier ajoute ce qu'on a écrit, **qu'il y ait des promos ou non** ;
-- le bouton **« + Ajouter à la liste »** d'une promo ajoute ce produit-là, avec une **note** courte
-  qui rappelle le magasin, le prix et la date (« Lidl · 0,89 € · jusqu'au 31 oct. ») ;
+- le bouton **« + Ajouter »** d'une promo ajoute ce produit-là, avec une **note** courte qui
+  rappelle le magasin et le prix (« Lidl · 0,89 € ») ; le type de promo et ses dates s'affichent,
+  toujours à jour, sous l'étiquette de l'article ;
   s'il est déjà dans la liste, le bouton l'indique (« ✓ Dans la liste ») ;
 - les promos s'affichent par 30 ; « Voir plus de promos » montre les suivantes.
 

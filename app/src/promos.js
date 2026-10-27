@@ -127,7 +127,7 @@ export function regrouper(motsCherches) {
  * Renvoie [{ offre, aVenir }].
  */
 export function chercherPromos(index, nom, aujourdhui) {
-  return trouver(index, motsCles(nom), aujourdhui, (motCherche, mot) => mot === motCherche);
+  return regrouperVariantes(trouver(index, motsCles(nom), aujourdhui, (motCherche, mot) => mot === motCherche));
 }
 
 /**
@@ -142,7 +142,52 @@ export function rechercherPromos(index, texte, aujourdhui, { magasin = "" } = {}
   const resultats = mots.length
     ? trouver(index, mots, aujourdhui, (motCherche, mot) => mot.startsWith(motCherche))
     : toutes(index, aujourdhui);
-  return magasin ? resultats.filter(({ offre }) => offre.source === magasin) : resultats;
+  return regrouperVariantes(magasin ? resultats.filter(({ offre }) => offre.source === magasin) : resultats);
+}
+
+/**
+ * Une même promo déclinée en plusieurs produits (« Au choix : Douceur, Nutrition, Purifiant… ») : le
+ * catalogue en donne une offre par produit, l'appli n'en montre qu'une. Même magasin, même marque,
+ * même premier mot du nom, mêmes prix, réduction et dates. On garde la place de la mieux classée, le
+ * nom le plus court (« Shampooing » plutôt que « Shampooing purifiant ») et le prix au kilo s'il existe.
+ */
+export function regrouperVariantes(resultats) {
+  const groupes = new Map();
+  for (const resultat of resultats) {
+    const o = resultat.offre;
+    const cle = [
+      o.source,
+      o.magasin,
+      motsCles(o.marque).join(" "),
+      motsCles(o.produit)[0],
+      o.prix,
+      o.ancien_prix,
+      o.reduction,
+      o.lot?.quantite,
+      o.lot?.prix,
+      o.carte_fidelite,
+      o.date_debut,
+      o.date_fin,
+    ].join("|");
+    if (groupes.has(cle)) groupes.get(cle).offres.push(o);
+    else groupes.set(cle, { aVenir: resultat.aVenir, offres: [o] });
+  }
+  return [...groupes.values()].map(({ aVenir, offres }) => {
+    if (offres.length === 1) return { offre: offres[0], aVenir };
+    const plusCourt = offres.reduce((a, b) => (b.produit.length < a.produit.length ? b : a));
+    const avecPrixAuKilo = offres.find((o) => o.prix_unitaire != null) ?? offres[0];
+    return {
+      offre: {
+        ...offres[0],
+        produit: plusCourt.produit,
+        description: plusCourt.description ?? offres[0].description,
+        prix_unitaire: avecPrixAuKilo.prix_unitaire,
+        unite: avecPrixAuKilo.unite,
+        variantes: offres.length,
+      },
+      aVenir,
+    };
+  });
 }
 
 function toutes(index, aujourdhui) {
@@ -209,15 +254,25 @@ function trouver(index, motsCherches, aujourdhui, correspond) {
 
 /**
  * L'article à ajouter à la liste depuis une promo : le nom du produit, et une note courte qui
- * rappelle où, combien (le prix payé en caisse) et jusqu'à quand (« Leclerc · 2,25 € · jusqu'au 7 nov. »).
+ * rappelle où et combien (le prix payé en caisse) : « Leclerc · 2,25 € ». Le type de promo et ses
+ * dates, eux, s'affichent à jour sous l'étiquette « 1 promo ».
  */
-export function articleDepuisPromo(offre, aujourdhui) {
+export function articleDepuisPromo(offre) {
   const nom = joliNom(offre.produit).slice(0, 100).trim();
   const prix = explicationPrix(offre).prix ?? offre.reduction;
-  return {
-    nom,
-    note: [enseigne(offre), prix, periodeCourte(offre, aujourdhui)].filter(Boolean).join(" · ").slice(0, 200),
-  };
+  return { nom, note: [enseigne(offre), prix].filter(Boolean).join(" · ").slice(0, 200) };
+}
+
+/**
+ * Les notes écrites par les anciennes versions pour une promo, raccourcies à l'affichage :
+ * « Promo Leclerc : 2,25 € · Jusqu'au samedi 7 novembre » ou « Leclerc · 2,25 € · jusqu'au 7 nov. »
+ * deviennent « Leclerc · 2,25 € ». Les autres notes restent telles quelles.
+ */
+export function noteCourte(note) {
+  if (!note) return note;
+  const ancienne = /^Promo (Leclerc|Lidl) : (.+?) · (?:Jusqu'|À partir|Dernier jour)/.exec(note);
+  if (ancienne) return `${ancienne[1]} · ${ancienne[2]}`;
+  return note.replace(/^((?:Leclerc|Lidl) · [^·]+?) · (?:jusqu'|dès le ).*$/, "$1");
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -265,17 +320,21 @@ export function periodeCourte(offre, aujourdhui) {
   return fin ? `jusqu'au ${jourCourt(fin)}` : "";
 }
 
-/** Quand profiter de la promo : « Jusqu'au mardi 28 octobre », « À partir de demain »… */
+/** Quand profiter de la promo, en court : « Jusqu'au sam. 31 oct. », « Dès demain », « Dernier jour »… */
 export function periode(offre, aujourdhui) {
   const { date_debut: debut, date_fin: fin } = offre;
   const demain = lendemain(aujourdhui);
-  if (debut && debut > aujourdhui)
-    return debut === demain ? "À partir de demain" : `À partir du ${formaterJour(debut)}`;
+  if (debut && debut > aujourdhui) return debut === demain ? "Dès demain" : `Dès ${jourEtMois(debut)}`;
   if (!fin) return "";
-  if (fin === aujourdhui) return "Dernier jour aujourd'hui";
+  if (fin === aujourdhui) return "Dernier jour";
   if (fin === demain) return "Jusqu'à demain";
-  return `Jusqu'au ${formaterJour(fin)}`;
+  return `Jusqu'au ${jourEtMois(fin)}`;
 }
+
+const JOUR_SEMAINE = new Intl.DateTimeFormat("fr-FR", { weekday: "short" });
+
+/** « sam. 31 oct. », « dim. 1er nov. ». */
+const jourEtMois = (iso) => `${JOUR_SEMAINE.format(versDate(iso))} ${jourCourt(iso)}`;
 
 /** « aujourd'hui à 5 h 48 », « hier à 5 h 48 », « dimanche 25 octobre à 5 h 48 ». */
 export function formaterMoment(date, maintenant = new Date()) {
@@ -366,14 +425,14 @@ export function enseigne(offre) {
 }
 
 /**
- * Comment marche le prix d'une promo, en clair : ce qu'on paie en caisse et où va la réduction.
- * Renvoie { genre, prix, mention, barre, avantage } :
+ * Comment lire le prix d'une promo. Renvoie { genre, prix, barre, unitaire, detail } :
  * - genre : « caisse » (déjà déduit en caisse), « lot » (en caisse, en prenant plusieurs),
- *   « carte-leclerc » (crédité sur la carte E.Leclerc), « carte-caisse » (en caisse avec la carte
+ *   « carte-leclerc » (rendu sur la carte E.Leclerc), « carte-caisse » (en caisse avec la carte
  *   E.Leclerc), « lidl-plus » (avec l'appli Lidl Plus) ou « aucun » (prix du catalogue) ;
- * - prix : le prix à afficher en gros, et mention : ce qu'il représente (« en caisse »…) ;
- * - barre : l'ancien prix à barrer, ou null ; unitaire : le prix au kilo qui va avec le gros prix ;
- * - avantage : la phrase qui explique la réduction, ou null.
+ * - prix : le prix à afficher en gros (celui payé en caisse) ; barre : l'ancien prix à barrer, ou
+ *   null ; unitaire : le prix au kilo qui va avec le gros prix ;
+ * - detail : ce qu'il faut savoir en plus, en court (« 3,15 € les 2 », « revient à 1,65 € »,
+ *   « sans l'appli : 2,49 € »), ou null. Le type de promo lui-même est donné par typePromo.
  */
 export function explicationPrix(offre) {
   const reduction = (offre.reduction ?? "").replace(/\s*avec Lidl Plus$/i, "");
@@ -386,69 +445,38 @@ export function explicationPrix(offre) {
       ? ` (${formaterPrixUnitaire(offre.lot.prix_unitaire, offre.unite)})`
       : "";
   const lot = lotFiable ? `${euros(offre.lot.prix)} les ${offre.lot.quantite}${auKiloDuLot}` : null;
+  const prix = euros(offre.prix);
 
   if (/ticket/i.test(reduction)) {
     // Le robot donne le prix une fois le Ticket déduit, et le prix payé en caisse en « ancien prix ».
-    const enCaisse = offre.ancien_prix ?? offre.prix;
-    const rendu = offre.ancien_prix != null && offre.prix != null ? offre.ancien_prix - offre.prix : null;
-    const detail = reduction.replace(/\s*en Ticket E\.Leclerc/i, "");
     // Le prix au kilo du robot est celui une fois le Ticket déduit : on le met avec ce prix-là.
     const auKilo = prixUnitaire(offre) ? ` (${prixUnitaire(offre)})` : "";
     return {
       genre: "carte-leclerc",
-      prix: euros(enCaisse),
-      mention: enCaisse != null ? "en caisse" : null,
+      prix: euros(offre.ancien_prix ?? offre.prix),
       barre: null,
       unitaire: null,
-      avantage:
-        rendu != null
-          ? `${euros(rendu)} (${detail}) rendus sur la carte · revient à ${euros(offre.prix)}${auKilo}`
-          : `${detail} rendus sur la carte`,
+      detail: offre.ancien_prix != null && offre.prix != null ? `revient à ${prix}${auKilo}` : null,
     };
   }
   if (offre.source === "lidl" && offre.carte_fidelite) {
     return {
       genre: "lidl-plus",
-      prix: euros(offre.prix),
-      mention: offre.lot ? "l'unité" : "avec Lidl Plus",
+      prix,
       barre: null,
       unitaire: prixUnitaire(offre),
-      avantage: offre.lot
-        ? `${reduction}${lot ? ` : ${lot}` : ""}`
-        : offre.ancien_prix != null
-          ? `Sans l'appli : ${euros(offre.ancien_prix)}`
-          : "À scanner en caisse",
+      detail: offre.lot ? lot : offre.ancien_prix != null ? `sans l'appli : ${euros(offre.ancien_prix)}` : null,
     };
   }
   if (offre.lot) {
-    return {
-      genre: offre.carte_fidelite ? "carte-caisse" : "lot",
-      prix: euros(offre.prix),
-      mention: offre.prix != null ? "l'unité" : null,
-      barre: null,
-      unitaire: prixUnitaire(offre),
-      avantage: `${reduction}${lot ? ` : ${lot}` : ""}`,
-    };
+    const genre = offre.carte_fidelite ? "carte-caisse" : "lot";
+    return { genre, prix, barre: null, unitaire: prixUnitaire(offre), detail: lot };
   }
   if (offre.ancien_prix != null || reduction) {
-    const carte = offre.carte_fidelite;
-    return {
-      genre: carte ? "carte-caisse" : "caisse",
-      prix: euros(offre.prix),
-      mention: offre.prix != null ? "en caisse" : null,
-      barre: euros(offre.ancien_prix),
-      unitaire: prixUnitaire(offre),
-      avantage: `${reduction ? `${reduction}, d` : "D"}éjà déduit`,
-    };
+    const genre = offre.carte_fidelite ? "carte-caisse" : "caisse";
+    return { genre, prix, barre: euros(offre.ancien_prix), unitaire: prixUnitaire(offre), detail: null };
   }
-  return {
-    genre: "aucun",
-    prix: euros(offre.prix),
-    mention: null,
-    barre: null,
-    unitaire: prixUnitaire(offre),
-    avantage: null,
-  };
+  return { genre: "aucun", prix, barre: null, unitaire: prixUnitaire(offre), detail: null };
 }
 
 /**

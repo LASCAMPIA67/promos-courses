@@ -13,6 +13,7 @@ import {
   indexerPromos,
   joliNom,
   motsCles,
+  noteCourte,
   periode,
   periodeCourte,
   phraseSource,
@@ -20,6 +21,7 @@ import {
   phrasesFraicheur,
   rechercherPromos,
   regrouper,
+  regrouperVariantes,
   resumeDescription,
   sourcesEnDifficulte,
   typePromo,
@@ -223,15 +225,15 @@ describe("Leclerc d'abord", () => {
   });
 });
 
-describe("explicationPrix : où va la réduction", () => {
+describe("explicationPrix : comment lire le prix", () => {
   const texte = (e) => ({
     ...e,
     prix: e.prix && simple(e.prix),
     barre: e.barre && simple(e.barre),
-    avantage: e.avantage && simple(e.avantage),
+    detail: e.detail && simple(e.detail),
   });
 
-  test("Ticket E.Leclerc : on paie le prix plein, la réduction revient sur la carte", () => {
+  test("Ticket E.Leclerc : on paie le prix plein, et ce que ça revient une fois le Ticket rendu", () => {
     const e = texte(
       explicationPrix(
         offre({
@@ -243,24 +245,22 @@ describe("explicationPrix : où va la réduction", () => {
         }),
       ),
     );
-    expect(e).toMatchObject({ genre: "carte-leclerc", prix: "3,95 €", mention: "en caisse", barre: null });
-    expect(e.avantage).toBe("1,19 € (30 %) rendus sur la carte · revient à 2,76 €");
+    expect(e).toEqual({
+      genre: "carte-leclerc",
+      prix: "3,95 €",
+      barre: null,
+      unitaire: null,
+      detail: "revient à 2,76 €",
+    });
   });
 
-  test("réduction immédiate : déjà déduite en caisse, ancien prix barré", () => {
+  test("réduction immédiate : ancien prix barré, rien de plus à dire", () => {
     const e = texte(explicationPrix(offre({ source: "leclerc", prix: 2.15, ancien_prix: 2.69, reduction: "-20 %" })));
-    expect(e).toMatchObject({ genre: "caisse", prix: "2,15 €", mention: "en caisse", barre: "2,69 €" });
-    expect(e.avantage).toBe("-20 %, déjà déduit");
-  });
-
-  test("réduction réservée à la carte E.Leclerc, mais en caisse", () => {
-    const e = texte(
-      explicationPrix(
-        offre({ source: "leclerc", prix: 5.25, ancien_prix: 7, reduction: "-25 %", carte_fidelite: true }),
-      ),
+    expect(e).toMatchObject({ genre: "caisse", prix: "2,15 €", barre: "2,69 €", detail: null });
+    const carte = explicationPrix(
+      offre({ source: "leclerc", prix: 5.25, ancien_prix: 7, reduction: "-25 %", carte_fidelite: true }),
     );
-    expect(e.genre).toBe("carte-caisse");
-    expect(e.avantage).toBe("-25 %, déjà déduit");
+    expect(carte.genre).toBe("carte-caisse");
   });
 
   test("lot : le prix à l'unité, et le prix en prenant plusieurs", () => {
@@ -270,16 +270,15 @@ describe("explicationPrix : où va la réduction", () => {
         offre({ source: "leclerc", prix: 2.55, prix_unitaire: 9.38, unite: "kg", reduction: "-60 % sur le 2e", lot }),
       ),
     );
-    expect(e).toMatchObject({ genre: "lot", prix: "2,55 €", mention: "l'unité" });
+    expect(e).toMatchObject({ genre: "lot", prix: "2,55 €", detail: "3,57 € les 2 (6,56 €/kg)" });
     expect(simple(e.unitaire)).toBe("9,38 €/kg");
-    expect(e.avantage).toBe("-60 % sur le 2e : 3,57 € les 2 (6,56 €/kg)");
     // Un prix de lot douteux n'est pas affiché.
     const douteux = offre({
       prix: 8.69,
       reduction: "-50 % sur le 2e",
       lot: { quantite: 2, prix: 8.69, prix_unitaire: null },
     });
-    expect(explicationPrix(douteux).avantage).toBe("-50 % sur le 2e");
+    expect(explicationPrix(douteux).detail).toBeNull();
   });
 
   test("Lidl Plus : le prix avec l'appli, et sans", () => {
@@ -288,18 +287,71 @@ describe("explicationPrix : où va la réduction", () => {
         offre({ prix: 1.99, ancien_prix: 2.49, reduction: "-20 % avec Lidl Plus", carte_fidelite: true }),
       ),
     );
-    expect(e).toMatchObject({ genre: "lidl-plus", prix: "1,99 €", mention: "avec Lidl Plus" });
-    expect(e.avantage).toBe("Sans l'appli : 2,49 €");
-    expect(explicationPrix(offre({ prix: 0.99, carte_fidelite: true })).avantage).toBe("À scanner en caisse");
+    expect(e).toMatchObject({ genre: "lidl-plus", prix: "1,99 €", detail: "sans l'appli : 2,49 €" });
+    expect(explicationPrix(offre({ prix: 0.99, carte_fidelite: true })).detail).toBeNull();
     const lot = { quantite: 2, prix: 3.59, prix_unitaire: 8.98 };
     const enLot = texte(
       explicationPrix(offre({ prix: 2.39, reduction: "-50 % sur le 2e avec Lidl Plus", carte_fidelite: true, lot })),
     );
-    expect(enLot.avantage).toBe("-50 % sur le 2e : 3,59 € les 2");
+    expect(enLot.detail).toBe("3,59 € les 2");
   });
 
   test("sans réduction : le prix du catalogue", () => {
-    expect(explicationPrix(offre({ prix: 12.49 }))).toMatchObject({ genre: "aucun", avantage: null });
+    expect(explicationPrix(offre({ prix: 12.49 }))).toMatchObject({ genre: "aucun", detail: null });
+  });
+});
+
+describe("regrouperVariantes : une même promo « au choix » n'est montrée qu'une fois", () => {
+  const variante = (id, produit, champs = {}) => ({
+    offre: offre({
+      id,
+      produit,
+      marque: "LE PETIT MARSEILLAIS",
+      source: "leclerc",
+      prix: 2.24,
+      ancien_prix: 3.73,
+      reduction: "-40 %",
+      ...champs,
+    }),
+    aVenir: false,
+  });
+
+  test("les variantes sont réunies : nom le plus court, prix au litre gardé, place de la mieux classée", () => {
+    const resultats = regrouperVariantes([
+      variante("a", "SHAMPOOING PURIFIANT"),
+      { offre: offre({ id: "autre", produit: "Gel douche" }), aVenir: false },
+      variante("b", "SHAMPOOING", { description: "Au choix : Douceur, Nutrition, Purifiant. 2 x 300 ml" }),
+      variante("c", "SHAMPOOING", { prix_unitaire: 3.73, unite: "l" }),
+    ]);
+    expect(resultats.map(({ offre: o }) => o.id)).toEqual(["a", "autre"]);
+    expect(resultats[0].offre).toMatchObject({
+      produit: "SHAMPOOING",
+      description: "Au choix : Douceur, Nutrition, Purifiant. 2 x 300 ml",
+      prix_unitaire: 3.73,
+      unite: "l",
+      variantes: 3,
+    });
+  });
+
+  test("des promos différentes restent séparées", () => {
+    const resultats = regrouperVariantes([
+      variante("a", "SHAMPOOING"),
+      variante("b", "SHAMPOOING", { prix: 4.17, ancien_prix: 6.95 }), // autre prix
+      variante("c", "APRÈS-SHAMPOOING"), // autre produit
+      variante("d", "SHAMPOOING", { source: "lidl" }), // autre magasin
+      variante("e", "SHAMPOOING", { date_fin: "2026-11-07" }), // autres dates
+    ]);
+    expect(resultats).toHaveLength(5);
+    expect(resultats[0].offre.variantes).toBeUndefined();
+  });
+
+  test("dans la recherche et les étiquettes de la liste aussi", () => {
+    const index = indexerPromos({
+      format: 2,
+      offres: [variante("a", "SHAMPOOING").offre, variante("b", "SHAMPOOING PURIFIANT").offre],
+    });
+    expect(chercherPromos(index, "Shampooing", AUJOURDHUI)).toHaveLength(1);
+    expect(rechercherPromos(index, "sham", AUJOURDHUI)).toHaveLength(1);
   });
 });
 
@@ -366,20 +418,26 @@ describe("resumeDescription", () => {
 });
 
 describe("articleDepuisPromo", () => {
-  test("nom du produit, et une note courte : où, combien, jusqu'à quand", () => {
-    const article = articleDepuisPromo(
-      offre({ produit: "LAIT DEMI-ÉCRÉMÉ UHT", source: "leclerc", prix: 6.12 }),
-      AUJOURDHUI,
-    );
+  test("nom du produit, et une note courte : où et combien", () => {
+    const article = articleDepuisPromo(offre({ produit: "LAIT DEMI-ÉCRÉMÉ UHT", source: "leclerc", prix: 6.12 }));
     expect(article.nom).toBe("Lait demi-écrémé UHT");
-    expect(simple(article.note)).toBe("Leclerc · 6,12 € · jusqu'au 28 oct.");
+    expect(simple(article.note)).toBe("Leclerc · 6,12 €");
   });
 
-  test("sans prix, la réduction ; promo à venir ; nom trop long raccourci", () => {
-    const gamme = offre({ produit: "Tous les produits BIO", prix: null, reduction: "-34 %", date_debut: "2026-10-29" });
-    expect(simple(articleDepuisPromo(gamme, AUJOURDHUI).note)).toBe("Lidl · -34 % · dès le 29 oct.");
-    expect(articleDepuisPromo(offre({ produit: "x".repeat(150) }), AUJOURDHUI).nom).toHaveLength(100);
+  test("sans prix, la réduction ; nom trop long raccourci", () => {
+    const gamme = offre({ produit: "Tous les produits BIO", prix: null, reduction: "-34 %" });
+    expect(simple(articleDepuisPromo(gamme).note)).toBe("Lidl · -34 %");
+    expect(articleDepuisPromo(offre({ produit: "x".repeat(150) })).nom).toHaveLength(100);
   });
+});
+
+test("les notes des anciennes versions sont raccourcies à l'affichage", () => {
+  expect(noteCourte("Promo Leclerc : 2,25 € · Jusqu'au samedi 7 novembre")).toBe("Leclerc · 2,25 €");
+  expect(noteCourte("Promo Lidl : -34 % · À partir du jeudi 29 octobre")).toBe("Lidl · -34 %");
+  expect(noteCourte("Leclerc · 0,99 € · jusqu'au 31 oct.")).toBe("Leclerc · 0,99 €");
+  expect(noteCourte("Lidl · 1,29 € · dès le 29 oct.")).toBe("Lidl · 1,29 €");
+  expect(noteCourte("sans lactose · grand format")).toBe("sans lactose · grand format");
+  expect(noteCourte(undefined)).toBeUndefined();
 });
 
 describe("dates", () => {
@@ -393,16 +451,17 @@ describe("dates", () => {
     expect(formaterJour("2026-11-01")).toBe("dimanche 1er novembre");
   });
 
-  test("période de la promo", () => {
-    expect(periode(offre({ date_fin: "2026-10-31" }), AUJOURDHUI)).toBe("Jusqu'au samedi 31 octobre");
+  test("période de la promo, en court", () => {
+    expect(simple(periode(offre({ date_fin: "2026-10-31" }), AUJOURDHUI))).toBe("Jusqu'au sam. 31 oct.");
+    expect(simple(periode(offre({ date_fin: "2026-11-01" }), AUJOURDHUI))).toBe("Jusqu'au dim. 1er nov.");
     expect(periode(offre({ date_fin: "2026-10-28" }), AUJOURDHUI)).toBe("Jusqu'à demain");
-    expect(periode(offre({ date_fin: AUJOURDHUI }), AUJOURDHUI)).toBe("Dernier jour aujourd'hui");
-    expect(periode(offre({ date_debut: "2026-10-29" }), AUJOURDHUI)).toBe("À partir du jeudi 29 octobre");
-    expect(periode(offre({ date_debut: "2026-10-28" }), AUJOURDHUI)).toBe("À partir de demain");
+    expect(periode(offre({ date_fin: AUJOURDHUI }), AUJOURDHUI)).toBe("Dernier jour");
+    expect(simple(periode(offre({ date_debut: "2026-10-29" }), AUJOURDHUI))).toBe("Dès jeu. 29 oct.");
+    expect(periode(offre({ date_debut: "2026-10-28" }), AUJOURDHUI)).toBe("Dès demain");
     expect(periode(offre({ date_debut: null, date_fin: null }), AUJOURDHUI)).toBe("");
   });
 
-  test("période en court, pour la note d'un article", () => {
+  test("période en court, sous l'étiquette d'un article (promo à venir)", () => {
     expect(simple(periodeCourte(offre({ date_fin: "2026-10-31" }), AUJOURDHUI))).toBe("jusqu'au 31 oct.");
     expect(simple(periodeCourte(offre({ date_debut: "2026-11-01", date_fin: "2026-11-07" }), AUJOURDHUI))).toBe(
       "dès le 1er nov.",
