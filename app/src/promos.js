@@ -384,20 +384,13 @@ export function fraicheur(miseAJour, maintenant = new Date()) {
   return { date, ancienne: maintenant - date > HEURES_AVANT_ALERTE * 3_600_000 };
 }
 
-/**
- * Phrases sur la date des promos : { info } à afficher discrètement, { alerte } si elles sont trop
- * anciennes (vide sinon).
- */
-export function phrasesFraicheur(miseAJour, maintenant = new Date()) {
+/** L'alerte à afficher quand les promos sont trop anciennes (le robot a manqué un passage), sinon "". */
+export function alerteFraicheur(miseAJour, maintenant = new Date()) {
   const { date, ancienne } = fraicheur(miseAJour, maintenant);
-  if (!date) return { info: "", alerte: "Date des promos inconnue : elles ont pu changer." };
+  if (!date) return "Date des promos inconnue : elles ont pu changer.";
+  if (!ancienne) return "";
   const moment = formaterMoment(date, maintenant);
-  const relatif = /^(aujourd'hui|hier)/.test(moment);
-  const depuis = relatif ? `d'${moment}` : `du ${moment}`;
-  return {
-    info: `Promos : ${moment}`,
-    alerte: ancienne ? `Promos ${depuis} : elles ont pu changer.` : "",
-  };
+  return `Promos ${/^(aujourd'hui|hier)/.test(moment) ? `d'${moment}` : `du ${moment}`} : elles ont pu changer.`;
 }
 
 /** Magasins dont les promos n'ont pas pu être lues en entier au dernier passage : [{ nom, etat }]. */

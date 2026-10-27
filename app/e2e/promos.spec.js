@@ -31,7 +31,7 @@ async function ajouterDepuisPromo(page, recherche, nom) {
 test("un article ajouté depuis une promo l'affiche à droite ; écrit à la main, rien", async ({ page, context }) => {
   await servirPromos(context);
   await seConnecter(page, COMPTES.un);
-  await expect(page.locator("#info-promos")).toContainText("Promos : aujourd'hui");
+  await expect(page.locator(".pied")).toHaveText(/^\s*v\d+\.\d+\.\d+\s*$/); // en bas : la version, rien d'autre
 
   await ajouterDepuisPromo(page, "lait", "Lait demi-écrémé UHT");
   await ajouter(page, "Laitue"); // écrite à la main : même en promo, rien à droite

@@ -14,6 +14,11 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+### Modifié
+
+- En bas de la liste, seule la version de l'appli reste : la phrase « Promos : aujourd'hui à… » est
+  retirée (un bandeau prévient toujours si les promos sont trop anciennes).
+
 ## [0.8.0] - 2026-10-27
 
 ### Ajouté

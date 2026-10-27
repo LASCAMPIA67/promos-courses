@@ -26,6 +26,7 @@ import {
 import { couleurDe, formaterAjout, nomDe, preparerFiche } from "./membres.js";
 import {
   URL_PROMOS,
+  alerteFraicheur,
   articleDepuisPromo,
   dateDuJour,
   enseigne,
@@ -35,7 +36,6 @@ import {
   noteCourte,
   periode,
   phraseSource,
-  phrasesFraicheur,
   rechercherPromos,
   periodeCourte,
   promoChoisie,
@@ -358,17 +358,13 @@ function relirePromosSiBesoin() {
 /** Prévient si les promos manquent, sont anciennes ou incomplètes ; rappelle leur date en bas. */
 function dessinerEtatPromos() {
   const alertes = [];
-  let info = "";
   if (etat.promosIndisponibles) {
     alertes.push("Promos indisponibles (pas de réseau ?).");
   } else if (etat.promos) {
-    const phrases = phrasesFraicheur(etat.promos.donnees.mise_a_jour);
-    info = phrases.info;
-    if (phrases.alerte) alertes.push(phrases.alerte);
+    alertes.push(alerteFraicheur(etat.promos.donnees.mise_a_jour));
     alertes.push(...sourcesEnDifficulte(etat.promos.donnees).map(phraseSource));
   }
-  afficherMessage($("etat-promos"), alertes.join(" "), "attention");
-  $("info-promos").textContent = info;
+  afficherMessage($("etat-promos"), alertes.filter(Boolean).join(" "), "attention");
 }
 
 function ouvrirPromo(article, { offre, aVenir }) {

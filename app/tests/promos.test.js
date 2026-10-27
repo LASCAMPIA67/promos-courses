@@ -7,6 +7,7 @@ import {
   dateDuJour,
   formaterJour,
   formaterMoment,
+  alerteFraicheur,
   formaterPrix,
   formaterPrixUnitaire,
   fraicheur,
@@ -19,7 +20,6 @@ import {
   phraseSource,
   prixUnitaire,
   promoChoisie,
-  phrasesFraicheur,
   rechercherPromos,
   regrouper,
   regrouperVariantes,
@@ -518,18 +518,16 @@ describe("dates", () => {
     expect(fraicheur("n'importe quoi", maintenant)).toEqual({ date: null, ancienne: true });
   });
 
-  test("phrases sur la date des promos", () => {
+  test("alerte quand les promos sont trop anciennes", () => {
     const maintenant = new Date(2026, 9, 27, 21, 0);
-    const recentes = phrasesFraicheur(new Date(2026, 9, 27, 5, 48).toISOString(), maintenant);
-    expect(simple(recentes.info)).toBe("Promos : aujourd'hui à 5 h 48");
-    expect(recentes.alerte).toBe("");
-    expect(simple(phrasesFraicheur(new Date(2026, 9, 26, 5, 48).toISOString(), maintenant).alerte)).toBe(
+    expect(alerteFraicheur(new Date(2026, 9, 27, 5, 48).toISOString(), maintenant)).toBe("");
+    expect(simple(alerteFraicheur(new Date(2026, 9, 26, 5, 48).toISOString(), maintenant))).toBe(
       "Promos d'hier à 5 h 48 : elles ont pu changer.",
     );
-    const anciennes = phrasesFraicheur(new Date(2026, 9, 24, 5, 48).toISOString(), maintenant);
-    expect(simple(anciennes.info)).toBe("Promos : samedi 24 octobre à 5 h 48");
-    expect(simple(anciennes.alerte)).toBe("Promos du samedi 24 octobre à 5 h 48 : elles ont pu changer.");
-    expect(phrasesFraicheur("???", maintenant).alerte).toMatch(/inconnue/);
+    expect(simple(alerteFraicheur(new Date(2026, 9, 24, 5, 48).toISOString(), maintenant))).toBe(
+      "Promos du samedi 24 octobre à 5 h 48 : elles ont pu changer.",
+    );
+    expect(alerteFraicheur("???", maintenant)).toMatch(/inconnue/);
   });
 });
 

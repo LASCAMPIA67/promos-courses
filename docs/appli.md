@@ -187,9 +187,9 @@ détails (« sans lactose », « grand format ») vont mieux dans la **note** de
 
 ### Des promos à jour
 
-- L'appli relit les promos à chaque ouverture (au plus une fois par heure). Tout en bas, une
-  ligne discrète rappelle le dernier passage du robot et la version de l'appli
-  (« Promos : aujourd'hui à 5 h 48 · v0.7.0 »).
+- L'appli relit les promos à chaque ouverture (au plus une fois par heure). Tout en bas, seule la
+  version de l'appli est rappelée (« v0.9.0 ») ; la date des promos n'est affichée que si elles
+  sont trop anciennes (voir ci-dessous).
 - **Sans réseau**, elle utilise les dernières promos lues.
 - Un **bandeau jaune** prévient si les promos ont plus de 36 heures (le robot a manqué un passage :
   voir le [dépannage du README](../README.md#dépannage)), si les promos d'un magasin manquent ce matin,
