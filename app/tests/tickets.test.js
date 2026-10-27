@@ -138,6 +138,16 @@ CB EMV 12,34
     expect(lireTicket("", "2026-10-27")).toEqual({ magasin: null, date: null, montant: null });
   });
 
+  test("« À PAYER » seul est le total ; les lignes de TVA n'en sont pas", () => {
+    const texte = `ARTICLES 12
+MONTANT TVA 5,5 %   1,62
+À PAYER             31,07
+ESPECES             40,00
+RENDU                8,93`;
+    expect(lireTicket(texte, AUJOURDHUI).montant).toBe(31.07);
+    expect(lireTicket("Montant HT 19,50\nMontant  23,40", AUJOURDHUI).montant).toBe(23.4);
+  });
+
   test("les dates impossibles sont écartées : futures, trop anciennes, ou qui n'existent pas", () => {
     expect(lireTicket("Date 31/02/2026 puis 15/10/2026", "2026-10-27").date).toBe("2026-10-15");
     expect(lireTicket("Garantie jusqu'au 27/10/2028", "2026-10-27").date).toBeNull();

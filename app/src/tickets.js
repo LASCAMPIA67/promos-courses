@@ -141,14 +141,15 @@ const MONTANT = /(\d{1,4})\s?[,.]\s?(\d{2})(?!\d)/g;
 
 /** Les lignes qui donnent le total, de la plus sûre à la moins sûre. */
 const LIGNES_TOTAL = [
-  /(net|total)\s*(a|à)\s*payer/i,
+  /(net|total|^|\s)\s*[aà]\s*payer/i, // « Total à payer », « Net à payer », « À payer »
   /\bt[o0]ta[l1i]\b/i,
   /\bmontant\b/i,
   /\b(cb|carte bancaire|carte|esp[eè]ces)\b/i,
 ];
 
 /** Les « totaux » qui n'en sont pas : sous-total, remises, TVA… */
-const FAUX_TOTAUX = /sous[\s-]?t[o0]tal|total\s*(des\s*)?(remises?|[ée]conomies?|tva|ht|articles?|points?|avantages?)/i;
+const FAUX_TOTAUX =
+  /sous[\s-]?t[o0]tal|total\s*(des\s*)?(remises?|[ée]conomies?|articles?|points?|avantages?)|\b(tva|ht)\b/i;
 
 function montantDeLaLigne(ligne) {
   const montants = [...ligne.matchAll(MONTANT)].map(([, euros, centimes]) => Number(`${euros}.${centimes}`));
