@@ -70,6 +70,32 @@ de la liste (qui a ajouté quoi). Les prénoms ne sont **que dans Firebase**, ja
 Chacun ne peut écrire que **sa propre** fiche ; les deux comptes peuvent lire les deux fiches. Sans
 fiche, un compte a une couleur donnée d'office et s'appelle « vous » ou « l'autre compte ».
 
+### Collection `tickets` : les tickets de caisse
+
+Un document par ticket, avec ce qu'on a indiqué en l'ajoutant. Le fichier (photo allégée ou PDF)
+est à part, dans la sous-collection `tickets/{id}/morceaux`, découpé en morceaux de 900 000 octets
+au plus : un document Firestore ne peut pas dépasser 1 Mio.
+
+| Champ | Type | Obligatoire | Signification |
+|---|---|---|---|
+| `magasin` | `leclerc`, `lidl` ou `autre` | oui | Où ont été faites les courses. |
+| `date_achat` | texte `AAAA-MM-JJ` | oui | Le jour des courses. |
+| `montant` | nombre (0 à 10 000) | non | Le total du ticket, en euros. |
+| `note` | texte (200 caractères max.) | non | « garantie de la cafetière »… |
+| `type` | `image/jpeg` ou `application/pdf` | oui | Photo allégée, ou PDF gardé tel quel. |
+| `taille` | nombre entier (5 Mio max.) | oui | Taille du fichier, en octets. |
+| `morceaux` | nombre entier (1 à 6) | oui | En combien de morceaux le fichier est découpé. |
+| `ajoute_par` | identifiant de compte | oui | Qui a ajouté le ticket (ne peut plus changer). |
+| `cree_le` | date du serveur | oui | Date d'ajout (ne peut plus changer). |
+
+Chaque morceau (`tickets/{id}/morceaux/0`, `…/1`…) n'a qu'un champ, `donnees` (octets). La fiche et
+ses morceaux sont envoyés ensemble, en une fois : un ticket n'est jamais à moitié enregistré.
+
+**Pourquoi pas Firebase Storage**, prévu pour les fichiers ? Depuis février 2026, il demande l'offre
+payante Blaze (avec une carte bancaire). Le 27/10/2026, nous avons choisi de garder l'offre gratuite :
+une photo allégée pèse 200 à 400 Ko, et le 1 Go gratuit de Firestore suffit pour environ 3 000
+tickets.
+
 ### Collection `reglages` : réglages communs
 
 Pour les préférences du foyer (cartes de fidélité, magasins préférés…). Son contenu sera défini avec
@@ -83,6 +109,9 @@ Elles se trouvent dans [`firebase/firestore.rules`](../firebase/firestore.rules)
 - un article a toujours la bonne forme (champs connus, longueurs raisonnables, dates du serveur) ;
 - on ne peut pas ajouter un article au nom de l'autre, ni changer son auteur ou sa date d'ajout ;
 - chacun ne modifie que sa propre fiche `membres` (prénom et couleur), toujours de la bonne forme ;
+- un ticket de caisse a toujours la bonne forme ; son fichier ne change jamais une fois envoyé (seuls
+  le magasin, la date, le montant et la note peuvent être corrigés), et chaque morceau appartient à
+  un ticket existant, sans dépasser le nombre de morceaux prévu ni 900 000 octets ;
 - toute autre collection est fermée.
 
 ### Les mettre en place ou les modifier
@@ -116,5 +145,7 @@ npm test
 ## Limites de l'offre gratuite
 
 L'offre Spark permet chaque jour environ 50 000 lectures et 20 000 écritures, et 1 Go de données :
-une liste de courses en utilise une infime partie. En cas de dépassement, Firebase **coupe** le
+une liste de courses en utilise une infime partie. Les tickets de caisse prennent plus de place :
+environ 300 Ko par ticket, soit environ 3 000 tickets pour 1 Go. Ouvrir un ticket compte une lecture
+par morceau (une ou deux en général). En cas de dépassement, Firebase **coupe** le
 service jusqu'au lendemain ou au mois suivant, mais ne facture jamais rien sur l'offre Spark.

@@ -14,6 +14,28 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+### Ajouté
+
+- **Appli 0.8 : les tickets de caisse.** En bas de la liste, « Tickets de caisse » garde les
+  tickets en photo, en capture d'écran ou en PDF (celui de l'appli E.Leclerc ou Lidl Plus), avec le
+  magasin, la date des courses, et si on veut le montant et une note. Les 3 derniers sont sous la
+  liste, tous les autres dans « Voir les tickets », par mois. Un ticket s'ouvre en grand (photo, ou
+  chaque page du PDF), se partage (Enregistrer dans Fichiers, Mail…), se corrige ou se supprime.
+  Après « Tout retirer », l'appli propose d'ajouter le ticket des courses. Marche sans réseau.
+- Les photos sont allégées avant l'envoi (1 400 pixels de large, JPEG, 200 à 400 Ko) ; les PDF sont
+  gardés tels quels (5 Mo au plus). Affichage des PDF avec PDF.js, chargé seulement à l'ouverture
+  d'un PDF. Voir [docs/appli.md](docs/appli.md#les-tickets-de-caisse).
+- Tickets gardés dans Firestore, sur l'offre gratuite (collection `tickets`, fichier découpé en
+  morceaux de moins de 1 Mio), jamais dans ce dépôt : voir
+  [docs/liste-commune.md](docs/liste-commune.md#collection-tickets--les-tickets-de-caisse).
+- Tests : 9 tests de logique, 6 tests des règles et 5 scénarios réels de plus ; captures.
+
+### Sécurité
+
+- Règles d'accès : la collection `tickets` n'accepte que des fiches de la bonne forme ; le fichier
+  d'un ticket ne peut plus être changé une fois envoyé, et chaque morceau doit appartenir à un
+  ticket existant, sans dépasser le nombre prévu ni 900 000 octets.
+
 ## [0.7.0] - 2026-10-27
 
 ### Ajouté

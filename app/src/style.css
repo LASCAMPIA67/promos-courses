@@ -1048,6 +1048,208 @@ dialog h2 {
   padding: 10px 8px;
 }
 
+.annulation > span {
+  flex: 1;
+}
+
+.fermer-annulation {
+  display: grid;
+  place-items: center;
+}
+
+.fermer-annulation svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* Les tickets de caisse */
+
+.ligne-ticket {
+  width: 100%;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ticket + .ticket {
+  border-top: 1px solid var(--bordure);
+}
+
+.icone-ticket {
+  flex: 0 0 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--accent-doux);
+  color: var(--accent-fonce);
+}
+
+.icone-ticket svg {
+  width: 19px;
+  height: 19px;
+}
+
+/* Bleu pour Leclerc, jaune pour Lidl, comme les étiquettes des promos. */
+.icone-ticket[data-magasin="leclerc"] {
+  background: #0066b3;
+  color: #ffffff;
+}
+
+.icone-ticket[data-magasin="lidl"] {
+  background: #ffe500;
+  color: #0050aa;
+}
+
+.texte-ticket {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+
+.fleche {
+  color: var(--discret);
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.voir-tickets {
+  display: block;
+  margin: 2px auto 0;
+}
+
+.mois {
+  margin: 16px 20px 6px;
+  color: var(--discret);
+  font-size: 0.95rem;
+}
+
+.tous-les-tickets {
+  padding: 0 12px calc(16px + env(safe-area-inset-bottom));
+}
+
+/* Ajouter un ticket : aperçu, puis le choix du magasin en trois boutons. */
+.apercu-ticket {
+  display: grid;
+  place-items: center;
+  min-height: 48px;
+  margin: 4px 0 2px;
+}
+
+.apercu-ticket img {
+  max-width: 100%;
+  max-height: 220px;
+  border: 1px solid var(--bordure);
+  border-radius: 10px;
+}
+
+.apercu-pdf {
+  margin: 0;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: var(--info-doux);
+  color: var(--info);
+  font-weight: 650;
+}
+
+.choix-magasin {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.choix-magasin legend {
+  padding: 0;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.choix-magasin label {
+  position: relative;
+  margin: 0;
+}
+
+.choix-magasin input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.choix-magasin span {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  border: 1px solid var(--bordure);
+  border-radius: 12px;
+  background: var(--fond);
+  font-weight: 600;
+}
+
+.choix-magasin input:checked + span {
+  border-color: var(--accent);
+  background: var(--accent-doux);
+  color: var(--accent-fonce);
+}
+
+.choix-magasin input:focus-visible + span {
+  outline: 2px solid var(--texte);
+  outline-offset: 2px;
+}
+
+/* Un ticket en grand. */
+.fenetre-ticket {
+  padding: 0;
+}
+
+.fichier-affiche {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  min-height: 120px;
+  place-items: center;
+}
+
+.image-ticket,
+.page-pdf {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--bordure);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.actions-ticket {
+  position: sticky;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--bordure);
+  background: var(--surface);
+}
+
+.actions-ticket .lien {
+  padding-inline: 10px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation: none !important;

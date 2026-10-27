@@ -15,7 +15,7 @@ Seuls nos deux comptes peuvent s'y connecter et voir la liste (voir
 
 Les captures sont faites avec des promos d'exemple et des prénoms fictifs (Camille en vert, Alex en orange).
 
-## Ce qu'elle sait faire (version 0.7)
+## Ce qu'elle sait faire (version 0.8)
 
 - **Se connecter** avec son e-mail et son mot de passe (une seule fois : la connexion reste active).
   Lien « Mot de passe oublié ? » pour recevoir un e-mail de changement de mot de passe.
@@ -48,7 +48,40 @@ Les captures sont faites avec des promos d'exemple et des prénoms fictifs (Cami
   d'accueil (« Plus tard » le cache pour 14 jours). Voir [installation-iphone.md](installation-iphone.md).
 - **Se mettre à jour toute seule** : à chaque ouverture, elle vérifie si une nouvelle version est
   publiée et la prend, sans jamais recharger pendant qu'on écrit.
+- **Garder les tickets de caisse** (voir ci-dessous).
 - **Mode sombre** automatique, textes lisibles par VoiceOver, grandes zones à toucher.
+
+## Les tickets de caisse
+
+Les tickets papier finissent souvent à la poubelle : l'appli les garde, pour vérifier un prix ou
+retrouver une preuve d'achat (garantie, retour d'un produit). Ils sont rangés **en bas de la
+liste**, sous le caddie, et visibles sur les deux téléphones.
+
+| Les derniers tickets, sous la liste | Ajouter un ticket | Un ticket en grand |
+|---|---|---|
+| ![Les tickets de caisse sous la liste](captures/tickets.png) | ![Ajouter un ticket : aperçu, magasin, date, montant](captures/ajout-ticket.png) | ![Un ticket ouvert en grand](captures/ticket.png) |
+
+- **Ajouter** : « + Ajouter » à côté de « Tickets de caisse ». L'iPhone propose de **prendre une
+  photo**, de choisir dans la **photothèque** (une capture d'écran, par exemple celle du ticket dans
+  l'appli E.Leclerc ou Lidl Plus) ou dans **Fichiers** (le **PDF** du ticket). Après « Tout retirer »
+  dans le caddie, l'appli propose aussi d'ajouter le ticket des courses.
+- **Ce qu'on indique** : le magasin (Leclerc d'office, ou Lidl si le nom du fichier le dit), la date
+  des courses (aujourd'hui d'office), et si on veut le montant et une note (« garantie de la
+  cafetière »).
+- **Sous la liste** : les 3 derniers tickets (« Leclerc · mar. 27/10 · 54,30 € ») ; « Voir les 12
+  tickets » les montre tous, classés par mois.
+- **En grand** : toucher un ticket l'ouvre (la photo, ou chaque page du PDF) ; on peut zoomer avec
+  deux doigts. **Partager** ouvre la feuille de partage de l'iPhone (Enregistrer dans Fichiers,
+  Mail, AirDrop…), avec le fichier d'origine pour un PDF. **Modifier** corrige le magasin, la date,
+  le montant ou la note ; **Supprimer** l'efface pour de bon (après confirmation).
+- **Photos allégées** : une photo est réduite à 1 400 pixels de large (assez pour lire chaque ligne)
+  et enregistrée en JPEG, soit 200 à 400 Ko. Un PDF est gardé tel quel (5 Mo au plus).
+- **Sans réseau** : le ticket est gardé sur le téléphone (« envoi en cours… ») et part au retour du
+  réseau. Un ticket ajouté par l'autre téléphone s'ouvre une première fois avec du réseau ; ensuite
+  il reste sur le téléphone.
+- **Privés** : comme la liste, les tickets sont dans Firebase et seuls nos deux comptes y ont accès.
+  Ils ne sont **jamais** dans ce dépôt GitHub, qui est public. Voir
+  [liste-commune.md](liste-commune.md#collection-tickets--les-tickets-de-caisse).
 
 ## Les promos
 
@@ -152,6 +185,9 @@ détails (« sans lactose », « grand format ») vont mieux dans la **note** de
 | [`app/src/liste.js`](../app/src/liste.js) | Lecture et modification de la liste dans Firebase. |
 | [`app/src/articles.js`](../app/src/articles.js) | Règles simples : nettoyage, doublons, tri, messages d'erreur. |
 | [`app/src/membres.js`](../app/src/membres.js) | Qui a ajouté quoi : couleur et prénom de chacun, date d'ajout en clair. |
+| [`app/src/tickets.js`](../app/src/tickets.js) | Les tickets de caisse : découpage du fichier, montant, date, classement par mois. |
+| [`app/src/fichiers.js`](../app/src/fichiers.js) | Photo allégée avant l'envoi, affichage en grand, partage. |
+| [`app/src/pdf.js`](../app/src/pdf.js) | Affichage des tickets en PDF ([PDF.js](https://mozilla.github.io/pdf.js/), chargé seulement à l'ouverture d'un PDF). |
 | [`app/src/promos.js`](../app/src/promos.js) | Les promos : recherche pour chaque article et dans toutes les promos, dates, prix, fraîcheur des données. |
 | [`app/src/familles.js`](../app/src/familles.js) | Les familles de produits : « chips » → Pringles, Lay's, Doritos… |
 | [`app/src/installation.js`](../app/src/installation.js) | Quand proposer d'installer l'appli sur l'iPhone. |
@@ -169,8 +205,8 @@ que dans Firebase.
 
 | Tests | Ce qu'ils vérifient | Commande |
 |---|---|---|
-| Logique ([`app/tests`](../app/tests)) | Nettoyage des saisies, doublons, tri, messages d'erreur ; couleur et prénom de chacun, date d'ajout en clair ; recherche des promos (accents, pluriel, mots proches, marques, familles de produits, faux amis, début de mot, filtre par magasin), article créé depuis une promo, où va la réduction (caisse, lot, carte E.Leclerc, Lidl Plus), description sans les prix répétés, Leclerc d'abord, promos terminées ou à venir, dates, prix, fraîcheur des données ; quand proposer l'installation. | `npm test` |
-| Scénarios réels ([`app/e2e`](../app/e2e)) | Un navigateur à la taille d'un iPhone utilise l'appli branchée sur l'**émulateur Firebase** (jamais la vraie base), avec deux comptes et un [fichier de promos d'exemple](../app/e2e/promos-exemple.js) aux dates du jour : connexion refusée, ajout, doublon, cochage, modification, suppression, synchronisation en direct entre deux téléphones, mode hors connexion, refus d'un compte étranger, déconnexion, étiquettes et détail des promos, promos anciennes ou incomplètes, promos indisponibles puis retrouvées, conseil d'installation dans Safari sur iPhone, glisser pour supprimer avec « Annuler », « Chips » qui trouve Pringles, promos affichées en écrivant (Leclerc d'abord, ajout d'une promo ou du texte écrit, affichage par 30), prix expliqué (carte E.Leclerc, Lidl Plus), prénom et couleur choisis sur un téléphone et vus sur l'autre (pastille, heure d'ajout). Sur GitHub, ils tournent dans Chrome **et Safari** (WebKit). | `npm run e2e` |
+| Logique ([`app/tests`](../app/tests)) | Nettoyage des saisies, doublons, tri, messages d'erreur ; couleur et prénom de chacun, date d'ajout en clair ; tickets de caisse (découpage et recollage du fichier, montant, date, magasin deviné, classement par mois, taille des photos) ; recherche des promos (accents, pluriel, mots proches, marques, familles de produits, faux amis, début de mot, filtre par magasin), article créé depuis une promo, où va la réduction (caisse, lot, carte E.Leclerc, Lidl Plus), description sans les prix répétés, Leclerc d'abord, promos terminées ou à venir, dates, prix, fraîcheur des données ; quand proposer l'installation. | `npm test` |
+| Scénarios réels ([`app/e2e`](../app/e2e)) | Un navigateur à la taille d'un iPhone utilise l'appli branchée sur l'**émulateur Firebase** (jamais la vraie base), avec deux comptes et un [fichier de promos d'exemple](../app/e2e/promos-exemple.js) aux dates du jour : connexion refusée, ajout, doublon, cochage, modification, suppression, synchronisation en direct entre deux téléphones, mode hors connexion, refus d'un compte étranger, déconnexion, étiquettes et détail des promos, promos anciennes ou incomplètes, promos indisponibles puis retrouvées, conseil d'installation dans Safari sur iPhone, glisser pour supprimer avec « Annuler », « Chips » qui trouve Pringles, promos affichées en écrivant (Leclerc d'abord, ajout d'une promo ou du texte écrit, affichage par 30), prix expliqué (carte E.Leclerc, Lidl Plus), prénom et couleur choisis sur un téléphone et vus sur l'autre (pastille, heure d'ajout), tickets de caisse en photo et en PDF ([fichiers d'exemple](../app/e2e/fichiers-exemple.js) : vus en grand sur l'autre téléphone, corrigés, partagés, supprimés, proposés après « Tout retirer », sans réseau, refusés à un compte étranger). Sur GitHub, ils tournent dans Chrome **et Safari** (WebKit). | `npm run e2e` |
 | Captures d'écran | Régénère les images de cette page dans `docs/captures/`. | `npm run captures` |
 
 Commandes à lancer dans le dossier `app/` (Node.js 22 et Java 21 nécessaires), après `npm ci`.

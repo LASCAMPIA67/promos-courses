@@ -59,6 +59,46 @@ service cloud.firestore {
       allow delete: if estDuFoyer() && membre == request.auth.uid;
     }
 
+    // Les tickets de caisse : une fiche par ticket (magasin, date, montant…) et son fichier (photo
+    // allégée ou PDF, 5 Mio au plus) découpé en morceaux de moins de 1 Mio, la limite d'un document.
+    function ticketValide(t) {
+      return t.keys().hasAll(['magasin', 'date_achat', 'type', 'taille', 'morceaux', 'ajoute_par', 'cree_le'])
+        && t.keys().hasOnly(['magasin', 'date_achat', 'montant', 'note', 'type', 'taille', 'morceaux', 'ajoute_par', 'cree_le'])
+        && t.magasin in ['leclerc', 'lidl', 'autre']
+        && t.date_achat is string && t.date_achat.matches('[0-9]{4}-[0-9]{2}-[0-9]{2}')
+        && (!('montant' in t) || (t.montant is number && t.montant >= 0 && t.montant <= 10000))
+        && texteOuAbsent(t, 'note', 200)
+        && t.type in ['image/jpeg', 'application/pdf']
+        && t.taille is int && t.taille > 0 && t.taille <= 5242880
+        && t.morceaux is int && t.morceaux >= 1 && t.morceaux <= 6
+        && t.ajoute_par is string
+        && t.cree_le is timestamp;
+    }
+
+    match /tickets/{ticket} {
+      allow read, delete: if estDuFoyer();
+      allow create: if estDuFoyer()
+        && ticketValide(request.resource.data)
+        && request.resource.data.ajoute_par == request.auth.uid
+        && request.resource.data.cree_le == request.time;
+      // Seuls le magasin, la date, le montant et la note peuvent être corrigés ; jamais le fichier.
+      allow update: if estDuFoyer()
+        && ticketValide(request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['magasin', 'date_achat', 'montant', 'note']);
+
+      // Les morceaux du fichier : numérotés 0, 1, 2…, ajoutés avec leur fiche, jamais modifiés.
+      match /morceaux/{morceau} {
+        allow read, delete: if estDuFoyer();
+        allow create: if estDuFoyer()
+          && morceau.matches('[0-5]')
+          && int(morceau) < getAfter(/databases/$(database)/documents/tickets/$(ticket)).data.morceaux
+          && request.resource.data.keys().hasOnly(['donnees'])
+          && request.resource.data.donnees is bytes
+          && request.resource.data.donnees.size() > 0
+          && request.resource.data.donnees.size() <= 900000;
+      }
+    }
+
     // Réglages communs du foyer (cartes de fidélité, magasins préférés…).
     match /reglages/{reglage} {
       allow read, write: if estDuFoyer();

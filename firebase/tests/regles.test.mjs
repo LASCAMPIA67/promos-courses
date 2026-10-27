@@ -5,7 +5,17 @@ import { readFileSync } from "node:fs";
 import { after, before, beforeEach, describe, test } from "node:test";
 
 import { assertFails, assertSucceeds, initializeTestEnvironment } from "@firebase/rules-unit-testing";
-import { deleteDoc, doc, getDoc, serverTimestamp, setDoc, Timestamp, updateDoc } from "firebase/firestore";
+import {
+  Bytes,
+  deleteDoc,
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+  Timestamp,
+  updateDoc,
+  writeBatch,
+} from "firebase/firestore";
 
 const COMPTE_1 = "ElRK8CEajUMQmtajHXv5qZVVT6G2";
 const COMPTE_2 = "XABqepPEkHXg8gBon5ljE5XEXOD3";
@@ -166,6 +176,85 @@ describe("membres : prénom et couleur de chacun", () => {
   test("un autre compte Firebase ne peut ni lire ni écrire les fiches", async () => {
     await assertFails(setDoc(doc(base(INCONNU), `membres/${INCONNU}`), fiche));
     await assertFails(getDoc(doc(base(INCONNU), `membres/${COMPTE_1}`)));
+  });
+});
+
+describe("tickets de caisse", () => {
+  const fichier = (taille) => Bytes.fromUint8Array(new Uint8Array(taille).fill(7));
+
+  function nouveauTicket(uid, champs = {}) {
+    return {
+      magasin: "leclerc",
+      date_achat: "2026-10-27",
+      montant: 54.3,
+      type: "image/jpeg",
+      taille: 1_200_000,
+      morceaux: 2,
+      ajoute_par: uid,
+      cree_le: serverTimestamp(),
+      ...champs,
+    };
+  }
+
+  /** La fiche et ses morceaux, envoyés ensemble comme le fait l'appli. */
+  function ajouterTicket(db, fiche, morceaux = [fichier(900_000), fichier(300_000)]) {
+    const lot = writeBatch(db);
+    lot.set(doc(db, "tickets/t1"), fiche);
+    morceaux.forEach((donnees, rang) => lot.set(doc(db, `tickets/t1/morceaux/${rang}`), { donnees }));
+    return lot.commit();
+  }
+
+  test("un ticket et son fichier sont acceptés, et les deux comptes peuvent le lire", async () => {
+    await assertSucceeds(ajouterTicket(base(COMPTE_1), nouveauTicket(COMPTE_1)));
+    await assertSucceeds(getDoc(doc(base(COMPTE_2), "tickets/t1")));
+    await assertSucceeds(getDoc(doc(base(COMPTE_2), "tickets/t1/morceaux/1")));
+  });
+
+  test("un PDF, sans montant ni note, en un seul morceau", async () => {
+    const { montant, ...sansMontant } = nouveauTicket(COMPTE_2, { type: "application/pdf", taille: 1000, morceaux: 1 });
+    await assertSucceeds(ajouterTicket(base(COMPTE_2), sansMontant, [fichier(1000)]));
+  });
+
+  test("la fiche est contrôlée", async () => {
+    const essai = (champs) => ajouterTicket(base(COMPTE_1), nouveauTicket(COMPTE_1, champs));
+    await assertFails(essai({ magasin: "carrefour" }));
+    await assertFails(essai({ date_achat: "27/10/2026" }));
+    await assertFails(essai({ montant: -3 }));
+    await assertFails(essai({ type: "text/html" }));
+    await assertFails(essai({ taille: 6 * 1024 * 1024 }));
+    await assertFails(essai({ note: "x".repeat(201) }));
+    await assertFails(essai({ pirate: true }));
+    await assertFails(essai({ cree_le: Timestamp.fromDate(new Date("2026-10-25T10:00:00Z")) }));
+    await assertFails(ajouterTicket(base(COMPTE_2), nouveauTicket(COMPTE_1)));
+  });
+
+  test("pas de morceau sans sa fiche, ni au-delà du nombre prévu, ni trop gros", async () => {
+    await assertFails(setDoc(doc(base(COMPTE_1), "tickets/seul/morceaux/0"), { donnees: fichier(10) }));
+    await assertFails(
+      ajouterTicket(base(COMPTE_1), nouveauTicket(COMPTE_1), [fichier(900_000), fichier(200_000), fichier(100_000)]),
+    );
+    await assertFails(ajouterTicket(base(COMPTE_1), nouveauTicket(COMPTE_1, { morceaux: 1 }), [fichier(1_000_000)]));
+    await assertFails(ajouterTicket(base(COMPTE_1), nouveauTicket(COMPTE_1, { morceaux: 1 }), [fichier(0)]));
+  });
+
+  test("on corrige le magasin, la date, le montant ou la note, jamais le fichier", async () => {
+    await assertSucceeds(ajouterTicket(base(COMPTE_1), nouveauTicket(COMPTE_1)));
+    const ref = doc(base(COMPTE_2), "tickets/t1");
+    await assertSucceeds(updateDoc(ref, { magasin: "lidl", date_achat: "2026-10-26", montant: 12, note: "ok" }));
+    await assertFails(updateDoc(ref, { taille: 10 }));
+    await assertFails(updateDoc(ref, { ajoute_par: COMPTE_2 }));
+    await assertFails(setDoc(doc(base(COMPTE_2), "tickets/t1/morceaux/0"), { donnees: fichier(10) }));
+  });
+
+  test("le foyer peut supprimer un ticket et son fichier ; un autre compte, rien", async () => {
+    await assertSucceeds(ajouterTicket(base(COMPTE_1), nouveauTicket(COMPTE_1)));
+    await assertFails(getDoc(doc(base(INCONNU), "tickets/t1")));
+    await assertFails(getDoc(doc(base(INCONNU), "tickets/t1/morceaux/0")));
+    await assertFails(deleteDoc(doc(base(INCONNU), "tickets/t1/morceaux/0")));
+    const db = base(COMPTE_2);
+    const lot = writeBatch(db);
+    for (const chemin of ["tickets/t1", "tickets/t1/morceaux/0", "tickets/t1/morceaux/1"]) lot.delete(doc(db, chemin));
+    await assertSucceeds(lot.commit());
   });
 });
 

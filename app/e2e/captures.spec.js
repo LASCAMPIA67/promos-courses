@@ -3,6 +3,7 @@
 
 import { expect, test } from "@playwright/test";
 
+import { choisirFichier, pdfExemple } from "./fichiers-exemple.js";
 import { COMPTES, creerComptes, seConnecter, viderLaBase } from "./outils.js";
 import { servirPromos } from "./promos-exemple.js";
 
@@ -106,10 +107,78 @@ for (const theme of ["light", "dark"]) {
 
     if (theme === "light") {
       await page.getByRole("button", { name: "Modifier Lait demi-écrémé" }).click();
-      await page.getByLabel("Note").fill("sans lactose si possible");
+      await page
+        .getByRole("dialog", { name: "Modifier l'article" })
+        .getByLabel("Note")
+        .fill("sans lactose si possible");
       await page.screenshot({ path: `${DOSSIER}modifier.png` });
+      await page.getByRole("button", { name: "Annuler" }).click();
+
+      // Les tickets de caisse : une photo (un ticket fictif, dessiné ici) et un PDF.
+      const ajouterTicket = page.getByRole("button", { name: "Ajouter un ticket de caisse" });
+      const photo = Buffer.from(await page.evaluate(dessinerTicket), "base64");
+      await choisirFichier(page, ajouterTicket, { name: "IMG_0042.png", mimeType: "image/png", buffer: photo });
+      const nouveau = page.getByRole("dialog", { name: "Nouveau ticket" });
+      await expect(nouveau.getByRole("img", { name: "Aperçu du ticket" })).toBeVisible();
+      await nouveau.getByLabel("Montant").fill("23,45");
+      await page.screenshot({ path: `${DOSSIER}ajout-ticket.png` });
+      await nouveau.getByRole("button", { name: "Enregistrer" }).click();
+      await choisirFichier(page, ajouterTicket, {
+        name: "ticket-lidl.pdf",
+        mimeType: "application/pdf",
+        buffer: pdfExemple(),
+      });
+      await nouveau.getByLabel("Montant").fill("2,54");
+      await nouveau.getByRole("button", { name: "Enregistrer" }).click();
+      await expect(page.locator("#liste-tickets .ticket")).toHaveCount(2);
+      await expect(page.locator("#liste-tickets")).not.toContainText("envoi en cours");
+      await page.locator("#liste-tickets").scrollIntoViewIfNeeded();
+      await page.screenshot({ path: `${DOSSIER}tickets.png` });
+
+      await page.getByRole("button", { name: /^Ouvrir le ticket Leclerc du / }).click();
+      await expect(page.getByRole("img", { name: "Photo du ticket de caisse" })).toBeVisible();
+      await page.screenshot({ path: `${DOSSIER}ticket.png` });
     }
   });
+}
+
+/** Un ticket de caisse fictif, dessiné dans le navigateur (image PNG en base64). */
+function dessinerTicket() {
+  const toile = document.createElement("canvas");
+  toile.width = 560;
+  toile.height = 900;
+  const dessin = toile.getContext("2d");
+  dessin.fillStyle = "#ffffff";
+  dessin.fillRect(0, 0, toile.width, toile.height);
+  dessin.fillStyle = "#222222";
+  dessin.font = "bold 30px monospace";
+  dessin.textAlign = "center";
+  dessin.fillText("MAGASIN EXEMPLE", 280, 70);
+  dessin.font = "22px monospace";
+  dessin.fillText("Ticket fictif pour la documentation", 280, 110);
+  dessin.textAlign = "left";
+  const lignes = [
+    ["LAIT DEMI-ECREME 2 L", "1,78"],
+    ["PAIN COMPLET", "1,65"],
+    ["BANANES 1 KG", "1,29"],
+    ["BEURRE DOUX", "2,49"],
+    ["CAFE MOULU 1 KG", "9,99"],
+    ["PATES SPAGHETTI x2", "1,90"],
+    ["CHOCOLAT AU LAIT", "2,15"],
+    ["YAOURTS NATURE x8", "2,20"],
+  ];
+  lignes.forEach(([produit, prix], rang) => {
+    const y = 190 + rang * 52;
+    dessin.fillText(produit, 40, y);
+    dessin.fillText(prix, 440, y);
+  });
+  dessin.fillRect(40, 640, 480, 3);
+  dessin.font = "bold 30px monospace";
+  dessin.fillText("TOTAL", 40, 700);
+  dessin.fillText("23,45 EUR", 340, 700);
+  dessin.font = "22px monospace";
+  dessin.fillText("Merci de votre visite", 140, 800);
+  return toile.toDataURL("image/png").split(",")[1];
 }
 
 test("capture du conseil d'installation (Safari sur iPhone)", async ({ browser }) => {

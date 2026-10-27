@@ -5,16 +5,22 @@ import { onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword,
 import { registerSW } from "virtual:pwa-register";
 
 import { messageErreur, pluriel, preparerSaisie, trierArticles, trouverDoublon } from "./articles.js";
+import { afficherFichier, nomFichier, partagerFichier, preparerFichier } from "./fichiers.js";
 import { auth, db } from "./firebase.js";
 import { proposerInstallation } from "./installation.js";
 import {
   ajouterArticle,
+  ajouterTicket,
   cocherArticle,
   enregistrerMembre,
+  lireFichierTicket,
   modifierArticle,
+  modifierTicket,
   suivreArticles,
   suivreMembres,
+  suivreTickets,
   supprimerArticle,
+  supprimerTicket,
   viderLeCaddie,
 } from "./liste.js";
 import { couleurDe, formaterAjout, nomDe, preparerFiche } from "./membres.js";
@@ -34,6 +40,18 @@ import {
   resumeDescription,
   sourcesEnDifficulte,
 } from "./promos.js";
+import {
+  MAGASINS_TICKET,
+  TICKETS_SOUS_LA_LISTE,
+  devinerMagasin,
+  formaterMontant,
+  formaterTaille,
+  jourEnLettres,
+  libelleTicket,
+  preparerTicket,
+  regrouperParMois,
+  trierTickets,
+} from "./tickets.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -48,6 +66,10 @@ const etat = {
   arreterSuivi: null,
   membres: {}, // { uid: { prenom, couleur } } : qui est qui, pour les pastilles de couleur
   arreterMembres: null,
+  tickets: [], // les tickets de caisse (fiches, sans leur fichier)
+  arreterTickets: null,
+  ticketOuvert: null, // { ticket, blob, liberer } : le ticket affiché en grand
+  ticketEnCours: null, // { ticket, fichier, jeton } : le ticket qu'on ajoute (fichier) ou qu'on corrige (ticket)
   articleOuvert: null,
   ligneOuverte: null, // article dont le bouton « Supprimer » est visible (glissé vers la gauche)
   promos: null, // { donnees, index, luesLe }
@@ -75,10 +97,14 @@ onAuthStateChanged(auth, (utilisateur) => {
   etat.utilisateur = utilisateur;
   etat.arreterSuivi?.();
   etat.arreterMembres?.();
+  etat.arreterTickets?.();
   etat.arreterSuivi = null;
   etat.arreterMembres = null;
+  etat.arreterTickets = null;
   etat.articles = [];
   etat.membres = {};
+  etat.tickets = [];
+  dessinerTickets();
   if (!utilisateur) {
     $("ajout-nom").value = "";
     dessinerSuggestions();
@@ -107,6 +133,14 @@ onAuthStateChanged(auth, (utilisateur) => {
     },
     // Sans les fiches (règles pas encore publiées, réseau…), les pastilles prennent une couleur d'office.
     (erreur) => console.warn("Fiches des membres indisponibles :", erreur),
+  );
+  etat.arreterTickets = suivreTickets(
+    db,
+    (tickets) => {
+      etat.tickets = tickets;
+      dessinerTickets();
+    },
+    (erreur) => console.warn("Tickets de caisse indisponibles :", erreur),
   );
 });
 
@@ -280,6 +314,8 @@ $("vider-caddie").addEventListener("click", async () => {
   const { dansLeCaddie } = trierArticles(etat.articles);
   if (await confirmer(`Retirer de la liste les ${pluriel(dansLeCaddie.length, "article")} du caddie ?`)) {
     viderLeCaddie(db, dansLeCaddie).catch(signalerErreur);
+    // Les courses sont finies : c'est le moment de garder le ticket.
+    proposerAction("Courses finies : garder le ticket ?", "Ajouter", choisirFichierTicket, 12_000);
   }
 });
 
@@ -698,15 +734,24 @@ function supprimerAvecAnnulation(article) {
 
 let attenteAnnulation;
 function proposerAnnulation(texte, annuler) {
+  proposerAction(texte, "Annuler", annuler, 6000);
+}
+
+/** Un message en bas de l'écran avec un bouton (« Annuler », « Ajouter »…), qui disparaît tout seul. */
+function proposerAction(texte, libelle, action, duree) {
   clearTimeout(attenteAnnulation);
   $("texte-annulation").textContent = texte;
+  $("bouton-annuler").textContent = libelle;
+  $("fermer-annulation").hidden = libelle === "Annuler";
   $("annulation").hidden = false;
   $("bouton-annuler").onclick = () => {
     $("annulation").hidden = true;
-    annuler();
+    action();
   };
-  attenteAnnulation = setTimeout(() => ($("annulation").hidden = true), 6000);
+  attenteAnnulation = setTimeout(() => ($("annulation").hidden = true), duree);
 }
+
+$("fermer-annulation").addEventListener("click", () => ($("annulation").hidden = true));
 
 // ---------------------------------------------------------------------------------------------
 // Modifier ou supprimer un article
@@ -750,6 +795,241 @@ $("supprimer-article").addEventListener("click", async () => {
   $("fenetre-article").close();
   if (await confirmer(`Supprimer « ${article.nom} » de la liste ?`)) {
     supprimerArticle(db, article.id).catch(signalerErreur);
+  }
+});
+
+// ---------------------------------------------------------------------------------------------
+// Les tickets de caisse : les derniers sous la liste, tous dans « Voir les tickets »
+
+function dessinerTickets() {
+  const tickets = trierTickets(etat.tickets);
+  $("liste-tickets").replaceChildren(...tickets.slice(0, TICKETS_SOUS_LA_LISTE).map(ligneTicket));
+  $("voir-tickets").hidden = tickets.length <= TICKETS_SOUS_LA_LISTE;
+  $("voir-tickets").textContent = `Voir les ${tickets.length} tickets`;
+  if ($("fenetre-tickets").open) dessinerTousLesTickets();
+  // Le ticket affiché a été corrigé ou supprimé sur l'autre téléphone.
+  if (etat.ticketOuvert) {
+    const aJour = etat.tickets.find((t) => t.id === etat.ticketOuvert.ticket.id);
+    if (aJour) dessinerEnteteTicket((etat.ticketOuvert.ticket = aJour));
+    else $("fenetre-ticket").close();
+  }
+}
+
+function ligneTicket(ticket) {
+  const ligne = document.createElement("li");
+  ligne.className = "ticket";
+  const bouton = document.createElement("button");
+  bouton.type = "button";
+  bouton.className = "ligne-ticket";
+  bouton.setAttribute(
+    "aria-label",
+    `Ouvrir le ticket ${[MAGASINS_TICKET[ticket.magasin], `du ${jourEnLettres(ticket.date_achat)}`, ticket.montant != null ? formaterMontant(ticket.montant) : null].filter(Boolean).join(" ")}`,
+  );
+  const icone = document.createElement("span");
+  icone.className = "icone-ticket";
+  icone.dataset.magasin = ticket.magasin;
+  icone.innerHTML =
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z" /><path d="M9 8h6M9 12h6" /></svg>';
+  const texte = document.createElement("span");
+  texte.className = "texte-ticket";
+  const titre = document.createElement("span");
+  titre.className = "nom";
+  titre.textContent = libelleTicket(ticket);
+  texte.append(titre);
+  const details = [ticket.note, ticket.enAttente ? "envoi en cours…" : null].filter(Boolean).join(" · ");
+  if (details) {
+    const sousTitre = document.createElement("span");
+    sousTitre.className = "details";
+    sousTitre.textContent = details;
+    texte.append(sousTitre);
+  }
+  const fleche = document.createElement("span");
+  fleche.className = "fleche";
+  fleche.setAttribute("aria-hidden", "true");
+  fleche.textContent = "›";
+  bouton.append(icone, texte, fleche);
+  bouton.addEventListener("click", () => ouvrirTicket(ticket));
+  ligne.append(bouton);
+  return ligne;
+}
+
+function dessinerTousLesTickets() {
+  $("tous-les-tickets").replaceChildren(
+    ...regrouperParMois(etat.tickets).map(({ mois, tickets }) => {
+      const groupe = document.createElement("section");
+      const titre = document.createElement("h3");
+      titre.className = "mois";
+      titre.textContent = mois;
+      const liste = document.createElement("ul");
+      liste.className = "liste";
+      liste.append(...tickets.map(ligneTicket));
+      groupe.append(titre, liste);
+      return groupe;
+    }),
+  );
+}
+
+$("voir-tickets").addEventListener("click", () => {
+  dessinerTousLesTickets();
+  $("fenetre-tickets").showModal();
+});
+
+// Ajouter un ticket : l'iPhone propose de prendre une photo, la photothèque (captures d'écran) ou
+// Fichiers (le PDF de l'appli E.Leclerc ou Lidl Plus).
+function choisirFichierTicket() {
+  $("fichier-ticket").click();
+}
+
+$("ajouter-ticket").addEventListener("click", choisirFichierTicket);
+
+$("fichier-ticket").addEventListener("change", () => {
+  const fichier = $("fichier-ticket").files[0];
+  $("fichier-ticket").value = ""; // pour pouvoir choisir le même fichier une autre fois
+  if (fichier) ouvrirFormulaireTicket({ fichier });
+});
+
+let jetonsTicket = 0;
+
+/** La fenêtre du ticket : nouveau (avec son fichier) ou à corriger (sans toucher au fichier). */
+async function ouvrirFormulaireTicket({ fichier = null, ticket = null }) {
+  const enCours = { ticket, fichier: null, jeton: (jetonsTicket += 1) };
+  etat.ticketEnCours = enCours;
+  $("titre-ajout-ticket").textContent = ticket ? "Modifier le ticket" : "Nouveau ticket";
+  const magasin = ticket?.magasin ?? devinerMagasin(fichier?.name);
+  for (const choix of document.querySelectorAll('input[name="magasin"]')) choix.checked = choix.value === magasin;
+  $("date-ticket").value = ticket?.date_achat ?? dateDuJour();
+  $("date-ticket").max = dateDuJour();
+  $("montant-ticket").value = ticket?.montant != null ? ticket.montant.toFixed(2).replace(".", ",") : "";
+  $("note-ticket").value = ticket?.note ?? "";
+  afficherMessage($("message-ticket"), "");
+  $("apercu-ticket").hidden = !fichier;
+  $("apercu-ticket").replaceChildren(texteDiscret("Préparation du ticket…"));
+  $("enregistrer-ticket").disabled = Boolean(fichier);
+  if (!$("fenetre-ajout-ticket").open) $("fenetre-ajout-ticket").showModal();
+  if (!fichier) return;
+  try {
+    const prepare = await preparerFichier(fichier);
+    if (etat.ticketEnCours?.jeton !== enCours.jeton) {
+      if (prepare.apercu) URL.revokeObjectURL(prepare.apercu);
+      return;
+    }
+    enCours.fichier = prepare;
+    $("apercu-ticket").replaceChildren(apercuTicket(prepare));
+    $("enregistrer-ticket").disabled = false;
+  } catch (erreur) {
+    console.error(erreur);
+    if (etat.ticketEnCours?.jeton !== enCours.jeton) return;
+    $("apercu-ticket").replaceChildren();
+    afficherMessage($("message-ticket"), erreur.message, "erreur");
+  }
+}
+
+function apercuTicket({ octets, apercu }) {
+  if (apercu) {
+    const image = document.createElement("img");
+    image.src = apercu;
+    image.alt = "Aperçu du ticket";
+    return image;
+  }
+  const carte = document.createElement("p");
+  carte.className = "apercu-pdf";
+  carte.textContent = `PDF · ${formaterTaille(octets.length)}`;
+  return carte;
+}
+
+function texteDiscret(texte) {
+  const paragraphe = document.createElement("p");
+  paragraphe.className = "discret";
+  paragraphe.textContent = texte;
+  return paragraphe;
+}
+
+$("form-ticket").addEventListener("submit", (evenement) => {
+  evenement.preventDefault();
+  const enCours = etat.ticketEnCours;
+  if (!enCours || (!enCours.ticket && !enCours.fichier)) return;
+  const { fiche, erreur } = preparerTicket(
+    {
+      magasin: document.querySelector('input[name="magasin"]:checked')?.value,
+      date: $("date-ticket").value,
+      montant: $("montant-ticket").value,
+      note: $("note-ticket").value,
+    },
+    dateDuJour(),
+  );
+  if (erreur) {
+    afficherMessage($("message-ticket"), erreur, "erreur");
+    return;
+  }
+  // Comme pour les articles, on n'attend pas le serveur : sans réseau, le ticket part plus tard.
+  if (enCours.ticket) modifierTicket(db, enCours.ticket.id, fiche).catch(signalerErreur);
+  else ajouterTicket(db, etat.utilisateur.uid, fiche, enCours.fichier).envoi.catch(signalerErreur);
+  $("fenetre-ajout-ticket").close();
+});
+
+$("fenetre-ajout-ticket").addEventListener("close", () => {
+  if (etat.ticketEnCours?.fichier?.apercu) URL.revokeObjectURL(etat.ticketEnCours.fichier.apercu);
+  etat.ticketEnCours = null;
+  $("apercu-ticket").replaceChildren();
+});
+
+// Un ticket en grand : la photo, ou chaque page du PDF.
+async function ouvrirTicket(ticket) {
+  const ouverture = { ticket, blob: null, liberer: null };
+  etat.ticketOuvert = ouverture;
+  dessinerEnteteTicket(ticket);
+  $("fichier-affiche").replaceChildren(texteDiscret("Ouverture du ticket…"));
+  $("partager-ticket").disabled = true;
+  $("fenetre-ticket").showModal();
+  try {
+    const blob = await lireFichierTicket(db, ticket);
+    if (etat.ticketOuvert !== ouverture) return;
+    ouverture.blob = blob;
+    ouverture.liberer = await afficherFichier(blob, $("fichier-affiche"));
+    if (etat.ticketOuvert !== ouverture) {
+      ouverture.liberer?.();
+      return;
+    }
+    $("partager-ticket").disabled = false;
+  } catch (erreur) {
+    console.error(erreur);
+    if (etat.ticketOuvert !== ouverture) return;
+    $("fichier-affiche").replaceChildren(texteDiscret(erreur.code ? messageErreur(erreur) : erreur.message));
+  }
+}
+
+function dessinerEnteteTicket(ticket) {
+  $("titre-ticket").textContent = `${MAGASINS_TICKET[ticket.magasin]}, ${jourEnLettres(ticket.date_achat)}`;
+  $("infos-ticket").textContent = [
+    ticket.montant != null ? formaterMontant(ticket.montant) : null,
+    ticket.note,
+    `ajouté par ${nomDe(ticket.ajoute_par, etat.membres, etat.utilisateur?.uid)}`,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+$("fenetre-ticket").addEventListener("close", () => {
+  etat.ticketOuvert?.liberer?.();
+  etat.ticketOuvert = null;
+  $("fichier-affiche").replaceChildren();
+});
+
+$("partager-ticket").addEventListener("click", () => {
+  const { ticket, blob } = etat.ticketOuvert ?? {};
+  if (blob) partagerFichier(blob, nomFichier(ticket)).catch(signalerErreur);
+});
+
+$("modifier-ticket").addEventListener("click", () => {
+  if (etat.ticketOuvert) ouvrirFormulaireTicket({ ticket: etat.ticketOuvert.ticket });
+});
+
+$("supprimer-ticket").addEventListener("click", async () => {
+  const ticket = etat.ticketOuvert?.ticket;
+  if (!ticket) return;
+  if (await confirmer("Supprimer ce ticket de caisse ? Il ne pourra pas être récupéré.")) {
+    supprimerTicket(db, ticket).catch(signalerErreur);
+    $("fenetre-ticket").close();
   }
 });
 

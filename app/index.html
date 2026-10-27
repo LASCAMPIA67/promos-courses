@@ -131,6 +131,20 @@
           </div>
           <ul id="liste-caddie" class="liste"></ul>
         </section>
+
+        <!-- Les tickets de caisse : les derniers ici, tous dans « Voir les tickets » -->
+        <section aria-labelledby="titre-tickets">
+          <div class="titre-section">
+            <h2 id="titre-tickets">Tickets de caisse</h2>
+            <button type="button" id="ajouter-ticket" class="lien" aria-label="Ajouter un ticket de caisse">
+              + Ajouter
+            </button>
+          </div>
+          <ul id="liste-tickets" class="liste"></ul>
+          <button type="button" id="voir-tickets" class="lien voir-tickets" hidden></button>
+        </section>
+        <!-- Photo, capture d'écran (photothèque) ou PDF (Fichiers) : l'iPhone propose les trois. -->
+        <input type="file" id="fichier-ticket" class="cache" accept="image/*,application/pdf" tabindex="-1" />
       </main>
 
       <footer class="pied discret">
@@ -141,6 +155,9 @@
       <div id="annulation" class="annulation" role="status" hidden>
         <span id="texte-annulation"></span>
         <button type="button" id="bouton-annuler" class="lien">Annuler</button>
+        <button type="button" id="fermer-annulation" class="lien fermer-annulation" aria-label="Fermer" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17" /></svg>
+        </button>
       </div>
     </div>
 
@@ -228,6 +245,61 @@
         </div>
         <button type="button" id="deconnexion" class="lien danger">Se déconnecter</button>
       </form>
+    </dialog>
+
+    <!-- Ajouter un ticket de caisse, ou corriger ses informations -->
+    <dialog id="fenetre-ajout-ticket" aria-labelledby="titre-ajout-ticket">
+      <form id="form-ticket" method="dialog" novalidate>
+        <h2 id="titre-ajout-ticket">Nouveau ticket</h2>
+        <div id="apercu-ticket" class="apercu-ticket"></div>
+        <fieldset class="choix-magasin">
+          <legend>Magasin</legend>
+          <label><input type="radio" name="magasin" value="leclerc" /><span>Leclerc</span></label>
+          <label><input type="radio" name="magasin" value="lidl" /><span>Lidl</span></label>
+          <label><input type="radio" name="magasin" value="autre" /><span>Autre</span></label>
+        </fieldset>
+        <label for="date-ticket">Date des courses</label>
+        <input id="date-ticket" type="date" required />
+        <label for="montant-ticket">Montant <span class="discret">(facultatif)</span></label>
+        <input id="montant-ticket" inputmode="decimal" maxlength="10" placeholder="54,30" autocomplete="off" />
+        <label for="note-ticket">Note <span class="discret">(facultatif)</span></label>
+        <input id="note-ticket" maxlength="200" placeholder="Ex. : garantie de la cafetière" />
+        <p id="message-ticket" class="message" role="alert" hidden></p>
+        <div class="actions">
+          <button type="button" class="bouton" data-fermer>Annuler</button>
+          <button type="submit" id="enregistrer-ticket" class="bouton principal">Enregistrer</button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- Un ticket de caisse, en grand -->
+    <dialog id="fenetre-ticket" class="fenetre-ticket" aria-labelledby="titre-ticket">
+      <div class="entete-fenetre">
+        <div>
+          <h2 id="titre-ticket">Ticket</h2>
+          <p id="infos-ticket" class="discret"></p>
+        </div>
+        <button type="button" class="bouton-icone" data-fermer aria-label="Fermer">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+        </button>
+      </div>
+      <div id="fichier-affiche" class="fichier-affiche" aria-live="polite"></div>
+      <div class="actions-ticket">
+        <button type="button" id="partager-ticket" class="bouton">Partager</button>
+        <button type="button" id="modifier-ticket" class="bouton">Modifier</button>
+        <button type="button" id="supprimer-ticket" class="lien danger">Supprimer</button>
+      </div>
+    </dialog>
+
+    <!-- Tous les tickets, par mois -->
+    <dialog id="fenetre-tickets" class="fenetre-promos" aria-labelledby="titre-tous-tickets">
+      <div class="entete-fenetre">
+        <h2 id="titre-tous-tickets">Tickets de caisse</h2>
+        <button type="button" class="bouton-icone" data-fermer aria-label="Fermer">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+        </button>
+      </div>
+      <div id="tous-les-tickets" class="tous-les-tickets"></div>
     </dialog>
 
     <!-- Confirmation -->

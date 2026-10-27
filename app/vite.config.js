@@ -50,9 +50,17 @@ export default defineConfig({
         clientsClaim: true,
         navigateFallback: "index.html",
         globPatterns: ["**/*.{js,css,html,png,svg,webmanifest}"],
+        // PDF.js (pour voir les tickets en PDF, 1,7 Mo) n'est pas installé d'avance avec l'appli :
+        // il est téléchargé à la première ouverture d'un PDF, puis gardé (voir ci-dessous).
+        globIgnores: ["**/assets/pdf*"],
         // Les promos : toujours les plus récentes quand il y a du réseau, sinon les dernières lues
         // (au fond du magasin, sans réseau, on les a quand même).
         runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.includes("/assets/pdf"),
+            handler: "CacheFirst",
+            options: { cacheName: "pdf", expiration: { maxEntries: 4 }, cacheableResponse: { statuses: [200] } },
+          },
           {
             urlPattern: new RegExp(`^${URL_PROMOS.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")}$`),
             handler: "NetworkFirst",

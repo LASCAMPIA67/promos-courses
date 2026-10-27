@@ -117,6 +117,9 @@ Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
 - **Caddie** : un article coché passe dans « Dans le caddie » ; « Tout retirer » vide le caddie.
 - **Supprimer d'un geste** : glisser un article vers la gauche, comme dans Mail sur l'iPhone
   (avec « Annuler » en cas d'erreur).
+- **Tickets de caisse** : en photo, en capture d'écran ou en PDF (celui de l'appli E.Leclerc ou
+  Lidl Plus), gardés en bas de la liste avec le magasin, la date et le montant ; on les ouvre en
+  grand, on les partage. Privés, comme la liste, et jamais dans ce dépôt.
 - **Marche sans réseau** (au fond du magasin) : les changements partent au retour du réseau.
 - **Privée** : seuls nos deux comptes peuvent s'y connecter.
 - **Installable sur l'iPhone**, sans App Store : icône sur l'écran d'accueil, plein écran, mises à

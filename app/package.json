@@ -1,7 +1,7 @@
 {
   "name": "promos-courses-appli",
   "private": true,
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Appli web (iPhone) : liste de courses commune et promos de nos magasins.",
   "type": "module",
   "scripts": {
@@ -16,7 +16,8 @@
     "captures": "CAPTURES=1 firebase emulators:exec --config ../firebase/firebase.json --only auth,firestore --project demo-promos-courses \"playwright test e2e/captures.spec.js\""
   },
   "dependencies": {
-    "firebase": "^13.1.0"
+    "firebase": "^13.1.0",
+    "pdfjs-dist": "^6.4.299"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
