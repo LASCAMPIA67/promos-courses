@@ -9,7 +9,7 @@ GitHub Pages à l'adresse :
 Seuls nos deux comptes peuvent s'y connecter et voir la liste (voir
 [liste-commune.md](liste-commune.md)).
 
-| Connexion | Liste | Promos d'un article | Toutes les promos | Modifier un article | Mode sombre |
+| Connexion | Liste | Promos d'un article | En écrivant un article | Modifier un article | Mode sombre |
 |---|---|---|---|---|---|
 | ![Écran de connexion](captures/connexion.png) | ![Liste de courses avec les articles en promo](captures/liste.png) | ![Les promos du lait chez Lidl et Leclerc](captures/promos.png) | ![Recherche « lait » dans toutes les promos](captures/recherche.png) | ![Modifier un article](captures/modifier.png) | ![Recherche en mode sombre](captures/recherche-sombre.png) |
 
@@ -36,7 +36,7 @@ Les captures sont faites avec des promos d'exemple.
 - **Sans réseau** (au fond du magasin) : tout continue de marcher ; un bandeau jaune le signale et
   les changements partent dès que le réseau revient.
 - **Voir les promos** de chaque article (voir ci-dessous).
-- **Chercher dans toutes les promos** et en ajouter une à la liste (onglet « Promos », voir ci-dessous).
+- **Voir les promos en écrivant** un article, et en ajouter une à la liste d'un geste (voir ci-dessous).
 - **S'installer sur l'iPhone** : dans Safari, un encadré vert explique comment l'ajouter à l'écran
   d'accueil (« Plus tard » le cache pour 14 jours). Voir [installation-iphone.md](installation-iphone.md).
 - **Se mettre à jour toute seule** : à chaque ouverture, elle vérifie si une nouvelle version est
@@ -51,25 +51,39 @@ Lingolsheim et d'E.Leclerc Geispolsheim. L'appli lit ce fichier et le compare à
 - un article **à acheter** qui est en promo porte une étiquette orange **« 2 promos »**, et le haut de
   l'écran indique combien d'articles sont en promo ;
 - en touchant l'étiquette, on voit **chaque promo** : le magasin (Lidl en jaune, Leclerc en bleu), le
-  produit et sa marque, le prix, l'ancien prix barré, la réduction (« -50 % sur le 2e »,
-  « 30 % en Ticket E.Leclerc »…), le prix au kilo ou au litre, le prix si on prend le lot, la carte de
-  fidélité éventuelle, et **jusqu'à quand** elle dure ; les promos **à venir** (catalogue de la semaine
-  suivante) sont en bleu avec « À partir du… » ; le lien « Voir dans le catalogue » ouvre le catalogue
-  officiel ;
+  produit et sa marque, l'essentiel de sa description (« 272 g · Goût nature… », sans les prix
+  répétés), le prix et le prix au kilo, **jusqu'à quand** elle dure, et **où va la réduction** (voir
+  ci-dessous) ; les promos **à venir** (catalogue de la semaine suivante) sont en bleu avec « À partir
+  du… » ; le lien « Voir dans le catalogue » ouvre le catalogue officiel ;
 - les promos les plus proches de l'article viennent d'abord : pour « Lait », « Lait demi-écrémé »
-  passe avant « Chocolat au lait ».
+  passe avant « Chocolat au lait » ; à pertinence égale, **Leclerc passe avant Lidl** (notre magasin
+  principal).
 
-### Chercher dans toutes les promos (onglet « Promos »)
+### Comprendre le prix : où va la réduction
 
-La barre en bas de l'écran passe de la **Liste** aux **Promos**. L'onglet « Promos » montre toutes
-les promos en cours et à venir des deux magasins :
+Sous le prix, un encadré de couleur dit en clair comment marche la réduction :
 
-- **chercher** : les résultats s'affichent pendant qu'on tape, et le début d'un mot suffit
-  (« fro » trouve « Fromage », « nute » trouve les produits Nutella) ; les mots entiers passent
-  d'abord (« lait » montre « Lait demi-écrémé » avant « Laitue ») ;
-- **filtrer** par magasin : **Tous**, **Lidl** ou **Leclerc** ;
-- **ajouter à la liste** : le bouton « + Ajouter à la liste » ajoute le produit, avec une **note**
-  qui rappelle le magasin, le prix et la date (« Promo Lidl : 0,89 € · Jusqu'au samedi 31 octobre ») ;
+| Encadré | Ce que ça veut dire | Exemple |
+|---|---|---|
+| 🟩 **Réduction en caisse** | Le prix affiché est déjà réduit ; l'ancien prix est barré. | « -15 %, déjà déduit du prix affiché. » |
+| 🟩 **En prenant plusieurs** | Le gros prix est celui d'un seul ; la réduction se fait en caisse en prenant le lot. | « -50 % sur le 2e : 9,18 € les 2 (0,77 €/L), en caisse. » |
+| 🟦 **Sur la carte E.Leclerc** | Ticket E.Leclerc : on paie le prix affiché en caisse ; une partie revient sur la carte, à dépenser plus tard. | « 0,70 € (30 %) reviennent sur la carte E.Leclerc, à dépenser plus tard : revient à 1,65 €. » |
+| 🟦 **Avec la carte E.Leclerc** | Réduction en caisse, réservée aux porteurs de la carte. | « -25 %, déjà déduit du prix affiché, sur présentation de la carte. » |
+| 🟨 **Avec l'appli Lidl Plus** | Le prix affiché est celui avec l'appli Lidl Plus, à scanner en caisse. | « Prix avec l'appli Lidl Plus, à scanner en caisse (sans l'appli : 2,49 €). » |
+
+Sans encadré : c'est le prix du catalogue, sans réduction particulière.
+
+### Les promos en écrivant un article
+
+Dès 2 lettres écrites dans « Ajouter un article… », les promos qui correspondent s'affichent sous
+le champ, à la place de la liste (la croix ✕ efface et fait revenir la liste) :
+
+- les résultats suivent ce qu'on tape, et le début d'un mot suffit (« fro » trouve « Fromage »,
+  « nute » trouve les produits Nutella) ; les mots entiers passent d'abord (« lait » montre « Lait
+  demi-écrémé » avant « Laitue »), et Leclerc avant Lidl ;
+- **« + »** ou **« OK »** sur le clavier ajoute ce qu'on a écrit, **qu'il y ait des promos ou non** ;
+- le bouton **« + Ajouter à la liste »** d'une promo ajoute ce produit-là, avec une **note** qui
+  rappelle le magasin, le prix et la date (« Promo Lidl : 0,89 € · Jusqu'au samedi 31 octobre ») ;
   s'il est déjà dans la liste, le bouton l'indique (« ✓ Dans la liste ») ;
 - les promos s'affichent par 30 ; « Voir plus de promos » montre les suivantes.
 
@@ -146,8 +160,8 @@ que dans Firebase.
 
 | Tests | Ce qu'ils vérifient | Commande |
 |---|---|---|
-| Logique ([`app/tests`](../app/tests)) | Nettoyage des saisies, doublons, tri, messages d'erreur ; recherche des promos (accents, pluriel, mots proches, marques, familles de produits, faux amis, début de mot, filtre par magasin), article créé depuis une promo, promos terminées ou à venir, dates, prix, fraîcheur des données ; quand proposer l'installation. | `npm test` |
-| Scénarios réels ([`app/e2e`](../app/e2e)) | Un navigateur à la taille d'un iPhone utilise l'appli branchée sur l'**émulateur Firebase** (jamais la vraie base), avec deux comptes et un [fichier de promos d'exemple](../app/e2e/promos-exemple.js) aux dates du jour : connexion refusée, ajout, doublon, cochage, modification, suppression, synchronisation en direct entre deux téléphones, mode hors connexion, refus d'un compte étranger, déconnexion, étiquettes et détail des promos, promos anciennes ou incomplètes, promos indisponibles puis retrouvées, conseil d'installation dans Safari sur iPhone, glisser pour supprimer avec « Annuler », « Chips » qui trouve Pringles, recherche dans toutes les promos (filtre, ajout à la liste, affichage par 30). Sur GitHub, ils tournent dans Chrome **et Safari** (WebKit). | `npm run e2e` |
+| Logique ([`app/tests`](../app/tests)) | Nettoyage des saisies, doublons, tri, messages d'erreur ; recherche des promos (accents, pluriel, mots proches, marques, familles de produits, faux amis, début de mot, filtre par magasin), article créé depuis une promo, où va la réduction (caisse, lot, carte E.Leclerc, Lidl Plus), description sans les prix répétés, Leclerc d'abord, promos terminées ou à venir, dates, prix, fraîcheur des données ; quand proposer l'installation. | `npm test` |
+| Scénarios réels ([`app/e2e`](../app/e2e)) | Un navigateur à la taille d'un iPhone utilise l'appli branchée sur l'**émulateur Firebase** (jamais la vraie base), avec deux comptes et un [fichier de promos d'exemple](../app/e2e/promos-exemple.js) aux dates du jour : connexion refusée, ajout, doublon, cochage, modification, suppression, synchronisation en direct entre deux téléphones, mode hors connexion, refus d'un compte étranger, déconnexion, étiquettes et détail des promos, promos anciennes ou incomplètes, promos indisponibles puis retrouvées, conseil d'installation dans Safari sur iPhone, glisser pour supprimer avec « Annuler », « Chips » qui trouve Pringles, promos affichées en écrivant (Leclerc d'abord, ajout d'une promo ou du texte écrit, affichage par 30), prix expliqué (carte E.Leclerc, Lidl Plus). Sur GitHub, ils tournent dans Chrome **et Safari** (WebKit). | `npm run e2e` |
 | Captures d'écran | Régénère les images de cette page dans `docs/captures/`. | `npm run captures` |
 
 Commandes à lancer dans le dossier `app/` (Node.js 22 et Java 21 nécessaires), après `npm ci`.

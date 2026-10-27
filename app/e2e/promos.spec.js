@@ -28,28 +28,34 @@ test("les articles en promo sont signalés, avec le détail de chaque promo", as
   await expect(page.getByRole("button", { name: "Voir 1 promo pour Laitue" })).toBeVisible();
   await expect(page.locator("#resume")).toHaveText("3 articles à acheter · 2 en promo");
 
-  // Le détail : les plus proches d'abord, en cours avant à venir.
+  // Le détail : les plus proches d'abord, Leclerc avant Lidl.
   await page.getByRole("button", { name: "Voir 3 promos pour Lait" }).click();
   const fenetre = page.getByRole("dialog", { name: "Promos pour « Lait »" });
   await expect(fenetre).toBeVisible();
-  await expect(fenetre.locator("#resume-promos")).toHaveText("3 promos : 1 chez Lidl, 2 chez Leclerc");
-  await expect(fenetre.locator(".promo-nom")).toHaveText(["Lait demi-écrémé", "Lait demi-écrémé UHT", "Chocolat au lait"]);
+  await expect(fenetre.locator("#resume-promos")).toHaveText("3 promos : 2 chez Leclerc, 1 chez Lidl");
+  await expect(fenetre.locator(".promo-nom")).toHaveText(["Lait demi-écrémé UHT LACTEL", "Lait demi-écrémé MILSANI", "Chocolat au lait CÔTE D'OR"]);
 
-  const lidl = fenetre.locator(".promo").nth(0);
-  await expect(lidl.locator(".enseigne")).toHaveText("Lidl");
-  await expect(lidl.locator(".prix")).toHaveText("0,89 €");
-  await expect(lidl.locator(".ancien-prix")).toHaveText("1,05 €");
-  await expect(lidl.locator(".reduction")).toHaveText("-15 %");
-  await expect(lidl.locator(".periode")).toContainText("Jusqu'au");
-
-  const aVenir = fenetre.locator(".promo").nth(1);
+  // Leclerc, à venir, en lot : prix à l'unité, et le prix en prenant les 2.
+  const aVenir = fenetre.locator(".promo").nth(0);
   await expect(aVenir.locator(".enseigne")).toHaveText("Leclerc");
   await expect(aVenir.locator(".periode")).toContainText("À partir du");
-  await expect(aVenir.locator(".promo-infos")).toHaveText("1,02 €/L · Par 2 : 9,18 € (0,77 €/L)");
+  await expect(aVenir.locator(".promo-description")).toHaveText("6 x 1 L");
+  await expect(aVenir.locator(".promo-prix")).toHaveText("6,12 €l'unité1,02 €/L");
+  await expect(aVenir.locator(".avantage")).toHaveText(
+    "En prenant plusieurs-50 % sur le 2e : 9,18 € les 2 (0,77 €/L), en caisse.",
+  );
   await expect(aVenir.getByRole("link", { name: "Voir dans le catalogue" })).toHaveAttribute(
     "href",
     "https://exemple.test/catalogue/lait-leclerc",
   );
+
+  // Lidl, réduction immédiate : ancien prix barré, déjà déduit en caisse.
+  const lidl = fenetre.locator(".promo").nth(1);
+  await expect(lidl.locator(".enseigne")).toHaveText("Lidl");
+  await expect(lidl.locator(".prix")).toHaveText("0,89 €");
+  await expect(lidl.locator(".ancien-prix")).toHaveText("1,05 €");
+  await expect(lidl.locator(".avantage")).toHaveText("Réduction en caisse-15 %, déjà déduit du prix affiché.");
+  await expect(lidl.locator(".periode")).toContainText("Jusqu'au");
 
   await fenetre.getByRole("button", { name: "Fermer" }).click();
   await expect(fenetre).toBeHidden();
@@ -59,6 +65,28 @@ test("les articles en promo sont signalés, avec le détail de chaque promo", as
   await expect(caddie(page)).toContainText("Laitue");
   await expect(caddie(page).locator(".bouton-promos")).toHaveCount(0);
   await expect(page.locator("#resume")).toHaveText("2 articles à acheter · 1 en promo");
+});
+
+test("le prix dit clairement où va la réduction : carte E.Leclerc ou Lidl Plus", async ({ page, context }) => {
+  await servirPromos(context);
+  await seConnecter(page, COMPTES.un);
+  await ajouter(page, "Pain complet");
+  await ajouter(page, "Bananes");
+
+  await page.getByRole("button", { name: "Voir 1 promo pour Pain complet" }).click();
+  const pain = page.getByRole("dialog", { name: "Promos pour « Pain complet »" }).locator(".promo");
+  await expect(pain.locator(".promo-prix")).toHaveText("2,35 €en caisse");
+  await expect(pain.locator(".avantage")).toHaveText(
+    "Sur la carte E.Leclerc0,70 € (30 %) reviennent sur la carte E.Leclerc, à dépenser plus tard : revient à 1,65 € (3,30 €/kg).",
+  );
+  await page.getByRole("button", { name: "Fermer" }).click();
+
+  await page.getByRole("button", { name: "Voir 1 promo pour Bananes" }).click();
+  const bananes = page.getByRole("dialog", { name: "Promos pour « Bananes »" }).locator(".promo");
+  await expect(bananes.locator(".promo-prix")).toHaveText("1,29 €avec Lidl Plus");
+  await expect(bananes.locator(".avantage")).toHaveText(
+    "Avec l'appli Lidl PlusPrix avec l'appli Lidl Plus, à scanner en caisse (sans l'appli : 1,69 €).",
+  );
 });
 
 test("« Chips » trouve aussi les marques de chips, comme Pringles", async ({ page, context }) => {

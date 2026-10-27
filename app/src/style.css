@@ -114,11 +114,6 @@ textarea {
   padding: 0 16px calc(24px + env(safe-area-inset-bottom));
 }
 
-/* Place pour la barre d'onglets en bas de l'écran. */
-#appli {
-  padding-bottom: calc(96px + env(safe-area-inset-bottom));
-}
-
 .ecran-centre {
   min-height: 100dvh;
   display: grid;
@@ -360,6 +355,37 @@ svg {
 
 .ajout input {
   background: var(--surface);
+}
+
+.champ-ajout {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.champ-ajout input {
+  padding-right: 42px;
+}
+
+.effacer {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--discret);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.effacer svg {
+  width: 18px;
+  height: 18px;
 }
 
 .ajout .quantite {
@@ -718,10 +744,11 @@ dialog h2 {
 
 .promo-marque {
   color: var(--discret);
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.03em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .promo-description {
@@ -742,26 +769,56 @@ dialog h2 {
 }
 
 .prix {
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 750;
 }
 
-.ancien-prix {
+.mention,
+.ancien-prix,
+.prix-unitaire {
   color: var(--discret);
+  font-size: 0.9rem;
 }
 
-.reduction {
-  align-self: center;
-  padding: 2px 8px;
-  border-radius: 6px;
-  background: var(--promo-doux);
-  color: var(--promo);
-  font-size: 0.85rem;
-  font-weight: 650;
+/* L'encadré qui dit où va la réduction : en caisse (vert), sur la carte E.Leclerc (bleu),
+   avec l'appli Lidl Plus (jaune). */
+.avantage {
+  display: grid;
+  gap: 1px;
+  margin-top: 4px !important;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border-left: 4px solid var(--accent);
+  background: var(--accent-doux);
+  font-size: 0.9rem;
 }
 
-.promo-infos {
-  font-size: 0.88rem;
+.avantage-titre {
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--accent-fonce);
+}
+
+.avantage[data-genre="carte-leclerc"],
+.avantage[data-genre="carte-caisse"] {
+  border-left-color: #0066b3;
+  background: var(--info-doux);
+}
+
+.avantage[data-genre="carte-leclerc"] .avantage-titre,
+.avantage[data-genre="carte-caisse"] .avantage-titre {
+  color: var(--info);
+}
+
+.avantage[data-genre="lidl-plus"] {
+  border-left-color: #ffd500;
+  background: var(--attention-doux);
+}
+
+.avantage[data-genre="lidl-plus"] .avantage-titre {
+  color: var(--attention);
 }
 
 .promo-actions {
@@ -778,6 +835,12 @@ dialog h2 {
   font-size: 0.9rem;
   font-weight: 600;
   text-decoration: none;
+}
+
+.note-promos {
+  padding: 12px 20px calc(18px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--bordure);
+  font-size: 0.8rem;
 }
 
 .bouton-ajouter {
@@ -803,50 +866,10 @@ dialog h2 {
 }
 
 /* ------------------------------------------------------------------------------------------ */
-/* Onglet « Promos » : recherche */
+/* Les promos trouvées pendant qu'on écrit un article */
 
-.recherche {
-  position: relative;
-  margin: 4px 0 10px;
-}
-
-.recherche svg {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--discret);
-  pointer-events: none;
-}
-
-.recherche input {
-  padding-left: 44px;
-  background: var(--surface);
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-.filtres {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.filtre {
-  min-height: 38px;
-  padding: 6px 16px;
-  border: 1px solid var(--bordure);
-  border-radius: 999px;
-  background: var(--surface);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.filtre[aria-pressed="true"] {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--sur-accent);
+.suggestions {
+  margin-top: 8px;
 }
 
 .etat-recherche {
@@ -865,12 +888,12 @@ dialog h2 {
   display: none;
 }
 
-/* « Article supprimé. Annuler », juste au-dessus des onglets. */
+/* « Article supprimé. Annuler », en bas de l'écran. */
 .annulation {
   position: fixed;
   left: 16px;
   right: 16px;
-  bottom: calc(76px + env(safe-area-inset-bottom));
+  bottom: calc(16px + env(safe-area-inset-bottom));
   z-index: 4;
   max-width: 608px;
   margin: 0 auto;
@@ -889,53 +912,6 @@ dialog h2 {
 .annulation .lien {
   color: var(--accent-doux);
   padding: 10px 8px;
-}
-
-/* ------------------------------------------------------------------------------------------ */
-/* Barre d'onglets, en bas de l'écran */
-
-.onglets {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 3;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  padding: 6px max(16px, calc((100% - 640px) / 2)) calc(6px + env(safe-area-inset-bottom));
-  background: color-mix(in srgb, var(--fond) 88%, transparent);
-  backdrop-filter: saturate(1.4) blur(14px);
-  -webkit-backdrop-filter: saturate(1.4) blur(14px);
-  border-top: 1px solid var(--bordure);
-}
-
-.onglet {
-  display: grid;
-  justify-items: center;
-  gap: 2px;
-  min-height: 50px;
-  padding: 4px;
-  border: 0;
-  background: none;
-  color: var(--discret);
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.onglet svg {
-  width: 26px;
-  height: 26px;
-}
-
-.onglet[aria-current="page"] {
-  color: var(--accent);
-}
-
-.note-promos {
-  padding: 12px 20px calc(18px + env(safe-area-inset-bottom));
-  border-top: 1px solid var(--bordure);
-  font-size: 0.8rem;
 }
 
 @media (prefers-reduced-motion: reduce) {

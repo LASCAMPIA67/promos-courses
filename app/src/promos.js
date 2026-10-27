@@ -9,6 +9,9 @@ export const URL_PROMOS = "https://raw.githubusercontent.com/LASCAMPIA67/promos-
 /** Version du format de promos.json que l'appli sait lire (voir docs/format-promos.md). */
 export const FORMAT = 2;
 
+/** Notre magasin principal : à pertinence égale, ses promos passent avant les autres. */
+export const MAGASIN_PRINCIPAL = "leclerc";
+
 /** Le robot passe chaque matin : au-delà de ce délai, il a manqué au moins un passage. */
 export const HEURES_AVANT_ALERTE = 36;
 
@@ -124,10 +127,13 @@ function toutes(index, aujourdhui) {
   return (index ?? [])
     .filter(({ offre }) => !offre.date_fin || offre.date_fin >= aujourdhui)
     .map(({ offre }) => ({ offre, aVenir: Boolean(offre.date_debut && offre.date_debut > aujourdhui) }))
-    .sort((a, b) => Number(a.aVenir) - Number(b.aVenir));
+    .sort((a, b) => Number(a.aVenir) - Number(b.aVenir) || secondaire(a.offre) - secondaire(b.offre));
 }
 
 const egal = (motCherche, mot) => mot === motCherche;
+
+/** 0 pour le magasin principal (Leclerc), 1 pour les autres. */
+const secondaire = (offre) => Number(offre.source !== MAGASIN_PRINCIPAL);
 
 function trouver(index, motsCherches, aujourdhui, correspond) {
   const groupes = regrouper(motsCherches);
@@ -163,9 +169,13 @@ function trouver(index, motsCherches, aujourdhui, correspond) {
       longueur: motsProduit.length,
     });
   }
+  // Les plus proches d'abord ; à pertinence égale (nom qui commence par l'article, ou pas), Leclerc
+  // avant Lidl.
   trouvees.sort(
     (a, b) =>
       Number(a.parFamille) - Number(b.parFamille) ||
+      Number(a.position > 0) - Number(b.position > 0) ||
+      secondaire(a.offre) - secondaire(b.offre) ||
       a.position - b.position ||
       Number(b.exact) - Number(a.exact) ||
       Number(a.aVenir) - Number(b.aVenir) ||
@@ -315,21 +325,114 @@ export function enseigne(offre) {
   return ENSEIGNES[offre.source] ?? offre.source;
 }
 
-/** Détails utiles pour comparer : prix au kilo, prix par lot, carte de fidélité. */
-export function infosPromo(offre) {
-  const infos = [];
-  if (offre.prix_unitaire != null && offre.unite && !(offre.unite === "pièce" && offre.prix_unitaire === offre.prix)) {
-    infos.push(formaterPrixUnitaire(offre.prix_unitaire, offre.unite));
+/**
+ * Comment marche le prix d'une promo, en clair : ce qu'on paie en caisse et où va la réduction.
+ * Renvoie { genre, prix, mention, barre, avantage } :
+ * - genre : « caisse » (déjà déduit en caisse), « lot » (en caisse, en prenant plusieurs),
+ *   « carte-leclerc » (crédité sur la carte E.Leclerc), « carte-caisse » (en caisse avec la carte
+ *   E.Leclerc), « lidl-plus » (avec l'appli Lidl Plus) ou « aucun » (prix du catalogue) ;
+ * - prix : le prix à afficher en gros, et mention : ce qu'il représente (« en caisse »…) ;
+ * - barre : l'ancien prix à barrer, ou null ; unitaire : le prix au kilo qui va avec le gros prix ;
+ * - avantage : la phrase qui explique la réduction, ou null.
+ */
+export function explicationPrix(offre) {
+  const reduction = (offre.reduction ?? "").replace(/\s*avec Lidl Plus$/i, "");
+  const euros = (montant) => (montant == null ? null : formaterPrix(montant));
+  // Prix du lot, sauf s'il est douteux (« -50 % sur le 2e » au même prix qu'un seul : erreur du catalogue).
+  const lotFiable = offre.lot?.prix != null && (offre.prix == null || offre.lot.prix > offre.prix || /offert/i.test(reduction));
+  const auKiloDuLot =
+    lotFiable && offre.lot.prix_unitaire != null && offre.unite && offre.unite !== "pièce"
+      ? ` (${formaterPrixUnitaire(offre.lot.prix_unitaire, offre.unite)})`
+      : "";
+  const lot = lotFiable ? `${euros(offre.lot.prix)} les ${offre.lot.quantite}${auKiloDuLot}` : null;
+
+  if (/ticket/i.test(reduction)) {
+    // Le robot donne le prix une fois le Ticket déduit, et le prix payé en caisse en « ancien prix ».
+    const enCaisse = offre.ancien_prix ?? offre.prix;
+    const rendu = offre.ancien_prix != null && offre.prix != null ? offre.ancien_prix - offre.prix : null;
+    const detail = reduction.replace(/\s*en Ticket E\.Leclerc/i, "");
+    // Le prix au kilo du robot est celui une fois le Ticket déduit : on le met avec ce prix-là.
+    const auKilo = prixUnitaire(offre) ? ` (${prixUnitaire(offre)})` : "";
+    return {
+      genre: "carte-leclerc",
+      prix: euros(enCaisse),
+      mention: enCaisse != null ? "en caisse" : null,
+      barre: null,
+      unitaire: null,
+      avantage:
+        rendu != null
+          ? `${euros(rendu)} (${detail}) reviennent sur la carte E.Leclerc, à dépenser plus tard : revient à ${euros(offre.prix)}${auKilo}.`
+          : `${detail} reviennent sur la carte E.Leclerc (Ticket E.Leclerc), à dépenser plus tard.`,
+    };
+  }
+  if (offre.source === "lidl" && offre.carte_fidelite) {
+    return {
+      genre: "lidl-plus",
+      prix: euros(offre.prix),
+      mention: offre.lot ? "l'unité" : "avec Lidl Plus",
+      barre: null,
+      unitaire: prixUnitaire(offre),
+      avantage: offre.lot
+        ? `Avec l'appli Lidl Plus, ${reduction} : ${lot}.`
+        : `Prix avec l'appli Lidl Plus, à scanner en caisse${offre.ancien_prix != null ? ` (sans l'appli : ${euros(offre.ancien_prix)})` : ""}.`,
+    };
   }
   if (offre.lot) {
-    const { quantite, prix, prix_unitaire: prixUnitaire } = offre.lot;
-    const auKilo = offre.unite && offre.unite !== "pièce" ? ` (${formaterPrixUnitaire(prixUnitaire, offre.unite)})` : "";
-    infos.push(`Par ${quantite} : ${formaterPrix(prix)}${auKilo}`);
+    return {
+      genre: offre.carte_fidelite ? "carte-caisse" : "lot",
+      prix: euros(offre.prix),
+      mention: offre.prix != null ? "l'unité" : null,
+      barre: null,
+      unitaire: prixUnitaire(offre),
+      avantage: `${reduction}${lot ? ` : ${lot}` : ""}, en caisse${offre.carte_fidelite ? ", sur présentation de la carte" : ""}.`,
+    };
   }
-  if (offre.carte_fidelite && !/lidl plus|ticket/i.test(offre.reduction ?? "")) {
-    infos.push(offre.source === "lidl" ? "avec Lidl Plus" : "avec la carte E.Leclerc");
+  if (offre.ancien_prix != null || reduction) {
+    const carte = offre.carte_fidelite;
+    return {
+      genre: carte ? "carte-caisse" : "caisse",
+      prix: euros(offre.prix),
+      mention: offre.prix != null ? "en caisse" : null,
+      barre: euros(offre.ancien_prix),
+      unitaire: prixUnitaire(offre),
+      avantage: `${reduction ? `${reduction}, d` : "D"}éjà déduit du prix affiché${carte ? ", sur présentation de la carte" : ""}.`,
+    };
   }
-  return infos;
+  return { genre: "aucun", prix: euros(offre.prix), mention: null, barre: null, unitaire: prixUnitaire(offre), avantage: null };
+}
+
+/**
+ * La description d'une promo sans ce qui répète le prix (prix au kilo, « Par 2 : … », « au lieu
+ * de … ») : « 4 tranches. 140 g.Le kg : 11,36 €.Par 2 (280 g) : 2,38 € au lieu de 3,18 € » →
+ * « 4 tranches · 140 g ».
+ */
+export function resumeDescription(texte) {
+  const PRIX = String.raw`\d+(?:[.,]\d+)?\s*€`;
+  return String(texte ?? "")
+    .replace(/\([^()]*€[^()]*\)/g, " · ") // « (1 kg = 7,96 €) »
+    .replace(new RegExp(String.raw`(?:avec Lidl Plus\s+)?au lieu de\s*${PRIX}?`, "gi"), " · ")
+    .replace(new RegExp(String.raw`\bLes\s+\d+\s+produits?(?:\s+dont\s+\d+\s+offerts?)?\s*:\s*${PRIX}`, "gi"), " · ")
+    .replace(new RegExp(String.raw`\bPar\s+\d+\s*(?:\([^)]*\))?\s*:\s*${PRIX}`, "gi"), " · ")
+    .replace(new RegExp(String.raw`\bL[ea]\s+(?:kg|L|litre|pièce)\s*:\s*${PRIX}`, "gi"), " · ")
+    .replace(/\bLe produit de\s+/gi, "")
+    .replace(new RegExp(String.raw`\s*:\s*${PRIX}`, "g"), " · ")
+    .replace(/(?:Même promotion disponible|[EÉ]galement disponible)[^.]*\.?/gi, " · ")
+    .replace(/avec Lidl Plus/gi, " · ")
+    .replace(/(?<!\d)\.\s*(?=\d)/g, " · ") // « 4 tranches. 140 g » → « 4 tranches · 140 g », mais pas « 1.98 L »
+    .replace(/\s*\.?\s*(?:·\s*)+/g, " · ")
+    .replace(/\s+/g, " ")
+    .replace(/^[\s·.,;:]+|[\s·,;:]+$/g, "")
+    .replace(/\.$/, "");
+}
+
+/**
+ * Le prix au kilo, au litre…, pour comparer (« 9,43 €/kg ») ; rien s'il est égal au prix (produit
+ * vendu au kilo ou à la pièce : il n'apprendrait rien).
+ */
+export function prixUnitaire(offre) {
+  const { prix_unitaire: montant, unite, prix } = offre;
+  if (montant == null || !unite || montant === prix) return null;
+  return formaterPrixUnitaire(montant, unite);
 }
 
 /** « 3 promos : 2 chez Lidl, 1 chez Leclerc ». */

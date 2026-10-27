@@ -42,113 +42,88 @@
       </div>
     </main>
 
-    <!-- L'appli : deux onglets, la liste de courses et toutes les promos -->
+    <!-- La liste de courses, et les promos trouvées pendant qu'on tape -->
     <div id="appli" class="ecran" hidden>
-      <div id="vue-liste">
-        <header class="entete">
-          <div>
-            <h1>Liste de courses</h1>
-            <p id="resume" class="discret" aria-live="polite"></p>
-          </div>
-          <button type="button" id="bouton-compte" class="bouton-icone" aria-label="Mon compte">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" /></svg>
-          </button>
-        </header>
-
-        <p id="bandeau" class="bandeau" role="status" hidden></p>
-
-        <aside id="conseil-installation" class="conseil" aria-labelledby="titre-conseil" hidden>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3" /><path d="M12 7v7M9 11l3 3 3-3" /></svg>
-          <div>
-            <p id="titre-conseil" class="conseil-titre">Installez l'appli sur l'iPhone</p>
-            <p>
-              Dans Safari, touchez le bouton <strong>Partager</strong> (ou <strong>···</strong> puis Partager), puis
-              <strong>« Sur l'écran d'accueil »</strong>.
-              <a href="https://github.com/lascampia67/promos-courses/blob/main/docs/installation-iphone.md" target="_blank" rel="noopener noreferrer">Voir le guide</a>
-            </p>
-            <button type="button" id="fermer-conseil" class="lien">Plus tard</button>
-          </div>
-        </aside>
-
-        <form id="form-ajout" class="ajout" autocomplete="off">
-          <label for="ajout-nom" class="cache">Article à ajouter</label>
-          <input id="ajout-nom" placeholder="Ajouter un article…" maxlength="100" enterkeyhint="done" autocapitalize="sentences" />
-          <label for="ajout-quantite" class="cache">Quantité (facultatif)</label>
-          <input id="ajout-quantite" class="quantite" placeholder="Qté" maxlength="30" enterkeyhint="done" />
-          <button type="submit" class="bouton-ajout" aria-label="Ajouter l'article">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
-          </button>
-        </form>
-        <p id="message-ajout" class="message" role="status" hidden></p>
-
-        <main class="contenu">
-          <p id="etat-promos" class="etat-promos" role="status" hidden></p>
-
-          <section aria-labelledby="titre-a-acheter">
-            <h2 id="titre-a-acheter" class="cache">À acheter</h2>
-            <ul id="liste-a-acheter" class="liste"></ul>
-            <div id="liste-vide" class="vide" hidden>
-              <p class="vide-titre">La liste est vide</p>
-              <p class="discret">Ajoutez un article ci-dessus : il apparaîtra aussitôt sur l'autre téléphone.</p>
-            </div>
-          </section>
-
-          <section id="section-caddie" aria-labelledby="titre-caddie" hidden>
-            <div class="titre-section">
-              <h2 id="titre-caddie">Dans le caddie</h2>
-              <button type="button" id="vider-caddie" class="lien">Tout retirer</button>
-            </div>
-            <ul id="liste-caddie" class="liste"></ul>
-          </section>
-        </main>
-
-        <footer class="pied discret">
-          <p id="info-promos"></p>
-          <p>Version <span id="version"></span></p>
-        </footer>
-      </div>
-
-      <!-- Toutes les promos -->
-      <div id="vue-promos" hidden>
-        <header class="entete">
-          <div>
-            <h1>Promos</h1>
-            <p id="resume-catalogue" class="discret"></p>
-          </div>
-        </header>
-
-        <form id="form-recherche" class="recherche" role="search" autocomplete="off">
-          <label for="recherche" class="cache">Chercher une promo</label>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
-          <input id="recherche" type="search" placeholder="Chercher : fromage, café, Nutella…" enterkeyhint="search" autocapitalize="off" />
-        </form>
-
-        <div class="filtres" role="group" aria-label="Magasin">
-          <button type="button" class="filtre" data-magasin="" aria-pressed="true">Tous</button>
-          <button type="button" class="filtre" data-magasin="lidl" aria-pressed="false">Lidl</button>
-          <button type="button" class="filtre" data-magasin="leclerc" aria-pressed="false">Leclerc</button>
+      <header class="entete">
+        <div>
+          <h1>Liste de courses</h1>
+          <p id="resume" class="discret" aria-live="polite"></p>
         </div>
+        <button type="button" id="bouton-compte" class="bouton-icone" aria-label="Mon compte">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" /></svg>
+        </button>
+      </header>
 
+      <p id="bandeau" class="bandeau" role="status" hidden></p>
+
+      <aside id="conseil-installation" class="conseil" aria-labelledby="titre-conseil" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3" /><path d="M12 7v7M9 11l3 3 3-3" /></svg>
+        <div>
+          <p id="titre-conseil" class="conseil-titre">Installez l'appli sur l'iPhone</p>
+          <p>
+            Dans Safari, touchez le bouton <strong>Partager</strong> (ou <strong>···</strong> puis Partager), puis
+            <strong>« Sur l'écran d'accueil »</strong>.
+            <a href="https://github.com/lascampia67/promos-courses/blob/main/docs/installation-iphone.md" target="_blank" rel="noopener noreferrer">Voir le guide</a>
+          </p>
+          <button type="button" id="fermer-conseil" class="lien">Plus tard</button>
+        </div>
+      </aside>
+
+      <form id="form-ajout" class="ajout" autocomplete="off">
+        <label for="ajout-nom" class="cache">Article à ajouter</label>
+        <div class="champ-ajout">
+          <input id="ajout-nom" placeholder="Ajouter un article…" maxlength="100" enterkeyhint="done" autocapitalize="sentences" />
+          <button type="button" id="effacer-saisie" class="effacer" aria-label="Effacer" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17" /></svg>
+          </button>
+        </div>
+        <label for="ajout-quantite" class="cache">Quantité (facultatif)</label>
+        <input id="ajout-quantite" class="quantite" placeholder="Qté" maxlength="30" enterkeyhint="done" />
+        <button type="submit" class="bouton-ajout" aria-label="Ajouter l'article">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+        </button>
+      </form>
+      <p id="message-ajout" class="message" role="status" hidden></p>
+
+      <!-- Pendant qu'on écrit un article : les promos qui correspondent -->
+      <section id="suggestions" class="suggestions" aria-labelledby="titre-suggestions" hidden>
+        <h2 id="titre-suggestions" class="cache">Promos trouvées</h2>
         <p id="etat-recherche" class="etat-recherche discret" role="status"></p>
         <ul id="resultats" class="promos resultats"></ul>
         <button type="button" id="plus-de-resultats" class="bouton large" hidden>Voir plus de promos</button>
-      </div>
+      </section>
+
+      <main id="contenu" class="contenu">
+        <p id="etat-promos" class="etat-promos" role="status" hidden></p>
+
+        <section aria-labelledby="titre-a-acheter">
+          <h2 id="titre-a-acheter" class="cache">À acheter</h2>
+          <ul id="liste-a-acheter" class="liste"></ul>
+          <div id="liste-vide" class="vide" hidden>
+            <p class="vide-titre">La liste est vide</p>
+            <p class="discret">Ajoutez un article ci-dessus : il apparaîtra aussitôt sur l'autre téléphone.</p>
+          </div>
+        </section>
+
+        <section id="section-caddie" aria-labelledby="titre-caddie" hidden>
+          <div class="titre-section">
+            <h2 id="titre-caddie">Dans le caddie</h2>
+            <button type="button" id="vider-caddie" class="lien">Tout retirer</button>
+          </div>
+          <ul id="liste-caddie" class="liste"></ul>
+        </section>
+      </main>
+
+      <footer class="pied discret">
+        <p id="info-promos"></p>
+        <p>Version <span id="version"></span></p>
+      </footer>
 
       <div id="annulation" class="annulation" role="status" hidden>
         <span id="texte-annulation"></span>
         <button type="button" id="bouton-annuler" class="lien">Annuler</button>
       </div>
 
-      <nav class="onglets" aria-label="Sections de l'appli">
-        <button type="button" class="onglet" data-vue="liste" aria-current="page">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11" /><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2" /></svg>
-          Liste
-        </button>
-        <button type="button" class="onglet" data-vue="promos">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z" /><circle cx="7.5" cy="7.5" r="1.2" /></svg>
-          Promos
-        </button>
-      </nav>
     </div>
 
     <!-- Modifier un article -->

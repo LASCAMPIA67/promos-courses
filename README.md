@@ -94,19 +94,21 @@ Le détail (adresses consultées, choix faits, sources écartées) est dans
 Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
 **https://lascampia67.github.io/promos-courses/**
 
-| Liste | Promos d'un article | Toutes les promos | Mode sombre |
+| Liste | Promos d'un article | En écrivant un article | Mode sombre |
 |---|---|---|---|
 | ![Liste de courses avec les articles en promo](docs/captures/liste.png) | ![Les promos du lait chez Lidl et Leclerc](docs/captures/promos.png) | ![Recherche « lait » dans toutes les promos](docs/captures/recherche.png) | ![Mode sombre](docs/captures/liste-sombre.png) |
 
 - **Liste commune** : ce que l'un ajoute, coche ou supprime apparaît aussitôt sur l'autre téléphone.
 - **Promos** : un article en promo chez Lidl ou Leclerc porte une étiquette « 2 promos ». En la
-  touchant, on voit chaque promo : magasin, prix, ancien prix, réduction, prix au kilo, prix par lot,
-  carte de fidélité, et jusqu'à quand (ou à partir de quand, pour les promos à venir).
+  touchant, on voit chaque promo : magasin, prix, prix au kilo, jusqu'à quand (ou à partir de quand)
+  et, en clair, **où va la réduction** : déjà déduite en caisse, en prenant plusieurs, rendue sur la
+  carte E.Leclerc (Ticket E.Leclerc) ou avec l'appli Lidl Plus. **Leclerc d'abord**, notre magasin
+  principal.
 - **Familles de produits** : « Chips » trouve aussi Pringles, Lay's, Doritos… ; « Soda » trouve
   Coca-Cola, Fanta… ; « Couches » trouve Pampers… (environ 50 familles).
-- **Toutes les promos** (onglet « Promos ») : chercher un produit ou une marque pendant qu'on tape,
-  filtrer par magasin, et ajouter une promo à la liste en un geste (avec une note qui rappelle le
-  magasin, le prix et la date).
+- **Les promos en écrivant** : en écrivant un article, les promos qui correspondent s'affichent
+  aussitôt ; « + » ajoute ce qu'on a écrit (même sans promo), ou on ajoute une promo d'un geste (avec
+  une note qui rappelle le magasin, le prix et la date).
 - **Promos à jour** : l'appli prévient si le robot n'est pas passé ou si un magasin manque.
 - **Ajout rapide** avec quantité facultative ; un article déjà dans la liste est signalé.
 - **Caddie** : un article coché passe dans « Dans le caddie » ; « Tout retirer » vide le caddie.
@@ -181,7 +183,7 @@ est décrit par un schéma JSON : [`promos.schema.json`](src/robot_promos/promos
 - **Format vérifié** : avant d'être enregistré, `promos.json` est contrôlé par son schéma JSON.
 - **Tests automatiques** à chaque modification : plus de 50 tests pour le robot (workflow « Tests »),
   15 tests qui vérifient que la liste commune reste réservée à nos deux comptes (« Règles Firebase »),
-  46 tests de logique de l'appli et 15 scénarios réels dans Chrome et Safari, avec deux téléphones
+  55 tests de logique de l'appli et 16 scénarios réels dans Chrome et Safari, avec deux téléphones
   simulés et des promos d'exemple (« Appli »).
   Si un test de l'appli échoue, elle n'est pas publiée.
 - **Alerte** : en cas de problème, un avertissement s'affiche sur la page du lancement (onglet

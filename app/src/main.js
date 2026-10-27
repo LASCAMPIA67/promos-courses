@@ -14,14 +14,14 @@ import {
   chercherPromos,
   dateDuJour,
   enseigne,
-  formaterPrix,
+  explicationPrix,
   indexerPromos,
-  infosPromo,
   joliNom,
   periode,
   phraseSource,
   phrasesFraicheur,
   rechercherPromos,
+  resumeDescription,
   resumePromos,
   sourcesEnDifficulte,
 } from "./promos.js";
@@ -41,8 +41,7 @@ const etat = {
   ligneOuverte: null, // article dont le bouton « Supprimer » est visible (glissé vers la gauche)
   promos: null, // { donnees, index, luesLe }
   promosIndisponibles: false,
-  vue: "liste", // onglet affiché : « liste » ou « promos »
-  recherche: { texte: "", magasin: "", nombre: PROMOS_PAR_PAGE },
+  recherche: { texte: "", nombre: PROMOS_PAR_PAGE }, // promos trouvées pendant qu'on écrit
 };
 
 auth.languageCode = "fr";
@@ -67,7 +66,8 @@ onAuthStateChanged(auth, (utilisateur) => {
   etat.arreterSuivi = null;
   etat.articles = [];
   if (!utilisateur) {
-    afficherVue("liste");
+    $("ajout-nom").value = "";
+    dessinerSuggestions();
     afficherEcran("connexion");
     return;
   }
@@ -226,6 +226,9 @@ $("form-ajout").addEventListener("submit", (evenement) => {
     return;
   }
   const doublon = trouverDoublon(etat.articles, article.nom);
+  $("ajout-nom").value = "";
+  $("ajout-quantite").value = "";
+  dessinerSuggestions(); // la liste réapparaît
   if (doublon) {
     afficherMessage($("message-ajout"), `« ${doublon.nom} » est déjà dans la liste.`, "info");
     surligner(doublon.id);
@@ -234,12 +237,8 @@ $("form-ajout").addEventListener("submit", (evenement) => {
   afficherMessage($("message-ajout"), "");
   // On n'attend pas la réponse du serveur : sans réseau, l'article est gardé et envoyé plus tard.
   ajouterArticle(db, etat.utilisateur.uid, article).catch(signalerErreur);
-  $("ajout-nom").value = "";
-  $("ajout-quantite").value = "";
   $("ajout-nom").focus();
 });
-
-$("ajout-nom").addEventListener("input", () => afficherMessage($("message-ajout"), ""));
 
 function surligner(id) {
   const ligne = document.querySelector(`.article[data-id="${CSS.escape(id)}"]`);
@@ -273,7 +272,7 @@ async function chargerPromos() {
     etat.promosIndisponibles = !etat.promos;
   }
   dessinerListe();
-  if (etat.vue === "promos") dessinerRecherche();
+  dessinerSuggestions();
 }
 
 function relirePromosSiBesoin() {
@@ -313,6 +312,15 @@ function element(balise, classe, texte) {
   return el;
 }
 
+// Ce que dit l'encadré sous le prix, selon l'endroit où va la réduction (voir explicationPrix).
+const TITRES_AVANTAGE = {
+  caisse: "Réduction en caisse",
+  lot: "En prenant plusieurs",
+  "carte-caisse": "Avec la carte E.Leclerc",
+  "carte-leclerc": "Sur la carte E.Leclerc",
+  "lidl-plus": "Avec l'appli Lidl Plus",
+};
+
 function cartePromo(offre, aVenir, aujourdhui, { avecAjout = false } = {}) {
   const carte = element("li", "promo");
   carte.toggleAttribute("data-a-venir", aVenir);
@@ -321,20 +329,32 @@ function cartePromo(offre, aVenir, aujourdhui, { avecAjout = false } = {}) {
   const magasin = element("span", "enseigne", enseigne(offre));
   magasin.dataset.source = offre.source;
   haut.append(magasin, element("span", "periode", periode(offre, aujourdhui)));
-  carte.append(haut, element("p", "promo-nom", joliNom(offre.produit)));
-  if (offre.marque) carte.append(element("p", "promo-marque", offre.marque));
-  if (offre.description) carte.append(element("p", "promo-description", offre.description));
 
-  const prix = element("p", "promo-prix");
-  if (offre.prix != null) prix.append(element("strong", "prix", formaterPrix(offre.prix)));
-  if (offre.ancien_prix != null) {
-    prix.append(element("span", "cache", " au lieu de "), element("s", "ancien-prix", formaterPrix(offre.ancien_prix)));
+  // Le nom, avec la marque si elle n'y est pas déjà.
+  const nom = element("p", "promo-nom", joliNom(offre.produit));
+  if (offre.marque && !joliNom(offre.produit).toLowerCase().includes(offre.marque.toLowerCase())) {
+    nom.append(" ", element("span", "promo-marque", offre.marque));
   }
-  if (offre.reduction) prix.append(element("span", "reduction", offre.reduction));
-  if (prix.childElementCount) carte.append(prix);
+  carte.append(haut, nom);
+  const description = resumeDescription(offre.description);
+  if (description) carte.append(element("p", "promo-description", description));
 
-  const infos = infosPromo(offre);
-  if (infos.length) carte.append(element("p", "promo-infos", infos.join(" · ")));
+  // Le prix, et en clair où va la réduction : en caisse, sur la carte E.Leclerc ou avec Lidl Plus.
+  const explication = explicationPrix(offre);
+  const prix = element("p", "promo-prix");
+  if (explication.prix) prix.append(element("strong", "prix", explication.prix));
+  if (explication.mention) prix.append(element("span", "mention", explication.mention));
+  if (explication.barre) {
+    prix.append(element("span", "cache", " au lieu de "), element("s", "ancien-prix", explication.barre));
+  }
+  if (explication.unitaire) prix.append(element("span", "prix-unitaire", explication.unitaire));
+  if (prix.childElementCount) carte.append(prix);
+  if (explication.avantage) {
+    const avantage = element("p", "avantage");
+    avantage.dataset.genre = explication.genre;
+    avantage.append(element("strong", "avantage-titre", TITRES_AVANTAGE[explication.genre]), element("span", null, explication.avantage));
+    carte.append(avantage);
+  }
 
   const actions = element("div", "promo-actions");
   if (avecAjout) actions.append(boutonAjouter(offre, aujourdhui));
@@ -350,83 +370,59 @@ function cartePromo(offre, aVenir, aujourdhui, { avecAjout = false } = {}) {
 }
 
 // ---------------------------------------------------------------------------------------------
-// Onglet « Promos » : chercher dans toutes les promos et les ajouter à la liste
+// Pendant qu'on écrit un article : les promos qui correspondent, à ajouter d'un geste.
+// « + » ou « OK » ajoute ce qui est écrit, qu'il y ait des promos ou non.
 
-function afficherVue(vue) {
-  etat.vue = vue;
-  $("vue-liste").hidden = vue !== "liste";
-  $("vue-promos").hidden = vue !== "promos";
-  for (const onglet of document.querySelectorAll(".onglet")) {
-    if (onglet.dataset.vue === vue) onglet.setAttribute("aria-current", "page");
-    else onglet.removeAttribute("aria-current");
-  }
-  window.scrollTo(0, 0);
-  if (vue === "promos") dessinerRecherche();
-}
+/** On cherche à partir de 2 lettres : une seule en trouverait presque partout. */
+const LETTRES_MINIMUM = 2;
 
-for (const onglet of document.querySelectorAll(".onglet")) {
-  onglet.addEventListener("click", () => afficherVue(onglet.dataset.vue));
-}
-
-function dessinerRecherche() {
-  const { texte, magasin, nombre } = etat.recherche;
+function dessinerSuggestions() {
+  const texte = $("ajout-nom").value.trim();
+  $("effacer-saisie").hidden = !texte;
   const index = etat.promos?.index;
-  $("plus-de-resultats").hidden = true;
-  if (!index) {
-    $("resume-catalogue").textContent = "";
-    $("etat-recherche").textContent = etat.promosIndisponibles
-      ? "Promos indisponibles pour le moment (pas de réseau ?)."
-      : "Chargement des promos…";
-    $("resultats").replaceChildren();
-    return;
-  }
-  const aujourdhui = dateDuJour();
-  const total = rechercherPromos(index, "", aujourdhui).length;
-  $("resume-catalogue").textContent = `${total.toLocaleString("fr-FR")} promos chez Lidl et Leclerc`;
+  const actives = texte.length >= LETTRES_MINIMUM && Boolean(index);
+  $("suggestions").hidden = !actives;
+  $("contenu").hidden = actives; // la liste revient dès que le champ est vide
+  if (!actives) return;
 
-  const resultats = rechercherPromos(index, texte, aujourdhui, { magasin });
-  const chez = magasin ? ` chez ${magasin === "lidl" ? "Lidl" : "Leclerc"}` : "";
+  if (texte !== etat.recherche.texte) etat.recherche = { texte, nombre: PROMOS_PAR_PAGE };
+  const aujourdhui = dateDuJour();
+  const resultats = rechercherPromos(index, texte, aujourdhui);
   const n = resultats.length;
-  if (!texte.trim()) {
-    $("etat-recherche").textContent = `${n.toLocaleString("fr-FR")} promos en cours et à venir${chez}.`;
-  } else if (n === 0) {
-    $("etat-recherche").textContent = `Aucune promo pour « ${texte.trim()} »${chez}.`;
-  } else {
-    $("etat-recherche").textContent = `${n} promo${n > 1 ? "s" : ""} trouvée${n > 1 ? "s" : ""}${chez}.`;
-  }
+  $("etat-recherche").textContent =
+    n === 0
+      ? `Aucune promo pour « ${texte} ». Touchez + pour l'ajouter quand même à la liste.`
+      : `${n} promo${n > 1 ? "s" : ""} pour « ${texte} », Leclerc d'abord. Touchez + pour ajouter « ${texte} » tel quel.`;
   $("resultats").replaceChildren(
-    ...resultats.slice(0, nombre).map(({ offre, aVenir }) => cartePromo(offre, aVenir, aujourdhui, { avecAjout: true })),
+    ...resultats
+      .slice(0, etat.recherche.nombre)
+      .map(({ offre, aVenir }) => cartePromo(offre, aVenir, aujourdhui, { avecAjout: true })),
   );
-  $("plus-de-resultats").hidden = n <= nombre;
+  $("plus-de-resultats").hidden = n <= etat.recherche.nombre;
 }
 
 let attenteRecherche;
-$("recherche").addEventListener("input", () => {
+$("ajout-nom").addEventListener("input", () => {
+  afficherMessage($("message-ajout"), "");
+  $("effacer-saisie").hidden = !$("ajout-nom").value.trim();
   clearTimeout(attenteRecherche);
-  attenteRecherche = setTimeout(() => {
-    etat.recherche.texte = $("recherche").value;
-    etat.recherche.nombre = PROMOS_PAR_PAGE;
-    dessinerRecherche();
-  }, 150);
+  attenteRecherche = setTimeout(dessinerSuggestions, 150);
 });
 
-$("form-recherche").addEventListener("submit", (evenement) => {
-  evenement.preventDefault();
-  $("recherche").blur(); // range le clavier pour voir les résultats
-});
-
-for (const filtre of document.querySelectorAll(".filtre")) {
-  filtre.addEventListener("click", () => {
-    etat.recherche.magasin = filtre.dataset.magasin;
-    etat.recherche.nombre = PROMOS_PAR_PAGE;
-    for (const autre of document.querySelectorAll(".filtre")) autre.setAttribute("aria-pressed", String(autre === filtre));
-    dessinerRecherche();
-  });
+function effacerSaisie() {
+  $("ajout-nom").value = "";
+  dessinerSuggestions();
+  $("ajout-nom").focus();
 }
+
+$("effacer-saisie").addEventListener("click", effacerSaisie);
+$("ajout-nom").addEventListener("keydown", (evenement) => {
+  if (evenement.key === "Escape") effacerSaisie();
+});
 
 $("plus-de-resultats").addEventListener("click", () => {
   etat.recherche.nombre += PROMOS_PAR_PAGE;
-  dessinerRecherche();
+  dessinerSuggestions();
 });
 
 /** « Ajouter à la liste », ou « Dans la liste » si l'article y est déjà. */

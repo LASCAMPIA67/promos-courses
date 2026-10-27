@@ -16,20 +16,30 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ### Ajouté
 
-- **Appli 0.6 : toutes les promos dans l'appli.** Barre d'onglets en bas de l'écran (« Liste » et
-  « Promos ») ; l'onglet « Promos » permet de chercher un produit ou une marque pendant qu'on tape
-  (le début d'un mot suffit), de filtrer par magasin, et d'ajouter une promo à la liste en un geste,
-  avec une note qui rappelle le magasin, le prix et la date. Affichage par 30, « Voir plus de promos ».
+- **Appli 0.6 : les promos en écrivant.** En écrivant un article, les promos qui correspondent
+  s'affichent aussitôt sous le champ, à la place de la liste (le début d'un mot suffit, dès 2
+  lettres) ; « + » ou « OK » ajoute ce qui est écrit, qu'il y ait des promos ou non, et le bouton
+  d'une promo ajoute ce produit avec une note qui rappelle le magasin, le prix et la date. Affichage
+  par 30, « Voir plus de promos ». Un seul écran, sans onglets.
+- **Leclerc d'abord** : à pertinence égale, les promos de Leclerc (notre magasin principal) passent
+  avant celles de Lidl.
+- **Prix en clair** : chaque promo dit où va la réduction, dans un encadré de couleur : déjà déduite
+  du prix (« Réduction en caisse »), en prenant plusieurs (« -50 % sur le 2e : 9,18 € les 2 »),
+  rendue sur la carte E.Leclerc (Ticket E.Leclerc : prix payé en caisse, montant rendu et prix
+  final), avec la carte E.Leclerc, ou avec l'appli Lidl Plus (et le prix sans l'appli).
+- **Fiches de promo plus lisibles** : la description ne répète plus les prix (« 272 g ·
+  Goût nature… » au lieu de « 272 g.Le kg : 9,38 €.Par 2 (544 g) : 3,57 € au lieu de 5,10 € ») ; la
+  marque suit le nom ; le prix au kilo est à côté du prix.
 - **Supprimer d'un geste** : glisser un article vers la gauche fait apparaître un bouton
   « Supprimer », comme dans Mail sur l'iPhone ; « Annuler » le remet pendant 6 secondes (même s'il
   était dans le caddie). La suppression depuis la fiche de l'article reste possible.
-- **Familles de produits** (environ 50) : « Chips » trouve aussi Pringles, Lay's, Doritos… ;
-  « Soda » trouve Coca-Cola, Fanta… ; « Couches » trouve « Changes bébé » Pampers… Dans la liste
-  comme dans l'onglet « Promos » ; les promos qui contiennent le mot écrit passent d'abord.
+- **Familles de produits** (48) : « Chips » trouve aussi Pringles, Lay's, Doritos… ; « Soda » trouve
+  Coca-Cola, Fanta… ; « Couches » trouve « Changes bébé » Pampers… Pour les étiquettes de la liste
+  comme pour les promos affichées en écrivant ; les promos qui contiennent le mot écrit passent
+  d'abord.
 - Les faux amis ne se confondent plus : « pâtes » ne trouve pas « pâté », ni « glaces » les
   « marrons glacés ».
-- Tests : 11 tests de logique et 4 scénarios réels de plus ; captures d'écran de l'onglet « Promos »
-  et du glissement.
+- Tests : 20 tests de logique et 5 scénarios réels de plus ; captures d'écran.
 
 ### Sécurité
 

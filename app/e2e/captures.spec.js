@@ -73,13 +73,12 @@ for (const theme of ["light", "dark"]) {
     await page.screenshot({ path: `${DOSSIER}promos${suffixe}.png` });
     await page.getByRole("button", { name: "Fermer" }).click();
 
-    // L'onglet « Promos » : chercher dans toutes les promos.
-    await page.getByRole("navigation").getByRole("button", { name: "Promos", exact: true }).click();
-    await page.getByRole("searchbox", { name: "Chercher une promo" }).fill("lait");
-    await expect(page.locator("#etat-recherche")).toHaveText("4 promos trouvées.");
-    await page.getByRole("searchbox", { name: "Chercher une promo" }).blur();
+    // En écrivant un article : les promos qui correspondent.
+    await page.getByLabel("Article à ajouter").fill("lait");
+    await expect(page.locator("#etat-recherche")).toContainText("4 promos pour « lait »");
+    await page.getByLabel("Article à ajouter").blur();
     await page.screenshot({ path: `${DOSSIER}recherche${suffixe}.png` });
-    await page.getByRole("navigation").getByRole("button", { name: "Liste", exact: true }).click();
+    await page.getByRole("button", { name: "Effacer" }).click();
 
     if (theme === "light") {
       await page.getByRole("button", { name: "Modifier Lait demi-écrémé" }).click();
