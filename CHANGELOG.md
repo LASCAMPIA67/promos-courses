@@ -14,6 +14,8 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+## [0.9.0] - 2026-10-27
+
 ### Ajouté
 
 - **La liste rangée par rayon**, dans l'ordre où on traverse le magasin (fruits et légumes,
@@ -263,7 +265,8 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 - Version antérieure à la mise en place des publications : pas de page « Release » (voir le lien
   ci-dessous vers son enregistrement d'origine).
 
-[Non publié]: https://github.com/lascampia67/promos-courses/compare/v0.8.0...HEAD
+[Non publié]: https://github.com/lascampia67/promos-courses/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/lascampia67/promos-courses/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/lascampia67/promos-courses/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/lascampia67/promos-courses/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/lascampia67/promos-courses/compare/v0.5.0...v0.6.0
