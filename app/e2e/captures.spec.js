@@ -66,3 +66,23 @@ for (const theme of ["light", "dark"]) {
     }
   });
 }
+
+test("capture du conseil d'installation (Safari sur iPhone)", async ({ browser }) => {
+  const contexte = await browser.newContext({
+    userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 27_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.0 Mobile/15E148 Safari/604.1",
+    viewport: { width: 393, height: 852 },
+    deviceScaleFactor: 2,
+    locale: "fr-FR",
+    baseURL: test.info().project.use.baseURL,
+  });
+  await servirPromos(contexte);
+  const page = await contexte.newPage();
+  await page.goto("");
+  await page.getByLabel("E-mail").fill(COMPTE.email);
+  await page.getByLabel("Mot de passe").fill(COMPTE.motDePasse);
+  await page.getByRole("button", { name: "Se connecter" }).click();
+  await expect(page.locator("#conseil-installation")).toBeVisible();
+  await expect(page.locator(".bouton-promos").first()).toBeVisible();
+  await page.screenshot({ path: `${DOSSIER}installation.png` });
+  await contexte.close();
+});

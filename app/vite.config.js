@@ -23,6 +23,8 @@ export default defineConfig({
   plugins: [
     VitePWA({
       registerType: "autoUpdate",
+      // L'inscription est faite dans src/main.js, pour vérifier les mises à jour à chaque ouverture.
+      injectRegister: false,
       includeAssets: ["icones/*.png", "icones/*.svg"],
       manifest: {
         id: "/promos-courses/",

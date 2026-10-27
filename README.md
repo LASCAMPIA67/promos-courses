@@ -7,7 +7,8 @@ et range toutes les promos dans un fichier. Une appli sur nos deux iPhones garde
 courses commune et la compare à ces promos pour dépenser le moins possible, sans rien faire au
 quotidien.
 
-**👉 L'appli : https://lascampia67.github.io/promos-courses/** (réservée à nos deux comptes)
+**👉 L'appli : https://lascampia67.github.io/promos-courses/** (réservée à nos deux comptes) —
+[l'installer sur l'iPhone](docs/installation-iphone.md)
 
 [![Robot des promos](https://github.com/lascampia67/promos-courses/actions/workflows/robot.yml/badge.svg)](https://github.com/lascampia67/promos-courses/actions/workflows/robot.yml)
 [![Tests](https://github.com/lascampia67/promos-courses/actions/workflows/tests.yml/badge.svg)](https://github.com/lascampia67/promos-courses/actions/workflows/tests.yml)
@@ -105,8 +106,11 @@ Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
 - **Caddie** : un article coché passe dans « Dans le caddie » ; « Tout retirer » vide le caddie.
 - **Marche sans réseau** (au fond du magasin) : les changements partent au retour du réseau.
 - **Privée** : seuls nos deux comptes peuvent s'y connecter.
+- **Installable sur l'iPhone**, sans App Store : icône sur l'écran d'accueil, plein écran, mises à
+  jour automatiques. Dans Safari, l'appli explique elle-même comment faire.
 
-Mode d'emploi, fonctionnement et tests : [docs/appli.md](docs/appli.md).
+Mode d'emploi, fonctionnement et tests : [docs/appli.md](docs/appli.md). Installation sur l'iPhone,
+pas à pas : [docs/installation-iphone.md](docs/installation-iphone.md).
 
 ## Au quotidien
 
@@ -169,7 +173,7 @@ est décrit par un schéma JSON : [`promos.schema.json`](src/robot_promos/promos
 - **Format vérifié** : avant d'être enregistré, `promos.json` est contrôlé par son schéma JSON.
 - **Tests automatiques** à chaque modification : plus de 50 tests pour le robot (workflow « Tests »),
   15 tests qui vérifient que la liste commune reste réservée à nos deux comptes (« Règles Firebase »),
-  31 tests de logique de l'appli et 9 scénarios réels dans Chrome et Safari, avec deux téléphones
+  35 tests de logique de l'appli et 11 scénarios réels dans Chrome et Safari, avec deux téléphones
   simulés et des promos d'exemple (« Appli »).
   Si un test de l'appli échoue, elle n'est pas publiée.
 - **Alerte** : en cas de problème, un avertissement s'affiche sur la page du lancement (onglet

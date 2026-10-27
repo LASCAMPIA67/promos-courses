@@ -286,6 +286,40 @@ svg {
   color: var(--danger);
 }
 
+/* Conseil : installer l'appli sur l'écran d'accueil. */
+.conseil {
+  display: flex;
+  gap: 12px;
+  margin: 0 0 10px;
+  padding: 12px 14px 4px;
+  border-radius: 12px;
+  background: var(--accent-doux);
+  font-size: 0.92rem;
+}
+
+.conseil > svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: var(--accent-fonce);
+}
+
+.conseil p {
+  margin: 0 0 4px;
+}
+
+.conseil-titre {
+  font-weight: 650;
+}
+
+.conseil a {
+  color: var(--accent-fonce);
+  font-weight: 600;
+}
+
+.conseil .lien {
+  padding: 6px 0 8px;
+}
+
 .etat-promos {
   margin: 0;
   padding: 10px 14px;

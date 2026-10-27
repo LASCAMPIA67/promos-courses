@@ -14,6 +14,15 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+### Ajouté
+
+- **Appli 0.5 : prête à installer sur l'iPhone.** Dans Safari sur iPhone ou iPad, un encadré explique
+  comment ajouter l'appli à l'écran d'accueil (« Plus tard » le cache pour 14 jours).
+- Mises à jour automatiques de l'appli installée : elle vérifie à chaque ouverture si une nouvelle
+  version est publiée et la prend d'elle-même, sans recharger pendant qu'on écrit.
+- Guide pas à pas : [docs/installation-iphone.md](docs/installation-iphone.md).
+- Tests : 4 tests de logique et 2 scénarios réels de plus (conseil d'installation), capture d'écran.
+
 ## [0.4.0] - 2026-10-27
 
 ### Ajouté

@@ -56,6 +56,19 @@
 
       <p id="bandeau" class="bandeau" role="status" hidden></p>
 
+      <aside id="conseil-installation" class="conseil" aria-labelledby="titre-conseil" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3" /><path d="M12 7v7M9 11l3 3 3-3" /></svg>
+        <div>
+          <p id="titre-conseil" class="conseil-titre">Installez l'appli sur l'iPhone</p>
+          <p>
+            Dans Safari, touchez le bouton <strong>Partager</strong> (ou <strong>···</strong> puis Partager), puis
+            <strong>« Sur l'écran d'accueil »</strong>.
+            <a href="https://github.com/lascampia67/promos-courses/blob/main/docs/installation-iphone.md" target="_blank" rel="noopener noreferrer">Voir le guide</a>
+          </p>
+          <button type="button" id="fermer-conseil" class="lien">Plus tard</button>
+        </div>
+      </aside>
+
       <form id="form-ajout" class="ajout" autocomplete="off">
         <label for="ajout-nom" class="cache">Article à ajouter</label>
         <input id="ajout-nom" placeholder="Ajouter un article…" maxlength="100" enterkeyhint="done" autocapitalize="sentences" />

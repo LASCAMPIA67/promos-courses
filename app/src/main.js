@@ -2,9 +2,11 @@
 // comparée aux promos de nos magasins.
 
 import { onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { registerSW } from "virtual:pwa-register";
 
 import { messageErreur, pluriel, preparerSaisie, trierArticles, trouverDoublon } from "./articles.js";
 import { auth, db } from "./firebase.js";
+import { proposerInstallation } from "./installation.js";
 import { ajouterArticle, cocherArticle, modifierArticle, supprimerArticle, suivreArticles, viderLeCaddie } from "./liste.js";
 import {
   URL_PROMOS,
@@ -320,6 +322,72 @@ chargerPromos();
 document.addEventListener("visibilitychange", relirePromosSiBesoin);
 window.addEventListener("online", () => {
   if (etat.promosIndisponibles) chargerPromos();
+});
+
+// ---------------------------------------------------------------------------------------------
+// Installation sur l'iPhone et mises à jour
+
+const CLE_CONSEIL = "conseil-installation-ferme-le";
+const appliInstallee = navigator.standalone === true || matchMedia("(display-mode: standalone)").matches;
+
+// La mémoire du navigateur peut être refusée (navigation privée) : ce n'est pas grave ici.
+function lireMemoire(cle) {
+  try {
+    return localStorage.getItem(cle);
+  } catch {
+    return null;
+  }
+}
+
+function ecrireMemoire(cle, valeur) {
+  try {
+    localStorage.setItem(cle, valeur);
+  } catch {
+    // tant pis : le conseil reviendra
+  }
+}
+
+function dessinerConseilInstallation() {
+  $("conseil-installation").hidden = !proposerInstallation({
+    userAgent: navigator.userAgent,
+    pointsDeContact: navigator.maxTouchPoints,
+    installee: appliInstallee,
+    fermeLe: Number(lireMemoire(CLE_CONSEIL)) || null,
+  });
+}
+
+$("fermer-conseil").addEventListener("click", () => {
+  ecrireMemoire(CLE_CONSEIL, String(Date.now()));
+  dessinerConseilInstallation();
+});
+dessinerConseilInstallation();
+
+/** Quelqu'un est en train d'écrire ou a une fenêtre ouverte : ce n'est pas le moment de recharger. */
+function saisieEnCours() {
+  if (document.querySelector("dialog[open]")) return true;
+  return [...document.querySelectorAll("input, textarea")].some((champ) => champ.value.trim());
+}
+
+// Une nouvelle version publiée est prise toute seule. L'appli installée reste souvent ouverte en
+// arrière-plan pendant des jours : elle vérifie donc à chaque retour au premier plan.
+registerSW({
+  immediate: true,
+  onRegisteredSW(_adresse, enregistrement) {
+    if (!enregistrement) return;
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") enregistrement.update().catch(() => {});
+    });
+  },
+  onNeedReload() {
+    if (!saisieEnCours()) {
+      window.location.reload();
+      return;
+    }
+    // On ne recharge pas sous les doigts de quelqu'un : on attend que l'appli passe en arrière-plan.
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") window.location.reload();
+    });
+  },
 });
 
 // ---------------------------------------------------------------------------------------------
