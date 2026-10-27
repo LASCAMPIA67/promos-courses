@@ -14,6 +14,8 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+## [0.4.0] - 2026-10-27
+
 ### Ajouté
 
 - **Appli 0.4 : la liste comparée aux promos.** Les articles en promo chez Lidl ou Leclerc portent une
@@ -98,7 +100,8 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 - Version antérieure à la mise en place des publications : pas de page « Release » (voir le lien
   ci-dessous vers son enregistrement d'origine).
 
-[Non publié]: https://github.com/lascampia67/promos-courses/compare/v0.3.0...HEAD
+[Non publié]: https://github.com/lascampia67/promos-courses/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/lascampia67/promos-courses/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/lascampia67/promos-courses/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/lascampia67/promos-courses/compare/ad703c7...v0.2.0
 [0.1.0]: https://github.com/lascampia67/promos-courses/commit/ad703c7

@@ -17,8 +17,8 @@ quotidien.
 ![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue)
 
 > [!NOTE]
-> Projet personnel en construction (version `0.x`). Le robot et la liste de courses commune
-> fonctionnent ; la comparaison de la liste avec les promos est en test.
+> Projet personnel en construction (version `0.x`). Le robot, la liste de courses commune et la
+> comparaison avec les promos fonctionnent ; reste l'installation sur nos iPhones.
 
 ## Sommaire
 
@@ -44,8 +44,8 @@ quotidien.
 | 1 | Choisir les magasins | ✅ Fait |
 | 2 | Tester les sources de promos | ✅ Fait |
 | 3 | Créer le robot qui récupère les promos | ✅ Fait et validé (version 0.2.0) |
-| 4 | Créer l'appli (liste de courses commune + comparaison aux promos) | 🚧 En cours : liste commune validée (version 0.3.0) ; comparaison avec les promos en test (version 0.4) |
-| 5 | L'installer sur nos deux iPhones | ⏳ À faire |
+| 4 | Créer l'appli (liste de courses commune + comparaison aux promos) | ✅ Fait et validé (version 0.4.0) |
+| 5 | L'installer sur nos deux iPhones | 🚧 En cours |
 
 Dernière mise à jour de ce tableau : 27/10/2026. Le détail des évolutions est dans le
 [journal des versions](CHANGELOG.md).
