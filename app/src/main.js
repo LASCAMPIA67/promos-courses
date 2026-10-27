@@ -27,7 +27,6 @@ import { couleurDe, formaterAjout, nomDe, preparerFiche } from "./membres.js";
 import {
   URL_PROMOS,
   articleDepuisPromo,
-  chercherPromos,
   dateDuJour,
   enseigne,
   explicationPrix,
@@ -39,6 +38,7 @@ import {
   phrasesFraicheur,
   rechercherPromos,
   periodeCourte,
+  promoChoisie,
   resumeDescription,
   sourcesEnDifficulte,
   typePromo,
@@ -195,8 +195,10 @@ function dessinerListe() {
   }
   const { aAcheter, dansLeCaddie } = trierArticles(etat.articles);
   const aujourdhui = dateDuJour();
-  const promos = new Map(aAcheter.map((a) => [a.id, chercherPromos(etat.promos?.index, a.nom, aujourdhui)]));
-  $("liste-a-acheter").replaceChildren(...aAcheter.map((a) => ligneArticle(a, promos.get(a.id))));
+  // À droite d'un article ajouté depuis une promo (« + Ajouter ») : cette promo, toujours à jour.
+  $("liste-a-acheter").replaceChildren(
+    ...aAcheter.map((a) => ligneArticle(a, promoChoisie(a, etat.promos?.index, aujourdhui))),
+  );
   $("liste-caddie").replaceChildren(...dansLeCaddie.map((a) => ligneArticle(a)));
   $("liste-vide").hidden = aAcheter.length > 0;
   $("section-caddie").hidden = dansLeCaddie.length === 0;
@@ -204,7 +206,7 @@ function dessinerListe() {
   dessinerEtatPromos();
 }
 
-function ligneArticle(article, promos = []) {
+function ligneArticle(article, promo = null) {
   const ligne = document.createElement("li");
   ligne.className = "article";
   ligne.dataset.id = article.id;
@@ -250,7 +252,8 @@ function ligneArticle(article, promos = []) {
   const devant = document.createElement("div");
   devant.className = "article-devant";
   devant.append(caseACocher, contenu);
-  if (promos.length) devant.append(boutonPromos(article, promos));
+  if (promo?.terminee) devant.append(element("span", "promo-terminee", "Promo terminée"));
+  else if (promo) devant.append(boutonPromo(article, promo));
 
   const supprimer = document.createElement("button");
   supprimer.type = "button";
@@ -265,26 +268,26 @@ function ligneArticle(article, promos = []) {
   return ligne;
 }
 
-function boutonPromos(article, promos) {
-  // Sous l'étiquette, le type de la meilleure promo : « -60 % sur le 2e », « -20 % en caisse »…
-  const { offre, aVenir } = promos[0];
+function boutonPromo(article, promo) {
+  // Sous l'étiquette, le type de la promo : « -60 % sur le 2e », « -20 % en caisse »…
+  const { offre, aVenir } = promo;
   const type = [typePromo(offre), aVenir ? periodeCourte(offre, dateDuJour()) : null].filter(Boolean).join(" · ");
   const bouton = document.createElement("button");
   bouton.type = "button";
   bouton.className = "bouton-promos";
-  bouton.setAttribute("aria-label", `Voir ${pluriel(promos.length, "promo")} pour ${article.nom} : ${type}`);
+  bouton.setAttribute("aria-label", `Voir la promo de ${article.nom} : ${type}`);
   const pastille = document.createElement("span");
   pastille.className = "pastille";
   pastille.innerHTML =
     '<svg viewBox="0 0 24 24" aria-hidden="true">' +
     '<path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z" />' +
     '<circle cx="7.5" cy="7.5" r="1.2" /></svg>';
-  pastille.append(pluriel(promos.length, "promo"));
+  pastille.append("Promo");
   const legende = document.createElement("span");
   legende.className = "type-promo";
   legende.textContent = type;
   bouton.append(pastille, legende);
-  bouton.addEventListener("click", () => ouvrirPromos(article, promos));
+  bouton.addEventListener("click", () => ouvrirPromo(article, promo));
   return bouton;
 }
 
@@ -368,10 +371,9 @@ function dessinerEtatPromos() {
   $("info-promos").textContent = info;
 }
 
-function ouvrirPromos(article, promos) {
-  const aujourdhui = dateDuJour();
-  $("titre-fenetre-promos").textContent = `Promos pour « ${article.nom} »`;
-  $("liste-promos").replaceChildren(...promos.map(({ offre, aVenir }) => cartePromo(offre, aVenir, aujourdhui)));
+function ouvrirPromo(article, { offre, aVenir }) {
+  $("titre-fenetre-promos").textContent = `Promo pour « ${article.nom} »`;
+  $("liste-promos").replaceChildren(cartePromo(offre, aVenir, dateDuJour()));
   $("fenetre-promos").showModal();
   $("liste-promos").scrollTop = 0;
 }
@@ -502,8 +504,16 @@ function boutonAjouter(offre) {
   bouton.addEventListener("click", () => {
     const { article, erreur } = preparerSaisie(articleDepuisPromo(offre));
     if (erreur) return;
-    // Comme pour l'ajout dans la liste : sans réseau, l'article part plus tard.
-    ajouterArticle(db, etat.utilisateur.uid, article).catch(signalerErreur);
+    // Comme pour l'ajout dans la liste : sans réseau, l'article part plus tard. Si les règles d'accès
+    // publiées dans Firebase ne connaissent pas encore le champ « promo », l'article est ajouté sans :
+    // sa promo est alors retrouvée d'après sa note (« Leclerc · 2,25 € »).
+    ajouterArticle(db, etat.utilisateur.uid, article)
+      .catch((refus) => {
+        if (refus?.code !== "permission-denied") throw refus;
+        const { promo, ...sansPromo } = article;
+        return ajouterArticle(db, etat.utilisateur.uid, sansPromo);
+      })
+      .catch(signalerErreur);
     bouton.disabled = true;
     bouton.textContent = "✓ Ajouté";
   });
@@ -734,9 +744,9 @@ document.addEventListener("pointerdown", (evenement) => {
 function supprimerAvecAnnulation(article) {
   fermerLignes();
   supprimerArticle(db, article.id).catch(signalerErreur);
-  const { nom, quantite, note, achete } = article;
+  const { nom, quantite, note, promo, achete } = article;
   proposerAnnulation(`« ${nom} » supprimé.`, () => {
-    const remis = { nom, ...(quantite ? { quantite } : {}), ...(note ? { note } : {}) };
+    const remis = { nom, ...(quantite ? { quantite } : {}), ...(note ? { note } : {}), ...(promo ? { promo } : {}) };
     ajouterArticle(db, etat.utilisateur.uid, remis, { achete }).catch(signalerErreur);
   });
 }

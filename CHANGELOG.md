@@ -28,14 +28,19 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 - Tickets gardés dans Firestore, sur l'offre gratuite (collection `tickets`, fichier découpé en
   morceaux de moins de 1 Mio), jamais dans ce dépôt : voir
   [docs/liste-commune.md](docs/liste-commune.md#collection-tickets--les-tickets-de-caisse).
-- **Le type de promo dans la liste** : sous l'étiquette « 2 promos », en petit, le type de la
-  meilleure promo, sans avoir à l'ouvrir : « -60 % sur le 2e », « -20 % en caisse », « 30 % sur la
-  carte », « -25 % avec la carte », « -23 % Lidl Plus », ou le prix ; « dès le 29 oct. » pour une
-  promo à venir.
-- Tests : 15 tests de logique, 6 tests des règles et 6 scénarios réels de plus ; captures.
+- **La promo choisie, dans la liste** : un article ajouté depuis une promo (« + Ajouter ») garde
+  cette promo (son identifiant, nouveau champ `promo` de l'article). À droite, une étiquette
+  « Promo » et dessous, en petit, son type, sans avoir à l'ouvrir : « -60 % sur le 2e », « -20 % en
+  caisse », « 30 % sur la carte », « -25 % avec la carte », « -23 % Lidl Plus », ou le prix ; « dès
+  le 29 oct. » pour une promo à venir ; « Promo terminée » quand elle n'est plus dans les catalogues.
+  Les articles ajoutés ainsi par les versions précédentes la retrouvent d'après leur note.
+- Tests : 18 tests de logique, 7 tests des règles et 7 scénarios réels de plus ; captures.
 
 ### Modifié
 
+- **Un article écrit à la main n'affiche plus de promo** (l'étiquette « 2 promos » qui comparait
+  chaque article à toutes les promos est retirée) : seule la promo choisie avec « + Ajouter »
+  s'affiche. Pour voir les promos d'un article, il suffit de l'écrire dans le champ.
 - **Plus de doublons** : une même promo déclinée en plusieurs produits (« Au choix : Douceur,
   Nutrition, Purifiant… »), que le catalogue Leclerc donne en plusieurs offres, n'est montrée qu'une
   fois, dans la liste comme pendant qu'on écrit.
@@ -50,7 +55,8 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ### Sécurité
 
-- Règles d'accès : la collection `tickets` n'accepte que des fiches de la bonne forme ; le fichier
+- Règles d'accès : un article peut porter l'identifiant de sa promo (`promo`, 100 caractères au
+  plus) ; la collection `tickets` n'accepte que des fiches de la bonne forme ; le fichier
   d'un ticket ne peut plus être changé une fois envoyé, et chaque morceau doit appartenir à un
   ticket existant, sans dépasser le nombre prévu ni 900 000 octets.
 

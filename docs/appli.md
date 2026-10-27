@@ -42,7 +42,7 @@ Les captures sont faites avec des promos d'exemple et des prénoms fictifs (Cami
 - **En direct sur les deux téléphones** : ce que l'un fait apparaît aussitôt chez l'autre.
 - **Sans réseau** (au fond du magasin) : tout continue de marcher ; un bandeau jaune le signale et
   les changements partent dès que le réseau revient.
-- **Voir les promos** de chaque article (voir ci-dessous).
+- **Voir la promo** d'un article ajouté depuis les promos (voir ci-dessous).
 - **Voir les promos en écrivant** un article, et en ajouter une à la liste d'un geste (voir ci-dessous).
 - **S'installer sur l'iPhone** : dans Safari, un encadré vert explique comment l'ajouter à l'écran
   d'accueil (« Plus tard » le cache pour 14 jours). Voir [installation-iphone.md](installation-iphone.md).
@@ -86,14 +86,21 @@ liste**, sous le caddie, et visibles sur les deux téléphones.
 ## Les promos
 
 Chaque matin, le robot range dans [`promos.json`](../promos.json) toutes les promos de Lidl
-Lingolsheim et d'E.Leclerc Geispolsheim. L'appli lit ce fichier et le compare à la liste :
+Lingolsheim et d'E.Leclerc Geispolsheim. L'appli lit ce fichier :
 
-- un article **à acheter** qui est en promo porte une étiquette orange **« 2 promos »**, et dessous,
-  en petit, le **type de la meilleure promo**, sans avoir à l'ouvrir : « -60 % sur le 2e » (en
-  prenant plusieurs), « -20 % en caisse », « 30 % sur la carte » (Ticket E.Leclerc), « -25 % avec
-  la carte », « -23 % Lidl Plus », ou le prix s'il n'y a pas de réduction particulière ; « dès le
-  29 oct. » s'ajoute pour une promo qui n'a pas encore commencé ;
-- en touchant l'étiquette, on voit **chaque promo**, rangée pour se lire d'un coup d'œil :
+- en écrivant un article, les promos qui correspondent s'affichent (voir plus bas) ; **« + Ajouter »**
+  sur l'une d'elles ajoute l'article **avec cette promo** ;
+- un article ajouté ainsi porte à droite une étiquette orange **« Promo »**, et dessous, en petit, le
+  **type de promo**, sans avoir à l'ouvrir : « -60 % sur le 2e » (en prenant plusieurs), « -20 % en
+  caisse », « 30 % sur la carte » (Ticket E.Leclerc), « -25 % avec la carte », « -23 % Lidl Plus »,
+  ou le prix s'il n'y a pas de réduction particulière ; « dès le 29 oct. » s'ajoute pour une promo
+  qui n'a pas encore commencé ; quand la promo n'est plus dans les catalogues, « Promo terminée » ;
+- un article **écrit à la main** (« + » ou « OK ») n'affiche **aucune promo**, même s'il y en a :
+  la liste reste légère ; pour les voir, il suffit d'écrire l'article dans le champ ;
+- les articles ajoutés depuis une promo par les versions précédentes retrouvent leur promo d'après
+  leur note (« Leclerc · 2,25 € ») ;
+- en touchant l'étiquette, on voit **cette promo**, rangée pour se lire d'un coup d'œil (comme dans
+  les résultats quand on écrit un article) :
   1. le magasin (Lidl en jaune, Leclerc en bleu) et **jusqu'à quand** elle dure (« Jusqu'au sam.
      31 oct. », « Dernier jour ») ; une promo **à venir** (catalogue de la semaine suivante) est en
      bleu (« Dès jeu. 29 oct. ») ;
@@ -104,9 +111,9 @@ Lingolsheim et d'E.Leclerc Geispolsheim. L'appli lit ce fichier et le compare à
   5. le **type de promo**, dans une pastille de couleur, et le détail utile (voir ci-dessous) ;
 - une même promo déclinée en plusieurs produits (« Au choix : Douceur, Nutrition, Purifiant… »), que
   le catalogue donne en plusieurs offres, n'est montrée **qu'une fois** ;
-- les promos les plus proches de l'article viennent d'abord : pour « Lait », « Lait demi-écrémé »
-  passe avant « Chocolat au lait » ; à pertinence égale, **Leclerc passe avant Lidl** (notre magasin
-  principal).
+- en écrivant un article, les promos les plus proches viennent d'abord : pour « Lait », « Lait
+  demi-écrémé » passe avant « Chocolat au lait » ; à pertinence égale, **Leclerc passe avant Lidl**
+  (notre magasin principal).
 
 ### Comprendre le prix : où va la réduction
 
@@ -122,7 +129,7 @@ est toujours celui **payé en caisse**.
 | 🟨 **-23 % Lidl Plus** | Le prix affiché est celui avec l'appli Lidl Plus, à scanner en caisse. | « sans l'appli : 2,49 € » |
 
 Sans pastille : c'est le prix du catalogue, sans réduction particulière. Le même type de promo est
-écrit en petit sous l'étiquette « 2 promos » de la liste.
+écrit en petit sous l'étiquette « Promo » de la liste.
 
 ### Les promos en écrivant un article
 
@@ -219,7 +226,7 @@ que dans Firebase.
 | Tests | Ce qu'ils vérifient | Commande |
 |---|---|---|
 | Logique ([`app/tests`](../app/tests)) | Nettoyage des saisies, doublons, tri, messages d'erreur ; couleur et prénom de chacun, date d'ajout en clair ; tickets de caisse (découpage et recollage du fichier, montant, date, magasin deviné, classement par mois, taille des photos) ; recherche des promos (accents, pluriel, mots proches, marques, familles de produits, faux amis, début de mot, filtre par magasin), article créé depuis une promo, où va la réduction (caisse, lot, carte E.Leclerc, Lidl Plus), description sans les prix répétés, Leclerc d'abord, promos terminées ou à venir, dates, prix, fraîcheur des données ; quand proposer l'installation. | `npm test` |
-| Scénarios réels ([`app/e2e`](../app/e2e)) | Un navigateur à la taille d'un iPhone utilise l'appli branchée sur l'**émulateur Firebase** (jamais la vraie base), avec deux comptes et un [fichier de promos d'exemple](../app/e2e/promos-exemple.js) aux dates du jour : connexion refusée, ajout, doublon, cochage, modification, suppression, synchronisation en direct entre deux téléphones, mode hors connexion, refus d'un compte étranger, déconnexion, étiquettes et détail des promos, promos anciennes ou incomplètes, promos indisponibles puis retrouvées, conseil d'installation dans Safari sur iPhone, glisser pour supprimer avec « Annuler », « Chips » qui trouve Pringles, promos affichées en écrivant (Leclerc d'abord, ajout d'une promo ou du texte écrit, affichage par 30), prix expliqué (carte E.Leclerc, Lidl Plus), prénom et couleur choisis sur un téléphone et vus sur l'autre (pastille, heure d'ajout), tickets de caisse en photo et en PDF ([fichiers d'exemple](../app/e2e/fichiers-exemple.js) : vus en grand sur l'autre téléphone, corrigés, partagés, supprimés, proposés après « Tout retirer », sans réseau, refusés à un compte étranger). Sur GitHub, ils tournent dans Chrome **et Safari** (WebKit). | `npm run e2e` |
+| Scénarios réels ([`app/e2e`](../app/e2e)) | Un navigateur à la taille d'un iPhone utilise l'appli branchée sur l'**émulateur Firebase** (jamais la vraie base), avec deux comptes et un [fichier de promos d'exemple](../app/e2e/promos-exemple.js) aux dates du jour : connexion refusée, ajout, doublon, cochage, modification, suppression, synchronisation en direct entre deux téléphones, mode hors connexion, refus d'un compte étranger, déconnexion, promo choisie avec « + Ajouter » affichée à droite de l'article (rien pour un article écrit à la main, promo retrouvée pour les articles des versions précédentes, « Promo terminée »), promos anciennes ou incomplètes, promos indisponibles puis retrouvées, conseil d'installation dans Safari sur iPhone, glisser pour supprimer avec « Annuler », « Chips » qui trouve Pringles, promos affichées en écrivant (Leclerc d'abord, ajout d'une promo ou du texte écrit, affichage par 30), prix expliqué (carte E.Leclerc, Lidl Plus), prénom et couleur choisis sur un téléphone et vus sur l'autre (pastille, heure d'ajout), tickets de caisse en photo et en PDF ([fichiers d'exemple](../app/e2e/fichiers-exemple.js) : vus en grand sur l'autre téléphone, corrigés, partagés, supprimés, proposés après « Tout retirer », sans réseau, refusés à un compte étranger). Sur GitHub, ils tournent dans Chrome **et Safari** (WebKit). | `npm run e2e` |
 | Captures d'écran | Régénère les images de cette page dans `docs/captures/`. | `npm run captures` |
 
 Commandes à lancer dans le dossier `app/` (Node.js 22 et Java 21 nécessaires), après `npm ci`.

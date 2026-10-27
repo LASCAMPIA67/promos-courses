@@ -18,6 +18,7 @@ import {
   periodeCourte,
   phraseSource,
   prixUnitaire,
+  promoChoisie,
   phrasesFraicheur,
   rechercherPromos,
   regrouper,
@@ -418,16 +419,49 @@ describe("resumeDescription", () => {
 });
 
 describe("articleDepuisPromo", () => {
-  test("nom du produit, et une note courte : où et combien", () => {
-    const article = articleDepuisPromo(offre({ produit: "LAIT DEMI-ÉCRÉMÉ UHT", source: "leclerc", prix: 6.12 }));
+  test("nom du produit, une note courte (où et combien) et l'identifiant de la promo", () => {
+    const article = articleDepuisPromo(
+      offre({ id: "lait-uht", produit: "LAIT DEMI-ÉCRÉMÉ UHT", source: "leclerc", prix: 6.12 }),
+    );
     expect(article.nom).toBe("Lait demi-écrémé UHT");
     expect(simple(article.note)).toBe("Leclerc · 6,12 €");
+    expect(article.promo).toBe("lait-uht");
   });
 
   test("sans prix, la réduction ; nom trop long raccourci", () => {
     const gamme = offre({ produit: "Tous les produits BIO", prix: null, reduction: "-34 %" });
     expect(simple(articleDepuisPromo(gamme).note)).toBe("Lidl · -34 %");
     expect(articleDepuisPromo(offre({ produit: "x".repeat(150) })).nom).toHaveLength(100);
+  });
+});
+
+describe("promoChoisie : la promo affichée à droite d'un article", () => {
+  const index = indexerPromos(donnees());
+  const depuis = (id) => ({ nom: "x", ...articleDepuisPromo(OFFRES.find((o) => o.id === id)) });
+
+  test("seulement pour un article ajouté depuis une promo, retrouvée par son identifiant", () => {
+    expect(promoChoisie(depuis("lait"), index, AUJOURDHUI)).toEqual({
+      offre: OFFRES.find((o) => o.id === "lait"),
+      aVenir: false,
+    });
+    expect(promoChoisie(depuis("lait-uht"), index, AUJOURDHUI).aVenir).toBe(true);
+    // Écrit à la main, même s'il est en promo : rien.
+    expect(promoChoisie({ nom: "Lait" }, index, AUJOURDHUI)).toBeNull();
+    expect(promoChoisie({ nom: "Lait", note: "sans lactose" }, index, AUJOURDHUI)).toBeNull();
+    // Promos pas encore lues : rien non plus, pour l'instant.
+    expect(promoChoisie(depuis("lait"), null, AUJOURDHUI)).toBeNull();
+  });
+
+  test("ajouté par une ancienne version (sans identifiant) : retrouvée d'après la note", () => {
+    const ancien = { nom: "Lait demi-écrémé", note: "Promo Lidl : 0,89 € · Jusqu'au mercredi 28 octobre" };
+    expect(promoChoisie(ancien, index, AUJOURDHUI)?.offre.id).toBe("lait");
+  });
+
+  test("une promo qui n'est plus dans les catalogues est dite terminée", () => {
+    expect(promoChoisie({ ...depuis("lait"), promo: "disparue", note: "Lidl · 9,99 €" }, index, AUJOURDHUI)).toEqual({
+      terminee: true,
+    });
+    expect(promoChoisie({ nom: "Beurre doux", promo: "beurre" }, index, AUJOURDHUI)).toEqual({ terminee: true });
   });
 });
 

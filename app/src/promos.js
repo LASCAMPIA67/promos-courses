@@ -253,14 +253,43 @@ function trouver(index, motsCherches, aujourdhui, correspond) {
 }
 
 /**
- * L'article à ajouter à la liste depuis une promo : le nom du produit, et une note courte qui
- * rappelle où et combien (le prix payé en caisse) : « Leclerc · 2,25 € ». Le type de promo et ses
- * dates, eux, s'affichent à jour sous l'étiquette « 1 promo ».
+ * L'article à ajouter à la liste depuis une promo : le nom du produit, une note courte qui rappelle
+ * où et combien (le prix payé en caisse, « Leclerc · 2,25 € ») et l'identifiant de la promo, pour
+ * l'afficher à droite de l'article (son type et ses dates, toujours à jour).
  */
 export function articleDepuisPromo(offre) {
   const nom = joliNom(offre.produit).slice(0, 100).trim();
-  const prix = explicationPrix(offre).prix ?? offre.reduction;
-  return { nom, note: [enseigne(offre), prix].filter(Boolean).join(" · ").slice(0, 200) };
+  return { nom, note: notePromo(offre), promo: offre.id };
+}
+
+const notePromo = (offre) =>
+  [enseigne(offre), explicationPrix(offre).prix ?? offre.reduction].filter(Boolean).join(" · ").slice(0, 200);
+
+/**
+ * La promo choisie pour un article ajouté depuis les promos (« + Ajouter ») : retrouvée par son
+ * identifiant, ou, pour un article ajouté par une ancienne version, d'après sa note (« Leclerc ·
+ * 2,25 € »). Renvoie { offre, aVenir } ; { terminee: true } si elle n'est plus dans les promos ; null
+ * pour un article écrit à la main (aucune promo n'est alors affichée), ou si les promos ne sont pas
+ * encore lues.
+ */
+export function promoChoisie(article, index, aujourdhui) {
+  // Espaces insécables ou non (« 2,25 € ») : la même note.
+  const espaces = (texte) => texte?.replace(/[\u00a0\u202f]/g, " ");
+  const note = espaces(noteCourte(article.note));
+  const depuisUneNote = /^(Leclerc|Lidl) · /.test(note ?? "");
+  if (!index || (!article.promo && !depuisUneNote)) return null;
+  const enCours = (o) => !o.date_fin || o.date_fin >= aujourdhui;
+  const parIdentifiant = article.promo ? index.find(({ offre }) => offre.id === article.promo)?.offre : null;
+  const offre =
+    parIdentifiant && enCours(parIdentifiant)
+      ? parIdentifiant
+      : depuisUneNote
+        ? chercherPromos(index, article.nom, aujourdhui)
+            .map((resultat) => resultat.offre)
+            .find((o) => espaces(notePromo(o)) === note)
+        : null;
+  if (!offre) return { terminee: true };
+  return { offre, aVenir: Boolean(offre.date_debut && offre.date_debut > aujourdhui) };
 }
 
 /**

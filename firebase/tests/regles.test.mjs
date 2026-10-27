@@ -112,6 +112,13 @@ describe("ajouter un article", () => {
     await assertFails(setDoc(doc(base(COMPTE_1), "articles/b"), nouvelArticle(COMPTE_1, { modifie_le: hier })));
   });
 
+  test("la promo d'où vient l'article (son identifiant) est facultative mais limitée", async () => {
+    const depuisUnePromo = nouvelArticle(COMPTE_1, { promo: "lidl-2026-10-22-80000" });
+    await assertSucceeds(setDoc(doc(base(COMPTE_1), "articles/a"), depuisUnePromo));
+    await assertFails(setDoc(doc(base(COMPTE_1), "articles/b"), nouvelArticle(COMPTE_1, { promo: "x".repeat(101) })));
+    await assertFails(setDoc(doc(base(COMPTE_1), "articles/c"), nouvelArticle(COMPTE_1, { promo: 42 })));
+  });
+
   test("les champs inconnus sont refusés", async () => {
     await assertFails(setDoc(doc(base(COMPTE_1), "articles/a"), nouvelArticle(COMPTE_1, { pirate: true })));
   });

@@ -579,6 +579,15 @@ svg {
   cursor: pointer;
 }
 
+/* Une promo choisie qui n'est plus dans les catalogues. */
+.promo-terminee {
+  flex: 0 0 auto;
+  align-self: center;
+  padding: 0 14px 0 4px;
+  color: var(--discret);
+  font-size: 0.78rem;
+}
+
 /* Sous l'étiquette : le type de promo, en petit (« -60 % sur le 2e »). */
 .type-promo {
   color: var(--promo);

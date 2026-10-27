@@ -1,6 +1,6 @@
 // Règles simples sur les articles de la liste (sans Firebase : faciles à tester).
 
-export const LONGUEURS = { nom: 100, quantite: 30, note: 200 };
+export const LONGUEURS = { nom: 100, quantite: 30, note: 200, promo: 100 };
 
 /** Enlève les espaces en trop : « ␣ lait   demi ␣ » → « lait demi ». */
 export function nettoyer(texte) {
@@ -23,15 +23,15 @@ export function cle(nom) {
  * Prépare un article saisi : textes nettoyés, champs vides retirés.
  * Renvoie { article } si tout va bien, ou { erreur } avec un message en français.
  */
-export function preparerSaisie({ nom, quantite = "", note = "" }) {
-  const article = { nom: nettoyer(nom), quantite: nettoyer(quantite), note: nettoyer(note) };
+export function preparerSaisie({ nom, quantite = "", note = "", promo = "" }) {
+  const article = { nom: nettoyer(nom), quantite: nettoyer(quantite), note: nettoyer(note), promo: nettoyer(promo) };
   if (!article.nom) return { erreur: "Écrivez le nom de l'article." };
   for (const [champ, max] of Object.entries(LONGUEURS)) {
     if (article[champ].length > max) {
       return { erreur: `Le champ « ${champ} » est trop long (${max} caractères au maximum).` };
     }
   }
-  for (const champ of ["quantite", "note"]) {
+  for (const champ of ["quantite", "note", "promo"]) {
     if (!article[champ]) delete article[champ];
   }
   return { article };

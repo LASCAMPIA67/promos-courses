@@ -55,10 +55,18 @@ for (const theme of ["light", "dark"]) {
       await page.screenshot({ path: `${DOSSIER}compte.png` });
       await fenetre.getByRole("button", { name: "Enregistrer" }).click();
 
+      // Trois articles ajoutés depuis une promo (« + Ajouter »), les autres écrits à la main.
+      for (const [recherche, nom, qui] of [
+        ["lait", "Lait demi-écrémé", page],
+        ["pain", "Pain de mie complet", autre],
+        ["bananes", "Bananes", page],
+      ]) {
+        await qui.getByLabel("Article à ajouter").fill(recherche);
+        await qui.getByRole("button", { name: `Ajouter ${nom} à la liste`, exact: true }).click();
+        await qui.getByRole("button", { name: "Effacer" }).click();
+        await expect(page.locator("#liste-a-acheter")).toContainText(nom);
+      }
       for (const [nom, quantite, qui] of [
-        ["Lait demi-écrémé", "2 L", page],
-        ["Pain complet", "", autre],
-        ["Bananes", "1 kg", page],
         ["Beurre doux", "", autre],
         ["Café moulu", "", page],
         ["Pâtes", "2", autre],
@@ -93,8 +101,8 @@ for (const theme of ["light", "dark"]) {
       await page.getByRole("button", { name: "Modifier Beurre doux" }).click(); // referme
     }
 
-    await page.getByRole("button", { name: "Voir 2 promos pour Lait demi-écrémé" }).click();
-    await expect(page.getByRole("dialog", { name: "Promos pour « Lait demi-écrémé »" })).toBeVisible();
+    await page.getByRole("button", { name: /^Voir la promo de Lait demi-écrémé/ }).click();
+    await expect(page.getByRole("dialog", { name: "Promo pour « Lait demi-écrémé »" })).toBeVisible();
     await page.screenshot({ path: `${DOSSIER}promos${suffixe}.png` });
     await page.getByRole("button", { name: "Fermer" }).click();
 

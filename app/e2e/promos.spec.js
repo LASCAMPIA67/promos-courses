@@ -1,8 +1,9 @@
-// Scénarios réels : la liste de courses comparée aux promos (fichier d'exemple, aux dates du jour).
+// Scénarios réels : les promos dans la liste (fichier d'exemple, aux dates du jour). Seul un article
+// ajouté depuis une promo (« + Ajouter ») affiche cette promo à droite.
 
 import { expect, test } from "@playwright/test";
 
-import { COMPTES, aAcheter, ajouter, caddie, creerComptes, seConnecter, viderLaBase } from "./outils.js";
+import { COMPTES, aAcheter, ajouter, caddie, creerComptes, ecrireArticle, seConnecter, viderLaBase } from "./outils.js";
 import { servirPromos } from "./promos-exemple.js";
 
 test.beforeAll(async ({ request }) => {
@@ -13,79 +14,92 @@ test.beforeEach(async ({ request }) => {
   await viderLaBase(request);
 });
 
-const ligne = (page, nom) => aAcheter(page).locator(".article").filter({ hasText: nom });
+/** La ligne de l'article qui porte exactement ce nom. */
+const ligne = (page, nom) =>
+  aAcheter(page)
+    .locator(".article")
+    .filter({ has: page.locator(".nom").getByText(nom, { exact: true }) });
 
-test("les articles en promo sont signalés, avec le détail de chaque promo", async ({ page, context }) => {
+/** Écrit dans le champ, touche « + Ajouter » sur la promo, puis efface le champ. */
+async function ajouterDepuisPromo(page, recherche, nom) {
+  await page.getByLabel("Article à ajouter").fill(recherche);
+  await page.getByRole("button", { name: `Ajouter ${nom} à la liste`, exact: true }).click();
+  await page.getByRole("button", { name: "Effacer" }).click();
+  await expect(ligne(page, nom)).toBeVisible();
+}
+
+test("un article ajouté depuis une promo l'affiche à droite ; écrit à la main, rien", async ({ page, context }) => {
   await servirPromos(context);
   await seConnecter(page, COMPTES.un);
   await expect(page.locator("#info-promos")).toContainText("Promos : aujourd'hui");
 
-  await ajouter(page, "Lait");
-  await ajouter(page, "Beurre"); // sa promo est terminée
-  await ajouter(page, "Laitue");
-  await expect(ligne(page, "Lait").first().getByRole("button", { name: "Voir 3 promos pour Lait" })).toBeVisible();
-  await expect(ligne(page, "Beurre").locator(".bouton-promos")).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Voir 1 promo pour Laitue" })).toBeVisible();
-  // Sous l'étiquette, le type de la meilleure promo, sans avoir à l'ouvrir.
-  await expect(ligne(page, "Lait").first().locator(".type-promo")).toHaveText(/^-50 % sur le 2e · dès le \d/);
-  await expect(ligne(page, "Laitue").locator(".type-promo")).toHaveText("0,79 €");
+  await ajouterDepuisPromo(page, "lait", "Lait demi-écrémé UHT");
+  await ajouter(page, "Laitue"); // écrite à la main : même en promo, rien à droite
+  const uht = ligne(page, "Lait demi-écrémé UHT");
+  await expect(uht.locator(".type-promo")).toHaveText(/^-50 % sur le 2e · dès le \d/);
+  await expect(uht.locator(".details")).toHaveText(/^\d\d:\d\d · Leclerc · 6,12 €$/);
+  await expect(ligne(page, "Laitue")).toBeVisible();
+  await expect(ligne(page, "Laitue").locator(".bouton-promos")).toHaveCount(0);
 
-  // Le détail : les plus proches d'abord, Leclerc avant Lidl.
-  await page.getByRole("button", { name: "Voir 3 promos pour Lait" }).click();
-  const fenetre = page.getByRole("dialog", { name: "Promos pour « Lait »" });
-  await expect(fenetre).toBeVisible();
-  await expect(fenetre.locator(".promo-nom")).toHaveText([
-    "Lait demi-écrémé UHT LACTEL",
-    "Lait demi-écrémé MILSANI",
-    "Chocolat au lait CÔTE D'OR",
-  ]);
-
-  // Leclerc, à venir, en lot : prix à l'unité, et le prix en prenant les 2.
-  const aVenir = fenetre.locator(".promo").nth(0);
-  await expect(aVenir.locator(".enseigne")).toHaveText("Leclerc");
-  await expect(aVenir.locator(".periode")).toContainText("Dès");
-  await expect(aVenir.locator(".promo-description")).toHaveText("6 x 1 L");
-  await expect(aVenir.locator(".promo-prix")).toHaveText("6,12 €1,02 €/L");
-  await expect(aVenir.locator(".promo-bas")).toHaveText("-50 % sur le 2e9,18 € les 2 (0,77 €/L)");
-  await expect(aVenir.getByRole("link", { name: "Voir Lait demi-écrémé UHT dans le catalogue" })).toHaveAttribute(
+  // Le détail de cette promo-là, et d'elle seule.
+  await uht.getByRole("button", { name: /^Voir la promo de Lait demi-écrémé UHT/ }).click();
+  const fenetre = page.getByRole("dialog", { name: "Promo pour « Lait demi-écrémé UHT »" });
+  const promo = fenetre.locator(".promo");
+  await expect(promo).toHaveCount(1);
+  await expect(promo.locator(".enseigne")).toHaveText("Leclerc");
+  await expect(promo.locator(".periode")).toContainText("Dès");
+  await expect(promo.locator(".promo-nom")).toHaveText("Lait demi-écrémé UHT LACTEL");
+  await expect(promo.locator(".promo-description")).toHaveText("6 x 1 L");
+  await expect(promo.locator(".promo-prix")).toHaveText("6,12 €1,02 €/L");
+  await expect(promo.locator(".promo-bas")).toHaveText("-50 % sur le 2e9,18 € les 2 (0,77 €/L)");
+  await expect(promo.getByRole("link", { name: "Voir Lait demi-écrémé UHT dans le catalogue" })).toHaveAttribute(
     "href",
     "https://exemple.test/catalogue/lait-leclerc",
   );
+  await fenetre.getByRole("button", { name: "Fermer" }).click();
+  await expect(fenetre).toBeHidden();
 
-  // Lidl, réduction immédiate : ancien prix barré, déjà déduit en caisse.
-  const lidl = fenetre.locator(".promo").nth(1);
+  // Lidl, réduction immédiate : ancien prix barré.
+  await ajouterDepuisPromo(page, "lait", "Lait demi-écrémé");
+  await expect(ligne(page, "Lait demi-écrémé").locator(".type-promo")).toHaveText("-15 % en caisse");
+  await ligne(page, "Lait demi-écrémé")
+    .getByRole("button", { name: /^Voir la promo/ })
+    .click();
+  const lidl = page.getByRole("dialog", { name: "Promo pour « Lait demi-écrémé »" }).locator(".promo");
   await expect(lidl.locator(".enseigne")).toHaveText("Lidl");
   await expect(lidl.locator(".prix")).toHaveText("0,89 €");
   await expect(lidl.locator(".ancien-prix")).toHaveText("1,05 €");
   await expect(lidl.locator(".type")).toHaveText("-15 % en caisse");
   await expect(lidl.locator(".periode")).toContainText("Jusqu'au");
-
-  await fenetre.getByRole("button", { name: "Fermer" }).click();
-  await expect(fenetre).toBeHidden();
+  await page.getByRole("button", { name: "Fermer" }).click();
 
   // Dans le caddie, plus besoin de l'étiquette.
-  await page.getByRole("checkbox", { name: "Laitue : à acheter" }).click();
-  await expect(caddie(page)).toContainText("Laitue");
+  await page.getByRole("checkbox", { name: "Lait demi-écrémé : à acheter" }).click();
+  await expect(caddie(page)).toContainText("Lait demi-écrémé");
   await expect(caddie(page).locator(".bouton-promos")).toHaveCount(0);
 });
 
 test("le prix dit clairement où va la réduction : carte E.Leclerc ou Lidl Plus", async ({ page, context }) => {
   await servirPromos(context);
   await seConnecter(page, COMPTES.un);
-  await ajouter(page, "Pain complet");
-  await ajouter(page, "Bananes");
-  await expect(ligne(page, "Pain complet").locator(".type-promo")).toHaveText("30 % sur la carte");
+  await ajouterDepuisPromo(page, "pain", "Pain de mie complet");
+  await ajouterDepuisPromo(page, "bananes", "Bananes");
+  await expect(ligne(page, "Pain de mie complet").locator(".type-promo")).toHaveText("30 % sur la carte");
   await expect(ligne(page, "Bananes").locator(".type-promo")).toHaveText("-23 % Lidl Plus");
 
-  await page.getByRole("button", { name: "Voir 1 promo pour Pain complet" }).click();
-  const pain = page.getByRole("dialog", { name: "Promos pour « Pain complet »" }).locator(".promo");
+  await ligne(page, "Pain de mie complet")
+    .getByRole("button", { name: /^Voir la promo/ })
+    .click();
+  const pain = page.getByRole("dialog", { name: "Promo pour « Pain de mie complet »" }).locator(".promo");
   await expect(pain.locator(".promo-prix")).toHaveText("2,35 €");
   await expect(pain.locator(".type")).toHaveText("30 % sur la carte");
   await expect(pain.locator(".detail")).toHaveText("revient à 1,65 € (3,30 €/kg)");
   await page.getByRole("button", { name: "Fermer" }).click();
 
-  await page.getByRole("button", { name: "Voir 1 promo pour Bananes" }).click();
-  const bananes = page.getByRole("dialog", { name: "Promos pour « Bananes »" }).locator(".promo");
+  await ligne(page, "Bananes")
+    .getByRole("button", { name: /^Voir la promo/ })
+    .click();
+  const bananes = page.getByRole("dialog", { name: "Promo pour « Bananes »" }).locator(".promo");
   await expect(bananes.locator(".promo-prix")).toHaveText("1,29 €");
   await expect(bananes.locator(".type")).toHaveText("-23 % Lidl Plus");
   await expect(bananes.locator(".detail")).toHaveText("sans l'appli : 1,69 €");
@@ -94,25 +108,43 @@ test("le prix dit clairement où va la réduction : carte E.Leclerc ou Lidl Plus
 test("une même promo « au choix » (plusieurs parfums) n'est montrée qu'une fois", async ({ page, context }) => {
   await servirPromos(context);
   await seConnecter(page, COMPTES.un);
-  await ajouter(page, "Shampoing");
-  await expect(ligne(page, "Shampoing").locator(".type-promo")).toHaveText("-40 % en caisse");
-  await page.getByRole("button", { name: "Voir 1 promo pour Shampoing" }).click();
-  const promos = page.getByRole("dialog", { name: "Promos pour « Shampoing »" }).locator(".promo");
-  await expect(promos).toHaveCount(1);
-  await expect(promos.locator(".promo-nom")).toHaveText("Shampooing LE PETIT MARSEILLAIS");
-  await expect(promos.locator(".promo-description")).toHaveText(
+  await page.getByLabel("Article à ajouter").fill("shampoing");
+  const resultats = page.locator("#resultats .promo");
+  await expect(resultats).toHaveCount(1);
+  await expect(resultats.locator(".promo-nom")).toHaveText("Shampooing LE PETIT MARSEILLAIS");
+  await expect(resultats.locator(".promo-description")).toHaveText(
     "Au choix : Douceur & Éclat, Nutrition, Purifiant · 2 x 300 ml (600 ml)",
   );
+  await page.getByRole("button", { name: "Ajouter Shampooing à la liste" }).click();
+  await page.getByRole("button", { name: "Effacer" }).click();
+  await expect(ligne(page, "Shampooing").locator(".type-promo")).toHaveText("-40 % en caisse");
 });
 
 test("« Chips » trouve aussi les marques de chips, comme Pringles", async ({ page, context }) => {
   await servirPromos(context);
   await seConnecter(page, COMPTES.un);
-  await ajouter(page, "Chips");
-  await page.getByRole("button", { name: "Voir 1 promo pour Chips" }).click();
-  await expect(page.getByRole("dialog", { name: "Promos pour « Chips »" }).locator(".promo-nom")).toHaveText([
-    "Pringles",
-  ]);
+  await page.getByLabel("Article à ajouter").fill("chips");
+  await expect(page.locator("#resultats .promo-nom")).toHaveText(["Pringles"]);
+});
+
+test("articles des versions précédentes : promo retrouvée d'après la note, ou dite terminée", async ({
+  page,
+  context,
+  request,
+}) => {
+  await servirPromos(context);
+  // Ajoutés depuis une promo par une ancienne version : pas d'identifiant, une note « Promo Lidl : … ».
+  await ecrireArticle(request, "ancien-lait", {
+    nom: "Lait demi-écrémé",
+    note: "Promo Lidl : 0,89 € · Jusqu'au samedi 31 octobre",
+  });
+  // Une promo choisie qui n'est plus dans les catalogues.
+  await ecrireArticle(request, "ancien-beurre", { nom: "Beurre doux", note: "Lidl · 1,99 €", promo: "beurre" });
+  await seConnecter(page, COMPTES.un);
+  await expect(ligne(page, "Lait demi-écrémé").locator(".type-promo")).toHaveText("-15 % en caisse");
+  await expect(ligne(page, "Lait demi-écrémé").locator(".details")).toHaveText(/ · Lidl · 0,89 €$/);
+  await expect(ligne(page, "Beurre doux").locator(".promo-terminee")).toHaveText("Promo terminée");
+  await expect(ligne(page, "Beurre doux").locator(".bouton-promos")).toHaveCount(0);
 });
 
 test("des promos trop anciennes ou incomplètes sont signalées", async ({ page, context }) => {
@@ -131,12 +163,12 @@ test("sans promos, la liste marche quand même", async ({ page, context }) => {
   await expect(page.locator("#etat-promos")).toHaveText("Promos indisponibles (pas de réseau ?).");
   await ajouter(page, "Lait");
   await expect(aAcheter(page)).toContainText("Lait");
-  await expect(page.locator(".bouton-promos")).toHaveCount(0);
 
   // Les promos reviennent avec le réseau.
   await context.unroute("**/promos-test.json");
   await servirPromos(context);
   await page.evaluate(() => window.dispatchEvent(new Event("online")));
-  await expect(page.getByRole("button", { name: "Voir 3 promos pour Lait" })).toBeVisible();
   await expect(page.locator("#etat-promos")).toBeHidden();
+  await page.getByLabel("Article à ajouter").fill("lait");
+  await expect(page.locator("#etat-recherche")).toHaveText("4 promos");
 });

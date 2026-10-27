@@ -102,12 +102,12 @@ Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
 - **Qui et quand** : une petite pastille de couleur sous le rond à cocher dit qui a ajouté l'article
   (chacun choisit son prénom et sa couleur dans « Mon compte ») ; sous le nom, la date et l'heure
   d'ajout.
-- **Promos** : un article en promo chez Lidl ou Leclerc porte une étiquette « 2 promos », avec
-  dessous le type de promo (« -60 % sur le 2e », « 30 % sur la carte »…). En la
-  touchant, on voit chaque promo : magasin, prix, prix au kilo, jusqu'à quand (ou à partir de quand)
-  et, en clair, **où va la réduction** : déjà déduite en caisse, en prenant plusieurs, rendue sur la
-  carte E.Leclerc (Ticket E.Leclerc) ou avec l'appli Lidl Plus. **Leclerc d'abord**, notre magasin
-  principal.
+- **Promos** : un article ajouté depuis une promo porte une étiquette « Promo », avec dessous le
+  type de promo (« -60 % sur le 2e », « 30 % sur la carte »…) ; un article écrit à la main n'en
+  affiche pas. En touchant l'étiquette, on voit la promo : magasin, prix, prix au kilo, jusqu'à quand
+  (ou à partir de quand) et, en clair, **où va la réduction** : déjà déduite en caisse, en prenant
+  plusieurs, rendue sur la carte E.Leclerc (Ticket E.Leclerc) ou avec l'appli Lidl Plus.
+  **Leclerc d'abord**, notre magasin principal.
 - **Familles de produits** : « Chips » trouve aussi Pringles, Lay's, Doritos… ; « Soda » trouve
   Coca-Cola, Fanta… ; « Couches » trouve Pampers… (environ 50 familles).
 - **Les promos en écrivant** : en écrivant un article, les promos qui correspondent s'affichent

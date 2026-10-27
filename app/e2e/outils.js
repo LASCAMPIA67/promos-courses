@@ -47,3 +47,29 @@ export async function ajouter(page, nom, quantite = "") {
 
 export const aAcheter = (page) => page.locator("#liste-a-acheter");
 export const caddie = (page) => page.locator("#liste-caddie");
+
+/**
+ * Écrit un article directement dans l'émulateur, comme l'aurait fait une ancienne version de l'appli
+ * (les règles d'accès ne s'appliquent pas à cette écriture d'administration).
+ */
+export async function ecrireArticle(request, id, { nom, note, promo, ajoutePar = COMPTES.un.uid }) {
+  const texte = (valeur) => (valeur == null ? {} : { stringValue: valeur });
+  const maintenant = { timestampValue: new Date().toISOString() };
+  const champs = {
+    nom: texte(nom),
+    achete: { booleanValue: false },
+    ajoute_par: texte(ajoutePar),
+    cree_le: maintenant,
+    modifie_le: maintenant,
+    ...(note ? { note: texte(note) } : {}),
+    ...(promo ? { promo: texte(promo) } : {}),
+  };
+  const reponse = await request.patch(
+    `${FIRESTORE}/v1/projects/${PROJET}/databases/(default)/documents/articles/${id}`,
+    {
+      headers: { Authorization: "Bearer owner" },
+      data: { fields: champs },
+    },
+  );
+  expect(reponse.ok()).toBeTruthy();
+}
