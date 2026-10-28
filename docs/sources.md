@@ -100,8 +100,15 @@ la miniature de taille standard de 500 pixels, comme le demandent les
 Chacune est téléchargée **une seule fois** par logo, avec la pause habituelle et l'adresse du projet
 dans la présentation du robot (« User-Agent »). La liste vient des logos que Wikidata (la base de
 Wikipédia) indique pour l'article Wikipédia de chaque marque, puis d'une vérification à l'œil :
-les photos (une bouteille, une vitrine), les anciens logos et ceux d'une maison mère qui n'est pas
-la marque du produit ont été écartés.
+les photos (une bouteille, une vitrine), les anciens logos, les logos d'une autre gamme
+(« Paysan Breton, les surgelés » pour un fromage) et ceux d'une maison mère qui n'est pas la marque
+du produit ont été écartés. Mesure du 28/10/2026 : 29 marques de plus ont un logo, et 42 promos ont
+le logo Marque Repère ; en tout, 288 marques sur 540 et **70 % des produits de marque** ont un logo
+(59 % avec le catalogue seul).
+
+> Wikipédia lui-même (les logos publiés seulement dans ses articles, comme celui de Marque Repère)
+> n'a pas encore pu être parcouru marque par marque : son serveur a limité nos demandes le
+> 28/10/2026. À compléter plus tard, avec la même vérification.
 
 > **Licences.** Les logos de Wikimedia Commons sont presque tous dans le domaine public (de simples
 > textes, trop simples pour le droit d'auteur), mais restent des marques déposées ; ceux de
