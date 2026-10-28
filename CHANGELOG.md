@@ -14,6 +14,8 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+## [0.11.0] - 2026-10-28
+
 ### Ajouté
 
 - **Une photo pour chaque promo** : à gauche de chaque fiche (résultats quand on écrit un article,
@@ -326,7 +328,8 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 - Version antérieure à la mise en place des publications : pas de page « Release » (voir le lien
   ci-dessous vers son enregistrement d'origine).
 
-[Non publié]: https://github.com/lascampia67/promos-courses/compare/v0.10.0...HEAD
+[Non publié]: https://github.com/lascampia67/promos-courses/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/lascampia67/promos-courses/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/lascampia67/promos-courses/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/lascampia67/promos-courses/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/lascampia67/promos-courses/compare/v0.7.0...v0.8.0
