@@ -94,10 +94,14 @@ italienne), « CATTIER » un champagne (ici des cosmétiques), « SCHNEIDER » u
 dans les promos. À chaque passage, le résumé du robot sur GitHub liste les **marques encore sans
 logo** : de quoi compléter la liste quand une nouvelle marque arrive.
 
-Les images viennent de `upload.wikimedia.org` (son `robots.txt` l'autorise) : une miniature de
-taille standard (500 pixels de large au plus), comme le demandent les
-[règles de Wikimedia](https://w.wiki/GHai), téléchargée **une seule fois** par logo, avec la pause
-habituelle et l'adresse du projet dans la présentation du robot (« User-Agent »).
+Les images viennent de `upload.wikimedia.org` (son `robots.txt` l'autorise) : pour un dessin (SVG),
+la miniature de taille standard de 500 pixels, comme le demandent les
+[règles de Wikimedia](https://w.wiki/GHai) ; pour une image (PNG, JPEG), le fichier lui-même.
+Chacune est téléchargée **une seule fois** par logo, avec la pause habituelle et l'adresse du projet
+dans la présentation du robot (« User-Agent »). La liste vient des logos que Wikidata (la base de
+Wikipédia) indique pour l'article Wikipédia de chaque marque, puis d'une vérification à l'œil :
+les photos (une bouteille, une vitrine), les anciens logos et ceux d'une maison mère qui n'est pas
+la marque du produit ont été écartés.
 
 > **Licences.** Les logos de Wikimedia Commons sont presque tous dans le domaine public (de simples
 > textes, trop simples pour le droit d'auteur), mais restent des marques déposées ; ceux de

@@ -1,9 +1,133 @@
 {
  "description": "Logos officiels pris sur Wikipédia, pour les marques dont le catalogue Leclerc ne donne pas de logo. Chaque logo a été vérifié à l'œil avant d'être ajouté ; « page » mène à la page du fichier (source, licence). Voir docs/sources.md.",
  "marques": {
+  "AVÈNE": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/9/97/Av_new-logo-2022_eau-thermale-avene.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Av_new-logo-2022_eau-thermale-avene.png"
+  },
+  "BIODERMA": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Bioderma_logo.svg/500px-Bioderma_logo.svg.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Bioderma_logo.svg"
+  },
+  "BIRRA MORETTI": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/3/32/Birra_Moretti_Logo_2023.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Birra_Moretti_Logo_2023.png"
+  },
+  "BURAGO": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/LOGO_BBurago.svg/500px-LOGO_BBurago.svg.png",
+   "page": "https://commons.wikimedia.org/wiki/File:LOGO_BBurago.svg"
+  },
+  "CATERPILLAR": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Caterpillar_logo.svg/500px-Caterpillar_logo.svg.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Caterpillar_logo.svg"
+  },
+  "FISHER PRICE PUERICULTURE": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Fisher-Price_2019.svg/500px-Fisher-Price_2019.svg.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Fisher-Price_2019.svg"
+  },
+  "HEAD & SHOULDERS": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Head%26shoulders-Logo.svg/500px-Head%26shoulders-Logo.svg.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Head%26shoulders-Logo.svg"
+  },
+  "ISLA DELICE": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Isla_D%C3%A9lice_logo_%28Full%29.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Isla_D%C3%A9lice_logo_%28Full%29.png"
+  },
+  "JAZWARES": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/4/44/Jazwares_toys_logo.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Jazwares_toys_logo.png"
+  },
+  "JOHNNIE WALKER": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Johnnie_Walker_wordmark.svg/500px-Johnnie_Walker_wordmark.svg.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Johnnie_Walker_wordmark.svg"
+  },
+  "KELLOGG'S": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Kellogg%27s-Logo.svg/500px-Kellogg%27s-Logo.svg.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Kellogg%27s-Logo.svg"
+  },
+  "KINDER MAXI": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Kinder_%28Wortmarke%29_logo.svg/500px-Kinder_%28Wortmarke%29_logo.svg.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Kinder_%28Wortmarke%29_logo.svg"
+  },
+  "KUSMI TEA": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Kusmi_logo.svg/500px-Kusmi_logo.svg.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Kusmi_logo.svg"
+  },
+  "LABORATOIRE GALLIA": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Logo-Gallia.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Logo-Gallia.png"
+  },
+  "LAPHROAIG": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Laphroaig_logo.svg/500px-Laphroaig_logo.svg.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Laphroaig_logo.svg"
+  },
+  "LUSTUCRU": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/3/3b/Logo_Lustucru.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Logo_Lustucru.jpg"
+  },
+  "MAPED CREATIV": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/d/de/Maped_company_logo.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Maped_company_logo.png"
+  },
   "MARQUE REPÈRE": {
    "image": "https://upload.wikimedia.org/wikipedia/fr/thumb/c/c9/Logo_Marque_Rep%C3%A8re_2018.png/500px-Logo_Marque_Rep%C3%A8re_2018.png",
    "page": "https://fr.wikipedia.org/wiki/Fichier:Logo_Marque_Rep%C3%A8re_2018.png"
+  },
+  "MC CAIN": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/McCain-Logo.svg/500px-McCain-Logo.svg.png",
+   "page": "https://commons.wikimedia.org/wiki/File:McCain-Logo.svg"
+  },
+  "MCCAIN": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/McCain-Logo.svg/500px-McCain-Logo.svg.png",
+   "page": "https://commons.wikimedia.org/wiki/File:McCain-Logo.svg"
+  },
+  "MONOPOLY": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Monopoly_logo_white_border.svg/500px-Monopoly_logo_white_border.svg.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Monopoly_logo_white_border.svg"
+  },
+  "NATURE VALLEY": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/1/16/Nature-valley-logo.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Nature-valley-logo.png"
+  },
+  "NEUTROGENA": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Neutrogena_logo.svg/500px-Neutrogena_logo.svg.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Neutrogena_logo.svg"
+  },
+  "PAYSAN BRETON": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/d/db/Paysan_breton.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Paysan_breton.jpg"
+  },
+  "POLISTIL": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Polistil_LOGO.svg/500px-Polistil_LOGO.svg.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Polistil_LOGO.svg"
+  },
+  "PURINA": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Nestl%C3%A9_Purina_logo.svg/500px-Nestl%C3%A9_Purina_logo.svg.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Nestl%C3%A9_Purina_logo.svg"
+  },
+  "SEVERIN": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Severin_Elektroger%C3%A4te_Logo_2025.svg/500px-Severin_Elektroger%C3%A4te_Logo_2025.svg.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Severin_Elektroger%C3%A4te_Logo_2025.svg"
+  },
+  "TROLLI": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Trolli_Logo_05.2022.svg/500px-Trolli_Logo_05.2022.svg.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Trolli_Logo_05.2022.svg"
+  },
+  "VARTA": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Varta-Logo.svg/500px-Varta-Logo.svg.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Varta-Logo.svg"
+  },
+  "VICHY": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/9/9b/Vichy_Laboratoires_%28logo%29.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Vichy_Laboratoires_%28logo%29.jpg"
+  },
+  "WILKINSON SWORD": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/6/61/Wilkinson_Sword_text_only.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Wilkinson_Sword_text_only.png"
+  },
+  "WWE": {
+   "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/WWE_Official_Logo.svg/500px-WWE_Official_Logo.svg.png",
+   "page": "https://commons.wikimedia.org/wiki/File:WWE_Official_Logo.svg"
   }
  }
 }
