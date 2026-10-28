@@ -51,7 +51,16 @@ def est_marque_repere(offre):
     return (offre.get("ean") or "").startswith(PREFIXE_MARQUE_REPERE) or marque in GAMMES_MARQUE_REPERE
 
 
+def lire_logos():
+    return json.loads(resources.files("robot_promos").joinpath("logos.json").read_text(encoding="utf-8"))
+
+
 def logos_officiels():
     """Les logos vérifiés un par un sur Wikipédia (logos.json) : marque (comme cle_marque) -> adresse."""
-    texte = resources.files("robot_promos").joinpath("logos.json").read_text(encoding="utf-8")
-    return {cle_marque(marque): logo["image"] for marque, logo in json.loads(texte)["marques"].items()}
+    return {cle_marque(marque): logo["image"] for marque, logo in lire_logos()["marques"].items()}
+
+
+def logos_a_verifier():
+    """Les logos trouvés sur Wikipédia qui attendent d'être regardés à l'œil : marque -> adresses
+    possibles (le même fichier sur Wikimedia Commons, puis sur le Wikipédia de l'article)."""
+    return {cle_marque(marque): logo["images"] for marque, logo in lire_logos().get("a_verifier", {}).items()}

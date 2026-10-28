@@ -1,5 +1,5 @@
 {
- "description": "Logos officiels pris sur Wikipédia, pour les marques dont le catalogue Leclerc ne donne pas de logo. Chaque logo a été vérifié à l'œil avant d'être ajouté ; « page » mène à la page du fichier (source, licence). Voir docs/sources.md.",
+ "description": "Logos officiels pris sur Wikipédia, pour les marques dont le catalogue Leclerc ne donne pas de logo. « marques » : vérifiés à l'œil, montrés dans l'appli ; « page » mène à la page du fichier (source, licence). « a_verifier » : trouvés sur Wikipédia, que le robot télécharge sans les montrer (le premier fichier qui existe parmi « images »), en attendant d'être regardés à l'œil. Voir docs/sources.md.",
  "marques": {
   "AVÈNE": {
    "image": "https://upload.wikimedia.org/wikipedia/commons/9/97/Av_new-logo-2022_eau-thermale-avene.png",
@@ -124,6 +124,196 @@
   "WWE": {
    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/WWE_Official_Logo.svg/500px-WWE_Official_Logo.svg.png",
    "page": "https://commons.wikimedia.org/wiki/File:WWE_Official_Logo.svg"
+  }
+ },
+ "a_verifier": {
+  "ALPRO": {
+   "images": [
+    "https://upload.wikimedia.org/wikipedia/commons/1/15/Alpro_2019_logo.png",
+    "https://upload.wikimedia.org/wikipedia/en/1/15/Alpro_2019_logo.png"
+   ],
+   "pages": [
+    "https://commons.wikimedia.org/wiki/File:Alpro_2019_logo.png",
+    "https://en.wikipedia.org/wiki/File:Alpro_2019_logo.png"
+   ]
+  },
+  "BANDAI": {
+   "images": [
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Logo_Bandai.svg/500px-Logo_Bandai.svg.png"
+   ],
+   "pages": [
+    "https://commons.wikimedia.org/wiki/File:Logo_Bandai.svg"
+   ]
+  },
+  "DANONE": {
+   "images": [
+    "https://upload.wikimedia.org/wikipedia/commons/3/3e/Danone_Master_Logo_Primary_Adobe_RGB.jpg",
+    "https://upload.wikimedia.org/wikipedia/fr/3/3e/Danone_Master_Logo_Primary_Adobe_RGB.jpg"
+   ],
+   "pages": [
+    "https://commons.wikimedia.org/wiki/File:Danone_Master_Logo_Primary_Adobe_RGB.jpg",
+    "https://fr.wikipedia.org/wiki/Fichier:Danone_Master_Logo_Primary_Adobe_RGB.jpg"
+   ]
+  },
+  "ELLE & VIRE": {
+   "images": [
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Elle_%26_Vire_-_Logo.svg/500px-Elle_%26_Vire_-_Logo.svg.png",
+    "https://upload.wikimedia.org/wikipedia/fr/thumb/8/8d/Elle_%26_Vire_-_Logo.svg/500px-Elle_%26_Vire_-_Logo.svg.png"
+   ],
+   "pages": [
+    "https://commons.wikimedia.org/wiki/File:Elle_%26_Vire_-_Logo.svg",
+    "https://fr.wikipedia.org/wiki/Fichier:Elle_%26_Vire_-_Logo.svg"
+   ]
+  },
+  "FINDUS": {
+   "images": [
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Findus_logo.svg/500px-Findus_logo.svg.png",
+    "https://upload.wikimedia.org/wikipedia/en/thumb/9/9f/Findus_logo.svg/500px-Findus_logo.svg.png"
+   ],
+   "pages": [
+    "https://commons.wikimedia.org/wiki/File:Findus_logo.svg",
+    "https://en.wikipedia.org/wiki/File:Findus_logo.svg"
+   ]
+  },
+  "GREY GOOSE": {
+   "images": [
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Grey_Goose_%28vodka%2C_logo%29.svg/500px-Grey_Goose_%28vodka%2C_logo%29.svg.png",
+    "https://upload.wikimedia.org/wikipedia/en/thumb/7/7a/Grey_Goose_%28vodka%2C_logo%29.svg/500px-Grey_Goose_%28vodka%2C_logo%29.svg.png"
+   ],
+   "pages": [
+    "https://commons.wikimedia.org/wiki/File:Grey_Goose_%28vodka%2C_logo%29.svg",
+    "https://en.wikipedia.org/wiki/File:Grey_Goose_%28vodka%2C_logo%29.svg"
+   ]
+  },
+  "HENDRICK'S": {
+   "images": [
+    "https://upload.wikimedia.org/wikipedia/commons/c/c6/Hendricks_Gin_Logo.jpg",
+    "https://upload.wikimedia.org/wikipedia/en/c/c6/Hendricks_Gin_Logo.jpg"
+   ],
+   "pages": [
+    "https://commons.wikimedia.org/wiki/File:Hendricks_Gin_Logo.jpg",
+    "https://en.wikipedia.org/wiki/File:Hendricks_Gin_Logo.jpg"
+   ]
+  },
+  "HENNESSY": {
+   "images": [
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Logo_hennessy.svg/500px-Logo_hennessy.svg.png",
+    "https://upload.wikimedia.org/wikipedia/en/thumb/b/bd/Logo_hennessy.svg/500px-Logo_hennessy.svg.png"
+   ],
+   "pages": [
+    "https://commons.wikimedia.org/wiki/File:Logo_hennessy.svg",
+    "https://en.wikipedia.org/wiki/File:Logo_hennessy.svg"
+   ]
+  },
+  "JAMESON": {
+   "images": [
+    "https://upload.wikimedia.org/wikipedia/commons/0/06/Jameson_Irish_Whiskey_logo.png",
+    "https://upload.wikimedia.org/wikipedia/en/0/06/Jameson_Irish_Whiskey_logo.png"
+   ],
+   "pages": [
+    "https://commons.wikimedia.org/wiki/File:Jameson_Irish_Whiskey_logo.png",
+    "https://en.wikipedia.org/wiki/File:Jameson_Irish_Whiskey_logo.png"
+   ]
+  },
+  "LUTTI": {
+   "images": [
+    "https://upload.wikimedia.org/wikipedia/commons/6/6c/Logo_Lutti.png",
+    "https://upload.wikimedia.org/wikipedia/fr/6/6c/Logo_Lutti.png"
+   ],
+   "pages": [
+    "https://commons.wikimedia.org/wiki/File:Logo_Lutti.png",
+    "https://fr.wikipedia.org/wiki/Fichier:Logo_Lutti.png"
+   ]
+  },
+  "MALIBU": {
+   "images": [
+    "https://upload.wikimedia.org/wikipedia/commons/c/c4/Malibu_%28rum%29_logo.png",
+    "https://upload.wikimedia.org/wikipedia/en/c/c4/Malibu_%28rum%29_logo.png"
+   ],
+   "pages": [
+    "https://commons.wikimedia.org/wiki/File:Malibu_%28rum%29_logo.png",
+    "https://en.wikipedia.org/wiki/File:Malibu_%28rum%29_logo.png"
+   ]
+  },
+  "NUXE": {
+   "images": [
+    "https://upload.wikimedia.org/wikipedia/commons/0/02/NUXE-LOGO-EQ3308C.png",
+    "https://upload.wikimedia.org/wikipedia/fr/0/02/NUXE-LOGO-EQ3308C.png"
+   ],
+   "pages": [
+    "https://commons.wikimedia.org/wiki/File:NUXE-LOGO-EQ3308C.png",
+    "https://fr.wikipedia.org/wiki/Fichier:NUXE-LOGO-EQ3308C.png"
+   ]
+  },
+  "PETIT NAVIRE": {
+   "images": [
+    "https://upload.wikimedia.org/wikipedia/commons/2/23/Logo_Petit_Navire_2017.png",
+    "https://upload.wikimedia.org/wikipedia/fr/2/23/Logo_Petit_Navire_2017.png"
+   ],
+   "pages": [
+    "https://commons.wikimedia.org/wiki/File:Logo_Petit_Navire_2017.png",
+    "https://fr.wikipedia.org/wiki/Fichier:Logo_Petit_Navire_2017.png"
+   ]
+  },
+  "PURESSENTIEL": {
+   "images": [
+    "https://upload.wikimedia.org/wikipedia/commons/6/67/Logo_Puressentiel.png",
+    "https://upload.wikimedia.org/wikipedia/fr/6/67/Logo_Puressentiel.png"
+   ],
+   "pages": [
+    "https://commons.wikimedia.org/wiki/File:Logo_Puressentiel.png",
+    "https://fr.wikipedia.org/wiki/Fichier:Logo_Puressentiel.png"
+   ]
+  },
+  "RAYNAL ET ROQUELAURE": {
+   "images": [
+    "https://upload.wikimedia.org/wikipedia/commons/9/94/Raynal_et_Roquelaure_Logo.png",
+    "https://upload.wikimedia.org/wikipedia/fr/9/94/Raynal_et_Roquelaure_Logo.png"
+   ],
+   "pages": [
+    "https://commons.wikimedia.org/wiki/File:Raynal_et_Roquelaure_Logo.png",
+    "https://fr.wikipedia.org/wiki/Fichier:Raynal_et_Roquelaure_Logo.png"
+   ]
+  },
+  "TIPIAK": {
+   "images": [
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Tipiak_.svg/500px-Tipiak_.svg.png",
+    "https://upload.wikimedia.org/wikipedia/fr/thumb/9/9b/Tipiak_.svg/500px-Tipiak_.svg.png"
+   ],
+   "pages": [
+    "https://commons.wikimedia.org/wiki/File:Tipiak_.svg",
+    "https://fr.wikipedia.org/wiki/Fichier:Tipiak_.svg"
+   ]
+  },
+  "VON DUTCH": {
+   "images": [
+    "https://upload.wikimedia.org/wikipedia/commons/b/b0/Von_Dutchlogo.png",
+    "https://upload.wikimedia.org/wikipedia/en/b/b0/Von_Dutchlogo.png"
+   ],
+   "pages": [
+    "https://commons.wikimedia.org/wiki/File:Von_Dutchlogo.png",
+    "https://en.wikipedia.org/wiki/File:Von_Dutchlogo.png"
+   ]
+  },
+  "WELEDA": {
+   "images": [
+    "https://upload.wikimedia.org/wikipedia/commons/3/37/Weleda_Logo.png",
+    "https://upload.wikimedia.org/wikipedia/en/3/37/Weleda_Logo.png"
+   ],
+   "pages": [
+    "https://commons.wikimedia.org/wiki/File:Weleda_Logo.png",
+    "https://en.wikipedia.org/wiki/File:Weleda_Logo.png"
+   ]
+  },
+  "BUSHMILLS": {
+   "images": [
+    "https://upload.wikimedia.org/wikipedia/commons/5/58/Bushmills_logo.jpeg",
+    "https://upload.wikimedia.org/wikipedia/en/5/58/Bushmills_logo.jpeg"
+   ],
+   "pages": [
+    "https://commons.wikimedia.org/wiki/File:Bushmills_logo.jpeg",
+    "https://en.wikipedia.org/wiki/File:Bushmills_logo.jpeg"
+   ]
   }
  }
 }

@@ -3,7 +3,7 @@
 import json
 from importlib import resources
 
-from robot_promos.marques import MARQUE_REPERE, cle_marque, est_marque_repere, logos_officiels
+from robot_promos.marques import MARQUE_REPERE, cle_marque, est_marque_repere, logos_a_verifier, logos_officiels
 
 
 def test_cle_marque():
@@ -35,3 +35,10 @@ def test_les_logos_de_wikipedia_sont_bien_ranges():
             ("https://commons.wikimedia.org/wiki/", "https://fr.wikipedia.org/wiki/", "https://en.wikipedia.org/wiki/")
         ), marque
     assert logos_officiels()[cle_marque(MARQUE_REPERE)] == marques[cle_marque(MARQUE_REPERE)]["image"]
+
+
+def test_les_logos_a_verifier_viennent_de_wikimedia():
+    for marque, adresses in logos_a_verifier().items():
+        assert marque not in logos_officiels(), marque  # vérifié : il passe dans « marques »
+        assert adresses, marque
+        assert all(a.startswith("https://upload.wikimedia.org/wikipedia/") for a in adresses), marque

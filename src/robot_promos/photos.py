@@ -29,7 +29,14 @@ from PIL import Image, ImageChops, ImageOps
 
 from robot_promos.avancee import Avancee, sans_nouvelles
 from robot_promos.config import ADRESSE_PHOTOS
-from robot_promos.marques import MARQUE_REPERE, SOUS_MARQUES, cle_marque, est_marque_repere, logos_officiels
+from robot_promos.marques import (
+    MARQUE_REPERE,
+    SOUS_MARQUES,
+    cle_marque,
+    est_marque_repere,
+    logos_a_verifier,
+    logos_officiels,
+)
 from robot_promos.offres import verifier
 from robot_promos.web import Navigateur
 
@@ -193,6 +200,31 @@ def preparer_logos(nav, offres, dossier, budget=None, horloge=time.monotonic, av
     return bilan
 
 
+def preparer_logos_a_verifier(nav, candidats, dossier):
+    """Télécharge, sans les montrer dans l'appli, les logos qui attendent d'être regardés à l'œil
+    (`candidats` : marque -> adresses possibles) : dans `dossier`/logos-a-verifier, le premier fichier
+    qui existe. Retire ceux qui ne sont plus candidats. Renvoie marque -> nom du fichier, ou None."""
+    dossier = Path(dossier) / "logos-a-verifier"
+    dossier.mkdir(parents=True, exist_ok=True)
+    trouves = {}
+    for marque, adresses in candidats.items():
+        trouves[marque] = None
+        for adresse in adresses:
+            nom = nom_logo(adresse)
+            if not (dossier / nom).exists():
+                try:
+                    (dossier / nom).write_bytes(reduire_logo(nav.get(adresse, timeout=60).content))
+                except Exception as erreur:  # noqa: BLE001 — l'adresse suivante est peut-être la bonne
+                    print(f"   Logo à vérifier introuvable ({adresse}) : {type(erreur).__name__}"[:300], flush=True)
+                    continue
+            trouves[marque] = nom
+            break
+    for fichier in dossier.glob("*.png"):
+        if fichier.name not in trouves.values():
+            fichier.unlink()
+    return trouves
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="python -m robot_promos.photos", description=__doc__.splitlines()[0])
     parser.add_argument("dossier", help="dossier des vignettes (la branche « photos »)")
@@ -208,6 +240,7 @@ def main(argv=None):
     # Les logos d'abord (peu nombreux, une fois par marque), puis les photos avec le temps qui reste.
     print("→ Logos des marques…", flush=True)
     logos = preparer_logos(nav, document["offres"], args.dossier, budget=args.minutes * 60, avancee=avancee)
+    a_verifier = preparer_logos_a_verifier(nav, logos_a_verifier(), args.dossier)
     print("→ Photos des produits…", flush=True)
     reste = max(0, args.minutes * 60 - (time.monotonic() - debut))
     bilan = preparer_photos(nav, document["offres"], args.dossier, budget=reste, avancee=avancee)
@@ -225,11 +258,13 @@ def main(argv=None):
         f"{logos['en_attente']} pour le prochain passage."
     )
     sans_logo = f"Marques sans logo ({len(logos['sans_logo'])}) : {', '.join(logos['sans_logo']) or 'aucune'}."
+    attente = ", ".join(f"{marque} : {nom or 'introuvable'}" for marque, nom in a_verifier.items()) or "aucun"
+    phrase_attente = f"Logos à vérifier à l'œil (dans logos-a-verifier/, pas montrés dans l'appli) : {attente}."
     print(f"   {phrase_logos}\n   {phrase}", flush=True)
     avancee(f"Photos : {nombre(bilan['avec_photo'])} promos avec photo", forcer=True)
     if resume := os.environ.get("GITHUB_STEP_SUMMARY"):
         with Path(resume).open("a", encoding="utf-8") as f:
-            f.write(f"\n### Photos et logos\n\n{phrase}\n\n{phrase_logos}\n\n{sans_logo}\n")
+            f.write(f"\n### Photos et logos\n\n{phrase}\n\n{phrase_logos}\n\n{sans_logo}\n\n{phrase_attente}\n")
     return 0
 
 

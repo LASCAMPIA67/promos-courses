@@ -123,9 +123,16 @@ du produit ont été écartés. Mesure du 28/10/2026 : 29 marques de plus ont un
 le logo Marque Repère ; en tout, 288 marques sur 540 et **70 % des produits de marque** ont un logo
 (59 % avec le catalogue seul).
 
-> Wikipédia lui-même (les logos publiés seulement dans ses articles, comme celui de Marque Repère)
-> n'a pas encore pu être parcouru marque par marque : son serveur a limité nos demandes le
-> 28/10/2026. À compléter plus tard, avec la même vérification.
+Les logos publiés **seulement dans les articles** de Wikipédia (comme celui de Sodebo ou de
+Danone) se trouvent avec [DBpedia](https://www.dbpedia.org/), qui publie les données des articles
+(le logo de l'encadré de chaque article). Comme Wikimedia limite les demandes depuis notre poste de
+travail, c'est le robot qui télécharge ces logos, en deux temps :
+
+1. **À vérifier** (`a_verifier` dans `logos.json`) : le robot télécharge le fichier (sur Wikimedia
+   Commons, sinon sur le Wikipédia de l'article) dans `logos-a-verifier/` de la branche `photos`,
+   **sans le montrer** dans l'appli ;
+2. **vérifié** : après l'avoir regardé à l'œil, à côté des produits de la marque, on le passe dans
+   `marques` ; un mauvais logo est simplement retiré de la liste.
 
 > **Licences.** Les logos de Wikimedia Commons sont presque tous dans le domaine public (de simples
 > textes, trop simples pour le droit d'auteur), mais restent des marques déposées ; ceux de

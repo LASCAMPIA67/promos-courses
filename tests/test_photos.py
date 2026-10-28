@@ -8,7 +8,16 @@ from PIL import Image
 from robot_promos import photos
 from robot_promos.config import ADRESSE_PHOTOS, MAGASINS
 from robot_promos.offres import creer_offre
-from robot_promos.photos import TAILLE, nom_logo, nom_photo, preparer_logos, preparer_photos, reduire, reduire_logo
+from robot_promos.photos import (
+    TAILLE,
+    nom_logo,
+    nom_photo,
+    preparer_logos,
+    preparer_logos_a_verifier,
+    preparer_photos,
+    reduire,
+    reduire_logo,
+)
 
 MEDIA = "https://nos-catalogues-promos-v2.e.leclerc/media/"
 
@@ -218,3 +227,15 @@ def test_preparer_logos_marque_repere_et_logos_de_wikipedia(tmp_path):
     assert [o["logo_marque"] for o in offres] == ["Marque Repère"] * 3 + [None] * 5
     assert bilan["marque_repere"] == 3
     assert bilan["sans_logo"] == ["ECO+"]
+
+
+def test_les_logos_a_verifier_sont_telecharges_sans_etre_montres(tmp_path):
+    (tmp_path / "logos-a-verifier").mkdir()
+    (tmp_path / "logos-a-verifier" / "ancien.png").write_bytes(b"plus candidat")
+    candidats = {
+        "ALPRO": [f"{WIKI}0000000000000000", f"{WIKI}en/alpro.png"],  # pas sur Commons : sur Wikipédia
+        "INTROUVABLE": [f"{WIKI}0000000000000000"],
+    }
+    trouves = preparer_logos_a_verifier(FauxNavigateur(logo_png()), candidats, tmp_path)
+    assert trouves == {"ALPRO": nom_logo(f"{WIKI}en/alpro.png"), "INTROUVABLE": None}
+    assert sorted(f.name for f in (tmp_path / "logos-a-verifier").iterdir()) == [nom_logo(f"{WIKI}en/alpro.png")]
