@@ -295,6 +295,12 @@ export function noteCourte(note) {
   return note.replace(/^(Leclerc · [^·]+?) · (?:jusqu'|dès le ).*$/, "$1");
 }
 
+/**
+ * La note d'un article, telle que la liste la montre : courte, et sans « Leclerc · » au début (il
+ * n'y a plus qu'un magasin) : « Leclerc · 2,25 € » → « 2,25 € ». La note enregistrée ne change pas.
+ */
+export const noteAffichee = (note) => noteCourte(note)?.replace(/^Leclerc · /, "");
+
 // ---------------------------------------------------------------------------------------------
 // Dates
 

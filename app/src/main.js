@@ -37,7 +37,7 @@ import {
   formaterMoment,
   indexerPromos,
   joliNom,
-  noteCourte,
+  noteAffichee,
   periode,
   phraseSource,
   rechercherPromos,
@@ -305,7 +305,7 @@ function ligneArticle(article, promo = null) {
   nom.className = "nom";
   nom.textContent = article.nom;
   contenu.append(element("span", "cache", "Modifier "), nom);
-  const details = [auteur.quand, article.quantite, noteCourte(article.note)].filter(Boolean).join(" · ");
+  const details = [auteur.quand, article.quantite, noteAffichee(article.note)].filter(Boolean).join(" · ");
   if (details) {
     const sousTitre = document.createElement("span");
     sousTitre.className = "details";
@@ -318,7 +318,14 @@ function ligneArticle(article, promo = null) {
   // Devant : la ligne elle-même ; derrière : le bouton « Supprimer », qu'on découvre en glissant.
   const devant = document.createElement("div");
   devant.className = "article-devant";
-  devant.append(caseACocher, contenu);
+  devant.append(caseACocher);
+  // La photo du produit de la promo choisie, en petit (rien sans photo sûre) ; la toucher montre la promo.
+  if (adresseSure(promo?.offre?.photo)) {
+    const photo = imageDuRobot(promo.offre.photo, "photo-article", "", (image) => image.remove());
+    photo.addEventListener("click", () => ouvrirPromo(article, promo));
+    devant.append(photo);
+  }
+  devant.append(contenu);
   if (promo?.terminee) devant.append(element("span", "promo-terminee", "Promo terminée"));
   else if (promo) devant.append(boutonPromo(article, promo));
 
@@ -588,17 +595,29 @@ $("plus-de-resultats").addEventListener("click", () => {
 function marquePromo(offre) {
   if (!offre.marque) return null;
   const nom = () => element("span", "marque-promo", offre.marque);
-  if (!/^https:\/\//.test(offre.logo ?? "")) return nom();
-  const logo = document.createElement("img");
-  logo.className = "logo-marque";
-  logo.alt = offre.marque; // lu par VoiceOver : le nom de la marque n'est écrit nulle part ailleurs
-  logo.loading = "lazy";
-  logo.decoding = "async";
-  logo.crossOrigin = "anonymous"; // pour le garder sur le téléphone (hors connexion)
-  logo.referrerPolicy = "no-referrer";
-  logo.addEventListener("error", () => logo.replaceWith(nom()), { once: true });
-  logo.src = offre.logo;
-  return logo;
+  if (!adresseSure(offre.logo)) return nom();
+  // Le texte de remplacement est lu par VoiceOver : le nom de la marque n'est écrit nulle part ailleurs.
+  return imageDuRobot(offre.logo, "logo-marque", offre.marque, (logo) => logo.replaceWith(nom()));
+}
+
+const adresseSure = (adresse) => /^https:\/\//.test(adresse ?? "");
+
+/**
+ * Une image faite par le robot (photo d'un produit, logo d'une marque) : chargée quand elle devient
+ * visible et gardée sur le téléphone pour le mode hors ligne. `siIntrouvable(image)` la remplace si
+ * elle ne se charge pas : jamais d'image cassée.
+ */
+function imageDuRobot(adresse, classe, texte, siIntrouvable) {
+  const image = document.createElement("img");
+  image.className = classe;
+  image.alt = texte;
+  image.loading = "lazy";
+  image.decoding = "async";
+  image.crossOrigin = "anonymous"; // une réponse lisible, que le téléphone peut garder
+  image.referrerPolicy = "no-referrer";
+  image.addEventListener("error", () => siIntrouvable(image), { once: true });
+  image.src = adresse;
+  return image;
 }
 
 /**
@@ -612,17 +631,8 @@ function photoPromo(offre) {
       '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2z" /><path d="M9 8V6.5a3 3 0 0 1 6 0V8" /></svg>';
     return cadre;
   };
-  if (!/^https:\/\//.test(offre.photo ?? "")) return sansPhoto();
-  const image = document.createElement("img");
-  image.className = "photo-promo";
-  image.alt = "";
-  image.loading = "lazy";
-  image.decoding = "async";
-  image.crossOrigin = "anonymous"; // pour la garder sur le téléphone (hors connexion)
-  image.referrerPolicy = "no-referrer";
-  image.addEventListener("error", () => image.replaceWith(sansPhoto()), { once: true });
-  image.src = offre.photo;
-  return image;
+  if (!adresseSure(offre.photo)) return sansPhoto();
+  return imageDuRobot(offre.photo, "photo-promo", "", (image) => image.replaceWith(sansPhoto()));
 }
 
 function boutonAjouter(offre) {

@@ -14,6 +14,7 @@ import {
   indexerPromos,
   joliNom,
   motsCles,
+  noteAffichee,
   noteCourte,
   periode,
   periodeCourte,
@@ -418,6 +419,13 @@ describe("promoChoisie : la promo affichée à droite d'un article", () => {
     );
     expect(promoChoisie({ nom: "Beurre doux", promo: "beurre" }, index, AUJOURDHUI)).toEqual({ terminee: true });
   });
+});
+
+test("dans la liste, la note sans « Leclerc · » (il n'y a plus qu'un magasin)", () => {
+  expect(noteAffichee("Leclerc · 2,25 €")).toBe("2,25 €");
+  expect(noteAffichee("Promo Leclerc : 2,25 € · Jusqu'au samedi 7 novembre")).toBe("2,25 €");
+  expect(noteAffichee("sans lactose")).toBe("sans lactose");
+  expect(noteAffichee(undefined)).toBeUndefined();
 });
 
 test("les notes des anciennes versions sont raccourcies à l'affichage", () => {

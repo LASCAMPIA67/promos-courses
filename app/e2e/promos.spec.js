@@ -37,9 +37,18 @@ test("un article ajouté depuis une promo l'affiche à droite ; écrit à la mai
   await ajouter(page, "Laitue"); // écrite à la main : même en promo, rien à droite
   const uht = ligne(page, "Lait demi-écrémé UHT");
   await expect(uht.locator(".type-promo")).toHaveText(/^-50 % sur le 2e · dès le \d/);
-  await expect(uht.locator(".details")).toHaveText(/^\d\d:\d\d · Leclerc · 6,12 €$/);
+  await expect(uht.locator(".details")).toHaveText(/^\d\d:\d\d · 6,12 €$/);
   await expect(ligne(page, "Laitue")).toBeVisible();
   await expect(ligne(page, "Laitue").locator(".bouton-promos")).toHaveCount(0);
+  // Dans la liste aussi, la photo du produit, en petit ; rien pour un article écrit à la main.
+  const photoUht = uht.locator("img.photo-article");
+  await expect(photoUht).toHaveAttribute("src", "https://exemple.test/photos/lait-uht.jpg");
+  await expect.poll(() => photoUht.evaluate((image) => image.complete && image.naturalWidth)).toBe(256);
+  await expect(ligne(page, "Laitue").locator(".photo-article")).toHaveCount(0);
+  // La toucher montre la promo.
+  await photoUht.click();
+  await expect(page.getByRole("dialog", { name: "Promo pour « Lait demi-écrémé UHT »" })).toBeVisible();
+  await page.getByRole("button", { name: "Fermer" }).click();
 
   // Le détail de cette promo-là, et d'elle seule.
   await uht.getByRole("button", { name: /^Voir la promo de Lait demi-écrémé UHT/i }).click();
@@ -76,6 +85,7 @@ test("un article ajouté depuis une promo l'affiche à droite ; écrit à la mai
   await page.getByRole("checkbox", { name: "Lait demi-écrémé : à acheter" }).click();
   await expect(caddie(page)).toContainText("Lait demi-écrémé");
   await expect(caddie(page).locator(".bouton-promos")).toHaveCount(0);
+  await expect(caddie(page).locator(".photo-article")).toHaveCount(0);
 });
 
 test("le prix dit clairement où va la réduction : sur la carte E.Leclerc, ou en caisse avec la carte", async ({
@@ -183,7 +193,7 @@ test("articles des versions précédentes : promo retrouvée d'après la note, o
   await ecrireArticle(request, "ancien-beurre", { nom: "Beurre doux", note: "Leclerc · 1,99 €", promo: "beurre" });
   await seConnecter(page, COMPTES.un);
   await expect(ligne(page, "Lait demi-écrémé").locator(".type-promo")).toHaveText("-15 % en caisse");
-  await expect(ligne(page, "Lait demi-écrémé").locator(".details")).toHaveText(/ · Leclerc · 0,89 €$/);
+  await expect(ligne(page, "Lait demi-écrémé").locator(".details")).toHaveText(/^\d\d:\d\d · 0,89 €$/);
   await expect(ligne(page, "Beurre doux").locator(".promo-terminee")).toHaveText("Promo terminée");
   await expect(ligne(page, "Beurre doux").locator(".bouton-promos")).toHaveCount(0);
 });

@@ -26,9 +26,14 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
   endroit. Le robot en fait une petite image PNG (1 à 12 Ko) rangée dans `logos/` de la branche
   `photos` ; nouveaux champs facultatifs `logo_catalogue` et `logo` dans `promos.json` (format
   inchangé). Chaque catalogue est relu une fois (lecture n° 3).
+- **La photo du produit dans la liste**, en petit, juste après le rond à cocher, pour chaque article
+  ajouté depuis une promo (rien sans photo sûre, ni dans le caddie) ; la toucher montre la promo.
 
 ### Modifié
 
+- Dans la liste, la note d'un article ajouté depuis une promo ne répète plus le magasin
+  (« 0,89 € » au lieu de « Leclerc · 0,89 € » : il n'y en a plus qu'un) ; la note enregistrée ne
+  change pas.
 - L'étape du robot « Fabriquer les photos » devient « Fabriquer les photos et les logos » (les
   logos d'abord, puis les photos, au plus une heure en tout) ; dans la fenêtre d'avancée :
   « Photos et logos ».

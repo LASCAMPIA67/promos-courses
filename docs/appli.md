@@ -108,7 +108,9 @@ Geispolsheim. L'appli lit ce fichier :
 
 - en écrivant un article, les promos qui correspondent s'affichent (voir plus bas) ; **« + Ajouter »**
   sur l'une d'elles ajoute l'article **avec cette promo** ;
-- un article ajouté ainsi porte à droite une étiquette orange **« Promo »**, et dessous, en petit, le
+- un article ajouté ainsi montre, juste après le rond à cocher, la **photo du produit** en petit (la
+  toucher montre la promo ; rien sans photo sûre, ni dans le caddie) ;
+- il porte à droite une étiquette orange **« Promo »**, et dessous, en petit, le
   **type de promo**, sans avoir à l'ouvrir : « -60 % sur le 2e » (en prenant plusieurs), « -20 % en
   caisse », « 30 % sur la carte » (Ticket E.Leclerc), « -25 % avec la carte », ou le prix s'il n'y a pas de réduction particulière ; « dès le 29 oct. » s'ajoute pour une promo
   qui n'a pas encore commencé ; quand la promo n'est plus dans les catalogues, « Promo terminée » ;
@@ -175,7 +177,8 @@ le champ, à la place de la liste (la croix ✕ efface et fait revenir la liste)
   demi-écrémé » avant « Laitue ») ;
 - **« + »** ou **« OK »** sur le clavier ajoute ce qu'on a écrit, **qu'il y ait des promos ou non** ;
 - le bouton **« + Ajouter »** d'une promo ajoute ce produit-là, avec une **note** courte qui
-  rappelle le magasin et le prix (« Leclerc · 0,89 € ») ; le type de promo et ses dates s'affichent,
+  rappelle le prix (« 0,89 € » ; elle est enregistrée « Leclerc · 0,89 € », mais la liste n'écrit
+  plus le magasin) ; le type de promo et ses dates s'affichent,
   toujours à jour, sous l'étiquette de l'article ;
   s'il est déjà dans la liste, le bouton l'indique (« ✓ Dans la liste ») ;
 - les promos s'affichent par 30 ; « Voir plus de promos » montre les suivantes.

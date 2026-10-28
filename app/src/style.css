@@ -633,6 +633,21 @@ svg {
   stroke: var(--sur-accent);
 }
 
+/* Dans la liste, la photo du produit d'un article ajouté depuis une promo, en petit. */
+.photo-article {
+  flex: none;
+  align-self: center;
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
+  margin-right: 12px;
+  border: 1px solid var(--bordure);
+  border-radius: 10px;
+  background: #ffffff;
+  object-fit: contain;
+  cursor: pointer;
+}
+
 .texte {
   flex: 1;
   min-width: 0;

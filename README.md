@@ -113,7 +113,7 @@ Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
   Coca-Cola, Fanta… ; « Couches » trouve Pampers… (environ 50 familles).
 - **Les promos en écrivant** : en écrivant un article, les promos qui correspondent s'affichent
   aussitôt ; « + » ajoute ce qu'on a écrit (même sans promo), ou on ajoute une promo d'un geste (avec
-  une note courte : « Leclerc · 0,89 € »).
+  une note courte : « 0,89 € ») ; dans la liste, il montre la photo du produit en petit.
 - **Promos à jour** : l'appli prévient si le robot n'est pas passé ou si les promos sont incomplètes ;
   **« Mettre à jour les promos »** (dans Mon compte) lance le robot sans attendre, montre où il en
   est étape par étape (« Photos : 312 sur 1 450 ») et recharge les promos dès qu'il a fini.
