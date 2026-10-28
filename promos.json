@@ -1,6 +1,6 @@
 {
  "format": 2,
- "mise_a_jour": "2026-10-28T16:03:24+01:00",
+ "mise_a_jour": "2026-10-28T16:11:18+01:00",
  "version_robot": "0.14.0",
  "magasins": {
   "leclerc-geispolsheim": {
@@ -16,7 +16,7 @@
    "nom": "Catalogues E.Leclerc Geispolsheim",
    "etat": "ok",
    "nb_offres": 1393,
-   "remarque": "9 catalogue(s)",
+   "remarque": "9 catalogue(s) ; 9 inchangé(s) depuis le dernier passage",
    "catalogues": [
     {
      "id": "26C409N",
@@ -26,7 +26,7 @@
      "version": "18660164073aa70d5bbccfa015b22a2f@2026-10-28T08:04:33Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26C409N/1067",
      "nb_offres": 29,
-     "reutilise": false
+     "reutilise": true
     },
     {
      "id": "26G310E",
@@ -36,7 +36,7 @@
      "version": "5a1e254d38373b2d261ef7340badfa64@2026-10-28T09:22:42Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310E/1067",
      "nb_offres": 44,
-     "reutilise": false
+     "reutilise": true
     },
     {
      "id": "26G310G",
@@ -46,7 +46,7 @@
      "version": "07da9b7ca474d937ebc986e4a3194029@2026-10-28T08:30:33Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
      "nb_offres": 270,
-     "reutilise": false
+     "reutilise": true
     },
     {
      "id": "26G124G",
@@ -56,7 +56,7 @@
      "version": "96a4c42bff10c8219b2775fd9f5c54cf@2026-10-28T08:17:27Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G124G/1067",
      "nb_offres": 354,
-     "reutilise": false
+     "reutilise": true
     },
     {
      "id": "26D009D",
@@ -66,7 +66,7 @@
      "version": "60892f34c8e392dbfe81adf23c4e7e2f@2026-10-28T08:06:14Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26D009D/1067",
      "nb_offres": 0,
-     "reutilise": false
+     "reutilise": true
     },
     {
      "id": "26G124E",
@@ -76,7 +76,7 @@
      "version": "875a3f1e8a7ff843ff831af550030135@2026-10-21T09:45:29Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G124E/1067",
      "nb_offres": 4,
-     "reutilise": false
+     "reutilise": true
     },
     {
      "id": "26G047G",
@@ -86,7 +86,7 @@
      "version": "ef5e6e393e883b27666cab63ed125268@2026-10-28T08:12:10Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G047G/1067",
      "nb_offres": 646,
-     "reutilise": false
+     "reutilise": true
     },
     {
      "id": "26G009P",
@@ -96,7 +96,7 @@
      "version": "fffae2e102be2e77a7b735c039a3fc5d@2026-10-28T08:09:54Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G009P/1067",
      "nb_offres": 46,
-     "reutilise": false
+     "reutilise": true
     },
     {
      "id": "26D001D",
@@ -106,7 +106,7 @@
      "version": "8d9c7659c709c6c978dc152b9f08f0f3@2026-04-17T16:30:47Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26D001D/1067",
      "nb_offres": 0,
-     "reutilise": false
+     "reutilise": true
     }
    ]
   }
@@ -136,7 +136,7 @@
    "page": null,
    "logo_catalogue": null,
    "historique": null,
-   "logo": null,
+   "logo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/logos/640557e9e6f0987ce5cc00a2ca567cea.png",
    "logo_marque": null,
    "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/868d5a998002f8def255244f18efb276.jpg"
   },
@@ -164,7 +164,7 @@
    "page": null,
    "logo_catalogue": null,
    "historique": null,
-   "logo": null,
+   "logo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/logos/640557e9e6f0987ce5cc00a2ca567cea.png",
    "logo_marque": null,
    "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/09916c2248ebb72c773e82b7811c5a6a.jpg"
   },
@@ -700,7 +700,7 @@
    "page": null,
    "logo_catalogue": null,
    "historique": null,
-   "logo": null,
+   "logo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/logos/17afb40ced71f4f73ac65b2ca71d632c.png",
    "logo_marque": null,
    "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/8a30e94800d4b77e3c03a673457d68a8.jpg"
   },
@@ -868,7 +868,7 @@
    "page": null,
    "logo_catalogue": null,
    "historique": null,
-   "logo": null,
+   "logo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/logos/371a69959c88ac391fa53d1c073f265f.png",
    "logo_marque": null,
    "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/efb4896013548fcbf670316ad3a92398.jpg"
   },
@@ -1008,7 +1008,7 @@
    "page": null,
    "logo_catalogue": null,
    "historique": null,
-   "logo": null,
+   "logo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/logos/371a69959c88ac391fa53d1c073f265f.png",
    "logo_marque": null,
    "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/8aa5213307f98ff123fc8e1ff4560b3c.jpg"
   },
@@ -1204,7 +1204,7 @@
    "page": null,
    "logo_catalogue": null,
    "historique": null,
-   "logo": null,
+   "logo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/logos/17afb40ced71f4f73ac65b2ca71d632c.png",
    "logo_marque": null,
    "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/04cd49d2558c78dff8ebcd32c4179f40.jpg"
   },
@@ -4928,7 +4928,7 @@
    "page": null,
    "logo_catalogue": null,
    "historique": null,
-   "logo": null,
+   "logo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/logos/592470de99a3311b696e7527bd3bfeb4.png",
    "logo_marque": null,
    "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/a62864a67450896500a400e122f4d29f.jpg"
   },
@@ -8624,7 +8624,7 @@
    "page": null,
    "logo_catalogue": null,
    "historique": null,
-   "logo": null,
+   "logo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/logos/592470de99a3311b696e7527bd3bfeb4.png",
    "logo_marque": null,
    "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/f7b96f764e62d15320d4223b5698990a.jpg"
   },
@@ -17560,7 +17560,7 @@
    "page": null,
    "logo_catalogue": null,
    "historique": null,
-   "logo": null,
+   "logo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/logos/592470de99a3311b696e7527bd3bfeb4.png",
    "logo_marque": null,
    "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/4fb927000ad1c6b09dfa006f75e773fc.jpg"
   },
@@ -20712,7 +20712,7 @@
    "page": null,
    "logo_catalogue": null,
    "historique": null,
-   "logo": null,
+   "logo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/logos/a142affefd0701893ae4fe14f8cedc8b.png",
    "logo_marque": null,
    "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/b94da376e5fd3f8845adcea24979443a.jpg"
   },
@@ -23252,7 +23252,7 @@
    "page": null,
    "logo_catalogue": null,
    "historique": null,
-   "logo": null,
+   "logo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/logos/a142affefd0701893ae4fe14f8cedc8b.png",
    "logo_marque": null,
    "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/13265f53e44eb10da1e6922f131d6157.jpg"
   },
@@ -25320,7 +25320,7 @@
    "page": null,
    "logo_catalogue": null,
    "historique": null,
-   "logo": null,
+   "logo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/logos/83e9afd04f23467a79d080873e3a6792.png",
    "logo_marque": null,
    "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/99579d7f97c6bc47dcd0cf508492f0cf.jpg"
   },
@@ -29184,7 +29184,7 @@
    "page": null,
    "logo_catalogue": null,
    "historique": null,
-   "logo": null,
+   "logo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/logos/788fa479fc1b75c7a4eba798550d6659.png",
    "logo_marque": null,
    "photo": null
   },
@@ -31784,7 +31784,7 @@
    "page": null,
    "logo_catalogue": null,
    "historique": null,
-   "logo": null,
+   "logo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/logos/ab8e11bdfbef9a70cfbc06ff948f985b.png",
    "logo_marque": null,
    "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/ad5c4f32c6a745fa0cddac55a9136ae6.jpg"
   },
@@ -33272,7 +33272,7 @@
    "page": null,
    "logo_catalogue": null,
    "historique": null,
-   "logo": null,
+   "logo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/logos/788fa479fc1b75c7a4eba798550d6659.png",
    "logo_marque": null,
    "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/52e4e201fcdb90841416572b7398740c.jpg"
   },
@@ -33824,7 +33824,7 @@
    "page": null,
    "logo_catalogue": null,
    "historique": null,
-   "logo": null,
+   "logo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/logos/f195d46ab2681c95bd61a78b0dfbad75.png",
    "logo_marque": null,
    "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/27c2c40317cd91447add3eaa90f10a9e.jpg"
   },
@@ -34172,7 +34172,7 @@
    "page": null,
    "logo_catalogue": null,
    "historique": null,
-   "logo": null,
+   "logo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/logos/c903c706956235f2a1aeacf88ab63093.png",
    "logo_marque": null,
    "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/bea56868eae019f60c2ec517bdb89368.jpg"
   },
@@ -35052,7 +35052,7 @@
    "page": null,
    "logo_catalogue": null,
    "historique": null,
-   "logo": null,
+   "logo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/logos/01fe866ed1ce06ec643742668521b9a0.png",
    "logo_marque": null,
    "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/405f106c92ab5f13a00f6af1cd4985d6.jpg"
   },
@@ -37508,7 +37508,7 @@
    "page": null,
    "logo_catalogue": null,
    "historique": null,
-   "logo": null,
+   "logo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/logos/020b5a3f638de805a3a5b238ceba2e5b.png",
    "logo_marque": null,
    "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/bd9f9b7a0caa44663ef0110fac86ab52.jpg"
   },
@@ -38344,7 +38344,7 @@
    "page": null,
    "logo_catalogue": null,
    "historique": null,
-   "logo": null,
+   "logo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/logos/aeed892b8b07e2d503da44aa0038976f.png",
    "logo_marque": null,
    "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/531531bb72cb4141a00753da58f0b68e.jpg"
   },
@@ -38764,7 +38764,7 @@
    "page": null,
    "logo_catalogue": null,
    "historique": null,
-   "logo": null,
+   "logo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/logos/76b68b127dd76d4972767e68a2195d98.png",
    "logo_marque": null,
    "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/f9db91fddef7a0a76e4880ab7fc632b3.jpg"
   },
