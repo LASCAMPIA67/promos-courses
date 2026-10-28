@@ -17,6 +17,8 @@ import {
   lireFichierTicket,
   modifierArticle,
   modifierTicket,
+  enregistrerCleRobot,
+  lireCleRobot,
   suivreArticles,
   suivreCorrectionsRayons,
   suivreMembres,
@@ -32,6 +34,7 @@ import {
   articleDepuisPromo,
   dateDuJour,
   explicationPrix,
+  formaterMoment,
   indexerPromos,
   joliNom,
   noteCourte,
@@ -45,6 +48,15 @@ import {
   typePromo,
 } from "./promos.js";
 import { AUTRES, RAYONS, cleRayon, rangerParRayon, rayonDe } from "./rayons.js";
+import {
+  ADRESSE_NOUVELLE_CLE,
+  ErreurRobot,
+  adressePromosFraiches,
+  cleValide,
+  dernierPassage,
+  lancerRobot,
+  phrasePassage,
+} from "./robot.js";
 import {
   MAGASINS_TICKET,
   TICKETS_SOUS_LA_LISTE,
@@ -64,6 +76,8 @@ const $ = (id) => document.getElementById(id);
 const ADRESSE_PROMOS = import.meta.env.MODE === "emulateurs" ? "promos-test.json" : URL_PROMOS;
 const RELIRE_LES_PROMOS_APRES = 60 * 60 * 1000; // 1 heure
 const PROMOS_PAR_PAGE = 30;
+/** Entre deux nouvelles du robot lancé depuis l'appli : il met de 2 minutes à une heure (photos). */
+const ATTENTE_ROBOT = import.meta.env.MODE === "emulateurs" ? 300 : 20_000;
 
 const etat = {
   utilisateur: null,
@@ -84,6 +98,9 @@ const etat = {
   promosIndisponibles: false,
   recherche: { texte: "", nombre: PROMOS_PAR_PAGE }, // promos trouvées pendant qu'on écrit
 };
+
+// Le robot lancé depuis l'appli : sa clé GitHub (lue dans Firebase), son suivi, ce qu'il fait.
+const robot = { cle: undefined, suivi: null, message: "", genre: "info" };
 
 auth.languageCode = "fr";
 $("version").textContent = __VERSION__;
@@ -389,11 +406,17 @@ $("vider-caddie").addEventListener("click", async () => {
 // ---------------------------------------------------------------------------------------------
 // Les promos
 
-async function chargerPromos() {
+/** Lit promos.json ; `adresse` : une autre copie (celle que le robot vient d'écrire, voir robot.js). */
+async function chargerPromos(adresse = ADRESSE_PROMOS) {
   try {
-    const reponse = await fetch(ADRESSE_PROMOS, { cache: "no-cache", signal: AbortSignal.timeout(20_000) });
+    const reponse = await fetch(adresse, { cache: "no-cache", signal: AbortSignal.timeout(20_000) });
     if (!reponse.ok) throw new Error(`promos.json : erreur ${reponse.status}`);
     const donnees = await reponse.json();
+    // GitHub sert parfois une copie de quelques minutes : jamais de promos plus anciennes que celles qu'on a.
+    if (etat.promos && donnees.mise_a_jour < etat.promos.donnees.mise_a_jour) {
+      etat.promos.luesLe = Date.now();
+      return;
+    }
     etat.promos = { donnees, index: indexerPromos(donnees), luesLe: Date.now() };
     etat.promosIndisponibles = false;
   } catch (erreur) {
@@ -412,6 +435,11 @@ function relirePromosSiBesoin() {
 
 /** Prévient si les promos manquent, sont anciennes ou incomplètes ; rappelle leur date en bas. */
 function dessinerEtatPromos() {
+  // Pendant que le robot travaille (« Mettre à jour les promos »), on suit son avancée ici.
+  if (robot.message) {
+    afficherMessage($("etat-promos"), robot.message, robot.genre);
+    return;
+  }
   const alertes = [];
   if (etat.promosIndisponibles) {
     alertes.push("Promos indisponibles (pas de réseau ?).");
@@ -1214,6 +1242,10 @@ $("bouton-compte").addEventListener("click", () => {
   for (const choix of document.querySelectorAll('input[name="couleur"]')) choix.checked = choix.value === couleur;
   dessinerLegende();
   afficherMessage($("message-compte"), "");
+  $("etat-robot").textContent = robot.message || dateDesPromos();
+  $("cle-robot").hidden = true;
+  $("champ-cle").value = "";
+  afficherMessage($("message-robot"), "");
   $("fenetre-compte").showModal();
 });
 
@@ -1252,6 +1284,120 @@ $("form-compte").addEventListener("submit", (evenement) => {
   });
   $("fenetre-compte").close();
 });
+
+// ---------------------------------------------------------------------------------------------
+// « Mettre à jour les promos » : lancer le robot sans attendre son passage du matin (voir robot.js)
+
+async function cleDuRobot() {
+  if (robot.cle === undefined) robot.cle = await lireCleRobot(db).catch(() => null);
+  return robot.cle;
+}
+
+/** Ce que fait le robot : dans « Mon compte » et, en haut de la liste, à la place de l'état des promos. */
+function nouvelleDuRobot(message, genre = "info") {
+  robot.message = message;
+  robot.genre = genre;
+  $("etat-robot").textContent = message || dateDesPromos();
+  dessinerEtatPromos();
+}
+
+const dateDesPromos = () =>
+  etat.promos ? `Promos mises à jour ${formaterMoment(new Date(etat.promos.donnees.mise_a_jour))}.` : "";
+
+$("lancer-robot").addEventListener("click", async () => {
+  afficherMessage($("message-robot"), "");
+  const cle = await cleDuRobot();
+  if (cle) demarrerRobot(cle);
+  else demanderCle();
+});
+
+function demanderCle(message) {
+  $("creer-cle").href = ADRESSE_NOUVELLE_CLE;
+  $("cle-robot").hidden = false;
+  if (message) afficherMessage($("message-robot"), message, "erreur");
+  $("champ-cle").focus();
+}
+
+async function enregistrerCle() {
+  const cle = $("champ-cle").value.trim();
+  if (!cleValide(cle)) {
+    afficherMessage($("message-robot"), "Ce n'est pas une clé GitHub : elle commence par « github_pat_ ».", "erreur");
+    return;
+  }
+  robot.cle = cle;
+  $("champ-cle").value = "";
+  $("cle-robot").hidden = true;
+  afficherMessage($("message-robot"), "");
+  enregistrerCleRobot(db, cle).catch(signalerErreur); // gardée pour les deux téléphones
+  demarrerRobot(cle);
+}
+
+$("enregistrer-cle").addEventListener("click", enregistrerCle);
+// « Entrée » dans le champ de la clé : l'enregistrer (et non enregistrer le prénom et fermer).
+$("champ-cle").addEventListener("keydown", (evenement) => {
+  if (evenement.key !== "Enter") return;
+  evenement.preventDefault();
+  enregistrerCle();
+});
+
+/** Lance le robot (sauf s'il travaille déjà), puis suit son passage jusqu'au bout. */
+async function demarrerRobot(cle) {
+  $("lancer-robot").disabled = true;
+  try {
+    const avant = await dernierPassage(cle);
+    if (avant?.etat === "en_cours") {
+      suivreRobot(cle, avant.id);
+    } else {
+      await lancerRobot(cle);
+      suivreRobot(cle, null, avant?.id);
+    }
+  } catch (erreur) {
+    $("lancer-robot").disabled = false;
+    if (erreur instanceof ErreurRobot && erreur.raison === "cle") demanderCle(erreur.message);
+    else afficherMessage($("message-robot"), erreur.message || "Le robot n'a pas pu être lancé.", "erreur");
+  }
+}
+
+/**
+ * Suit le passage `id` (déjà en cours), ou celui qui vient d'être demandé : le premier qui n'est pas
+ * `precedent`. GitHub met quelques secondes à le créer.
+ */
+function suivreRobot(cle, id, precedent) {
+  clearTimeout(robot.suivi);
+  const etape = async () => {
+    try {
+      const passage = await dernierPassage(cle);
+      const leBon = passage && (id ? passage.id === id : passage.id !== precedent);
+      if (leBon && passage.etat !== "en_cours") {
+        await finDuRobot(cle, passage);
+        return;
+      }
+      nouvelleDuRobot(leBon ? phrasePassage(passage) : "Le robot démarre…");
+    } catch (erreur) {
+      console.warn("Robot : pas de nouvelles pour l'instant.", erreur); // on réessaie
+    }
+    robot.suivi = setTimeout(etape, ATTENTE_ROBOT);
+  };
+  nouvelleDuRobot("Le robot démarre…");
+  etape();
+}
+
+async function finDuRobot(cle, passage) {
+  robot.suivi = null;
+  $("lancer-robot").disabled = false;
+  if (passage.etat !== "reussi") {
+    nouvelleDuRobot(phrasePassage(passage), "erreur");
+    return;
+  }
+  // Les promos que le robot vient d'écrire, sans attendre la copie de GitHub (5 minutes).
+  const adresse =
+    import.meta.env.MODE === "emulateurs" ? ADRESSE_PROMOS : await adressePromosFraiches(cle).catch(() => undefined);
+  await chargerPromos(adresse);
+  nouvelleDuRobot("Promos mises à jour.", "succes");
+  setTimeout(() => {
+    if (robot.message === "Promos mises à jour.") nouvelleDuRobot("");
+  }, 8_000);
+}
 
 $("deconnexion").addEventListener("click", async () => {
   $("fenetre-compte").close();

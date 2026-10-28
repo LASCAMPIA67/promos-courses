@@ -272,4 +272,17 @@ describe("réglages", () => {
     await assertSucceeds(getDoc(doc(base(COMPTE_2), "reglages/foyer")));
     await assertFails(getDoc(doc(base(INCONNU), "reglages/foyer")));
   });
+
+  test("la clé du robot : une clé GitHub « fine-grained », pour le foyer seulement", async () => {
+    const cle = `github_pat_${"A1b2_".repeat(10)}`;
+    await assertSucceeds(setDoc(doc(base(COMPTE_1), "reglages/robot"), { cle }));
+    await assertSucceeds(getDoc(doc(base(COMPTE_2), "reglages/robot")));
+    await assertFails(getDoc(doc(base(INCONNU), "reglages/robot")));
+    await assertFails(setDoc(doc(base(INCONNU), "reglages/robot"), { cle }));
+    await assertFails(setDoc(doc(base(COMPTE_1), "reglages/robot"), { cle: "ghp_ancienneCleClassique12345678" }));
+    await assertFails(setDoc(doc(base(COMPTE_1), "reglages/robot"), { cle: `${cle} !` }));
+    await assertFails(setDoc(doc(base(COMPTE_1), "reglages/robot"), { cle, autre: 1 }));
+    await assertFails(setDoc(doc(base(COMPTE_1), "reglages/robot"), { cle: `github_pat_${"a".repeat(251)}` }));
+    await assertSucceeds(deleteDoc(doc(base(COMPTE_2), "reglages/robot")));
+  });
 });

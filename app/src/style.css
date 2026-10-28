@@ -373,6 +373,50 @@ svg {
   color: var(--attention);
 }
 
+/* Le robot lancé depuis l'appli : en cours (bleu), réussi (vert), échoué (rouge). */
+.section-robot {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--bordure);
+}
+
+.section-robot h3,
+.section-robot p {
+  margin: 0;
+}
+
+.section-robot h3 {
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.cle-robot {
+  display: grid;
+  gap: 8px;
+}
+
+.cle-robot .lien {
+  justify-self: start;
+  padding-inline: 0;
+}
+
+.etat-promos[data-genre="info"] {
+  background: var(--info-doux);
+  color: var(--info);
+}
+
+.etat-promos[data-genre="succes"] {
+  background: var(--accent-doux);
+  color: var(--accent-texte);
+}
+
+.etat-promos[data-genre="erreur"] {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: var(--danger);
+}
+
 /* ------------------------------------------------------------------------------------------ */
 /* En-tête et ajout */
 

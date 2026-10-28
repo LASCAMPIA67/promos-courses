@@ -8,6 +8,7 @@ import {
   deleteDoc,
   deleteField,
   doc,
+  getDoc,
   getDocs,
   onSnapshot,
   serverTimestamp,
@@ -80,6 +81,16 @@ export function suivreCorrectionsRayons(db, rappel, enCasErreur) {
 /** Retient le rayon d'un article pour le foyer : `cle` est le nom réduit à ses mots (voir rayons.js). */
 export function corrigerRayon(db, cle, rayon) {
   return setDoc(doc(db, "reglages", "rayons"), { [cle]: rayon }, { merge: true });
+}
+
+/** La clé GitHub du foyer qui lance le robot des promos (réglage « robot »), ou null. */
+export async function lireCleRobot(db) {
+  return (await getDoc(doc(db, "reglages", "robot"))).data()?.cle ?? null;
+}
+
+/** Garde la clé GitHub du robot pour le foyer (les deux téléphones). */
+export function enregistrerCleRobot(db, cle) {
+  return setDoc(doc(db, "reglages", "robot"), { cle });
 }
 
 /** Enregistre sa propre fiche : { prenom, couleur }. */

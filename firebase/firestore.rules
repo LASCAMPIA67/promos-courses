@@ -100,9 +100,19 @@ service cloud.firestore {
       }
     }
 
-    // Réglages communs du foyer (cartes de fidélité, magasins préférés…).
+    // La clé GitHub qui lance le robot des promos depuis l'appli : une clé « fine-grained »
+    // (github_pat_…), et rien d'autre.
+    function cleRobotValide(r) {
+      return r.keys().hasOnly(['cle'])
+        && r.cle is string
+        && r.cle.matches('github_pat_[A-Za-z0-9_]{20,250}');
+    }
+
+    // Réglages communs du foyer (rayons corrigés…) et clé du robot (« robot »).
     match /reglages/{reglage} {
-      allow read, write: if estDuFoyer();
+      allow read, delete: if estDuFoyer();
+      allow create, update: if estDuFoyer()
+        && (reglage != 'robot' || cleRobotValide(request.resource.data));
     }
 
     // Tout le reste est fermé.

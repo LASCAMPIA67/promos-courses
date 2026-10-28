@@ -363,6 +363,30 @@
           <button type="button" class="bouton" data-fermer>Fermer</button>
           <button type="submit" class="bouton principal">Enregistrer</button>
         </div>
+        <!-- Lancer le robot des promos sans attendre son passage du matin (voir src/robot.js) -->
+        <section class="section-robot" aria-labelledby="titre-robot">
+          <h3 id="titre-robot">Promos</h3>
+          <p id="etat-robot" class="discret" role="status"></p>
+          <button type="button" id="lancer-robot" class="bouton">Mettre à jour les promos</button>
+          <div id="cle-robot" class="cle-robot" hidden>
+            <p class="discret">
+              Une seule fois : créez une clé GitHub qui sert seulement à lancer le robot (choisissez le dépôt «
+              promos-courses »), copiez-la, puis collez-la ici.
+            </p>
+            <a id="creer-cle" class="lien" target="_blank" rel="noopener noreferrer">Créer la clé sur GitHub</a>
+            <label for="champ-cle">Clé GitHub</label>
+            <input
+              id="champ-cle"
+              type="password"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false"
+              placeholder="github_pat_…"
+            />
+            <button type="button" id="enregistrer-cle" class="bouton principal">Enregistrer et lancer</button>
+          </div>
+          <p id="message-robot" class="message" role="alert" hidden></p>
+        </section>
         <button type="button" id="deconnexion" class="lien danger">Se déconnecter</button>
       </form>
     </dialog>

@@ -15,7 +15,7 @@ Seuls nos deux comptes peuvent s'y connecter et voir la liste (voir
 
 Les captures sont faites avec des promos d'exemple et des prénoms fictifs (Camille en vert, Alex en orange).
 
-## Ce qu'elle sait faire (version 0.11)
+## Ce qu'elle sait faire (version 0.12)
 
 - **Se connecter** avec son e-mail et son mot de passe (une seule fois : la connexion reste active).
   Lien « Mot de passe oublié ? » pour recevoir un e-mail de changement de mot de passe.
@@ -224,6 +224,36 @@ détails (« sans lactose », « grand format ») vont mieux dans la **note** de
   ou si elles n'ont pas pu être lues. La liste, elle, marche toujours.
 - Les prix viennent des catalogues : ils peuvent varier en magasin (rupture, erreur de catalogue).
 
+### Mettre à jour les promos sans attendre
+
+Le robot passe chaque matin, mais GitHub le lance parfois avec plusieurs heures de retard. Dans
+**Mon compte** → **Promos**, le bouton **« Mettre à jour les promos »** le lance tout de suite :
+
+- l'appli suit son passage (« Le robot travaille depuis 4 min… », en haut de la liste aussi) puis
+  recharge les promos toute seule (« Promos mises à jour. ») ; d'habitude 2 à 5 minutes, jusqu'à une
+  heure les jours où il y a beaucoup de nouvelles photos ;
+- s'il travaille déjà, l'appli suit ce passage au lieu d'en lancer un autre ;
+- chaque passage relit le site Leclerc (toujours avec des pauses) : le bouton sert quand les promos
+  ne sont pas à jour, pas plusieurs fois par jour.
+
+**La première fois**, il faut une **clé GitHub** qui sert seulement à lancer ce robot. Elle est
+gardée dans notre base Firebase (les deux téléphones l'utilisent), jamais dans ce dépôt public :
+
+1. Dans l'appli, toucher **« Mettre à jour les promos »**, puis **« Créer la clé sur GitHub »** : la
+   page de GitHub s'ouvre, déjà remplie (nom « Bouton robot promos », durée d'un an, droit
+   **Actions : Read and write**). Se connecter à GitHub si besoin.
+2. Sous **Repository access**, choisir **Only select repositories**, puis le dépôt
+   **promos-courses**.
+3. Vérifier sous **Permissions** que **Actions** est sur **Read and write** (rien d'autre).
+4. Toucher **Generate token**, confirmer, puis **copier** la clé (elle commence par `github_pat_`).
+5. Revenir dans l'appli, la coller dans **« Clé GitHub »** et toucher **« Enregistrer et lancer »**.
+
+Cette clé ne peut que lancer, suivre ou arrêter les robots de ce dépôt : elle ne peut rien modifier
+dans le code, les promos ou la liste. **Dans un an**, GitHub la périme : l'appli dit alors « Clé
+GitHub refusée ou expirée » et propose d'en coller une nouvelle (mêmes étapes). Pour la retirer à
+tout moment : sur GitHub, **Settings** → **Developer settings** → **Personal access tokens** →
+**Fine-grained tokens** → **Delete**.
+
 ## Comment elle est faite
 
 | Élément | Rôle |
@@ -239,6 +269,7 @@ détails (« sans lactose », « grand format ») vont mieux dans la **note** de
 | [`app/src/pdf.js`](../app/src/pdf.js) | Affichage et texte des tickets en PDF ([PDF.js](https://mozilla.github.io/pdf.js/), chargé seulement à l'ouverture d'un PDF). |
 | [`app/src/lecture.js`](../app/src/lecture.js) | Lecture d'une photo de ticket sur le téléphone ([Tesseract.js](https://tesseract.projectnaptha.com), en français ; ses fichiers sont servis par l'appli, dans `ocr/`, chargés à la première lecture). |
 | [`app/src/promos.js`](../app/src/promos.js) | Les promos : recherche pour chaque article et dans toutes les promos, dates, prix, fraîcheur des données. |
+| [`app/src/robot.js`](../app/src/robot.js) | « Mettre à jour les promos » : lancer et suivre le robot avec l'API de GitHub, puis lire les promos qu'il vient d'écrire. |
 | [`app/src/familles.js`](../app/src/familles.js) | Les familles de produits : « chips » → Pringles, Lay's, Doritos… |
 | [`app/src/installation.js`](../app/src/installation.js) | Quand proposer d'installer l'appli sur l'iPhone. |
 | [`app/src/firebase.js`](../app/src/firebase.js) | Connexion au projet Firebase (et à l'émulateur pour les tests). |
@@ -256,8 +287,8 @@ que dans Firebase.
 
 | Tests | Ce qu'ils vérifient | Commande |
 |---|---|---|
-| Logique ([`app/tests`](../app/tests)) | Nettoyage des saisies, doublons, tri, messages d'erreur ; couleur et prénom de chacun, date d'ajout en clair ; tickets de caisse (découpage et recollage du fichier, montant, date, classement par mois, taille des photos, total et date lus sur un ticket même mal lu, faux totaux et dates impossibles écartés) ; recherche des promos (accents, pluriel, mots proches, marques, familles de produits, faux amis, début de mot), article créé depuis une promo, où va la réduction (caisse, lot, carte E.Leclerc), description sans les prix répétés, promos terminées ou à venir, dates, prix, fraîcheur des données ; quand proposer l'installation. | `npm test` |
-| Scénarios réels ([`app/e2e`](../app/e2e)) | Un navigateur à la taille d'un iPhone utilise l'appli branchée sur l'**émulateur Firebase** (jamais la vraie base), avec deux comptes et un [fichier de promos d'exemple](../app/e2e/promos-exemple.js) aux dates du jour : connexion refusée, ajout, doublon, cochage, modification, suppression, synchronisation en direct entre deux téléphones, mode hors connexion, refus d'un compte étranger, déconnexion, promo choisie avec « + Ajouter » affichée à droite de l'article (rien pour un article écrit à la main, promo retrouvée pour les articles des versions précédentes, « Promo terminée »), promos anciennes ou incomplètes, promos indisponibles puis retrouvées, conseil d'installation dans Safari sur iPhone, glisser pour supprimer avec « Annuler », « Chips » qui trouve Pringles, promos affichées en écrivant (mot entier d'abord, ajout d'une promo ou du texte écrit, affichage par 30), prix expliqué (sur la carte E.Leclerc, ou en caisse avec la carte), prénom et couleur choisis sur un téléphone et vus sur l'autre (pastille, heure d'ajout), photo de chaque promo (ou emplacement neutre sans photo sûre ou introuvable), tickets de caisse en photo et en PDF ([fichiers d'exemple](../app/e2e/fichiers-exemple.js) : lus tout seuls — date et total — sans changer ce qu'on a choisi, vus en grand sur l'autre téléphone, corrigés, partagés, supprimés, proposés après « Tout retirer », sans réseau, refusés à un compte étranger). Sur GitHub, ils tournent dans Chrome **et Safari** (WebKit). | `npm run e2e` |
+| Logique ([`app/tests`](../app/tests)) | Nettoyage des saisies, doublons, tri, messages d'erreur ; couleur et prénom de chacun, date d'ajout en clair ; tickets de caisse (découpage et recollage du fichier, montant, date, classement par mois, taille des photos, total et date lus sur un ticket même mal lu, faux totaux et dates impossibles écartés) ; recherche des promos (accents, pluriel, mots proches, marques, familles de produits, faux amis, début de mot), article créé depuis une promo, où va la réduction (caisse, lot, carte E.Leclerc), description sans les prix répétés, promos terminées ou à venir, dates, prix, fraîcheur des données ; quand proposer l'installation ; lancement et suivi du robot (clé reconnue, page de GitHub déjà remplie, refus expliqués, passage en cours ou fini, promos fraîches). | `npm test` |
+| Scénarios réels ([`app/e2e`](../app/e2e)) | Un navigateur à la taille d'un iPhone utilise l'appli branchée sur l'**émulateur Firebase** (jamais la vraie base), avec deux comptes et un [fichier de promos d'exemple](../app/e2e/promos-exemple.js) aux dates du jour : connexion refusée, ajout, doublon, cochage, modification, suppression, synchronisation en direct entre deux téléphones, mode hors connexion, refus d'un compte étranger, déconnexion, promo choisie avec « + Ajouter » affichée à droite de l'article (rien pour un article écrit à la main, promo retrouvée pour les articles des versions précédentes, « Promo terminée »), promos anciennes ou incomplètes, promos indisponibles puis retrouvées, conseil d'installation dans Safari sur iPhone, glisser pour supprimer avec « Annuler », « Chips » qui trouve Pringles, promos affichées en écrivant (mot entier d'abord, ajout d'une promo ou du texte écrit, affichage par 30), prix expliqué (sur la carte E.Leclerc, ou en caisse avec la carte), prénom et couleur choisis sur un téléphone et vus sur l'autre (pastille, heure d'ajout), photo de chaque promo (ou emplacement neutre sans photo sûre ou introuvable), « Mettre à jour les promos » avec un GitHub simulé (clé demandée une seule fois et retrouvée sur l'autre téléphone, robot suivi, promos rechargées, clé expirée), tickets de caisse en photo et en PDF ([fichiers d'exemple](../app/e2e/fichiers-exemple.js) : lus tout seuls — date et total — sans changer ce qu'on a choisi, vus en grand sur l'autre téléphone, corrigés, partagés, supprimés, proposés après « Tout retirer », sans réseau, refusés à un compte étranger). Sur GitHub, ils tournent dans Chrome **et Safari** (WebKit). | `npm run e2e` |
 | Accessibilité ([`app/e2e/accessibilite.spec.js`](../app/e2e/accessibilite.spec.js)) | Chaque écran (connexion, liste, recherche, promo, fenêtres, tickets), en mode clair et sombre, vérifié avec [axe](https://github.com/dequelabs/axe-core) selon les règles WCAG 2.2 niveau AA : contrastes, noms lus par VoiceOver, champs… | `npm run e2e` |
 | Rapidité ([Lighthouse](https://developer.chrome.com/docs/lighthouse)) | L'appli construite, mesurée sur un téléphone simulé : rapidité (85 sur 100 au moins), accessibilité (100), bonnes pratiques (95 au moins). Sur GitHub, à chaque modification (rapports gardés 14 jours). | `npm run build && npm run qualite` |
 | Captures d'écran | Régénère les images de cette page dans `docs/captures/`. | `npm run captures` |

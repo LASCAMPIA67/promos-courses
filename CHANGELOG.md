@@ -14,6 +14,23 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+### Ajouté
+
+- **« Mettre à jour les promos »** (Mon compte → Promos) : lance le robot sans attendre son passage du
+  matin (GitHub le lance parfois avec plusieurs heures de retard), suit son avancée (« Le robot
+  travaille depuis 4 min… », en haut de la liste aussi) et recharge les promos dès qu'il a fini,
+  directement depuis ce qu'il vient d'écrire (sans la copie de 5 minutes de GitHub). S'il travaille
+  déjà, l'appli suit ce passage au lieu d'en lancer un autre. Il faut une fois une clé GitHub
+  « fine-grained » limitée à ce dépôt et au droit « Actions » (un an) : l'appli ouvre la page de
+  GitHub déjà remplie, puis garde la clé dans Firebase (`reglages/robot`) pour les deux téléphones,
+  jamais dans ce dépôt. Clé refusée ou expirée : l'appli le dit et en demande une nouvelle.
+- Règles d'accès : `reglages/robot` n'accepte qu'une clé `github_pat_…`, sans autre champ.
+
+### Modifié
+
+- L'appli ne remplace jamais ses promos par une copie plus ancienne (GitHub sert parfois une copie
+  de quelques minutes).
+
 ## [0.11.0] - 2026-10-28
 
 ### Ajouté

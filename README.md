@@ -113,7 +113,9 @@ Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
 - **Les promos en écrivant** : en écrivant un article, les promos qui correspondent s'affichent
   aussitôt ; « + » ajoute ce qu'on a écrit (même sans promo), ou on ajoute une promo d'un geste (avec
   une note courte : « Leclerc · 0,89 € »).
-- **Promos à jour** : l'appli prévient si le robot n'est pas passé ou si les promos sont incomplètes.
+- **Promos à jour** : l'appli prévient si le robot n'est pas passé ou si les promos sont incomplètes ;
+  **« Mettre à jour les promos »** (dans Mon compte) lance le robot sans attendre et recharge les
+  promos dès qu'il a fini.
 - **Rangée par rayon**, dans l'ordre du magasin (le surgelé en dernier) ; un rayon mal deviné se
   corrige une fois pour toutes.
 - **Ajout rapide** avec quantité facultative ; un article déjà dans la liste est signalé.
@@ -223,7 +225,8 @@ de l'activité, mais GitHub ne le garantit pas. Si la date `mise_a_jour` de `pro
 
 1. onglet **Actions** → **Robot des promos** ;
 2. si un bandeau jaune l'indique, cliquer sur **Enable workflow** ;
-3. lancer le robot à la main (voir [Au quotidien](#lancer-le-robot-à-la-main)).
+3. lancer le robot à la main : dans l'appli, **Mon compte** → **« Mettre à jour les promos »**, ou
+   sur GitHub (voir [Au quotidien](#lancer-le-robot-à-la-main)).
 
 L'appli le signale d'elle-même : un bandeau jaune apparaît quand les promos ont plus de 36 heures.
 </details>

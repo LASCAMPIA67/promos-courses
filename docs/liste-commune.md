@@ -103,6 +103,7 @@ Les préférences du foyer, une fiche par réglage :
 
 | Document | Contenu |
 |---|---|
+| `reglages/robot` | La clé GitHub qui lance le robot des promos depuis l'appli (« Mettre à jour les promos ») : `{ "cle": "github_pat_…" }`. Une clé limitée au lancement des robots de ce dépôt, d'un an ; voir [appli.md](appli.md#mettre-à-jour-les-promos-sans-attendre). |
 | `reglages/rayons` | Les rayons corrigés à la main : `{ "tomato ketchup": "epicerie-salee", … }`. La clé est le nom de l'article réduit à ses mots (minuscules, sans accents ni pluriel), la valeur un rayon de [`app/src/rayons.js`](../app/src/rayons.js). |
 
 ## Les règles d'accès
@@ -116,6 +117,8 @@ Elles se trouvent dans [`firebase/firestore.rules`](../firebase/firestore.rules)
 - un ticket de caisse a toujours la bonne forme ; son fichier ne change jamais une fois envoyé (seuls
   le magasin, la date, le montant et la note peuvent être corrigés), et chaque morceau appartient à
   un ticket existant, sans dépasser le nombre de morceaux prévu ni 900 000 octets ;
+- la clé du robot (`reglages/robot`) n'est qu'une clé GitHub « fine-grained » (`github_pat_…`), sans
+  autre champ ;
 - toute autre collection est fermée.
 
 ### Les mettre en place ou les modifier
