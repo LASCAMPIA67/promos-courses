@@ -1,7 +1,7 @@
 {
  "format": 2,
- "mise_a_jour": "2026-10-28T16:11:18+01:00",
- "version_robot": "0.14.0",
+ "mise_a_jour": "2026-10-28T19:25:12+01:00",
+ "version_robot": "0.15.0",
  "magasins": {
   "leclerc-geispolsheim": {
    "nom": "E.Leclerc Geispolsheim",
@@ -49,16 +49,6 @@
      "reutilise": true
     },
     {
-     "id": "26G124G",
-     "nom": "Un automne en fête",
-     "debut": "2026-10-20",
-     "fin": "2026-10-31",
-     "version": "96a4c42bff10c8219b2775fd9f5c54cf@2026-10-28T08:17:27Z#lecture-5",
-     "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G124G/1067",
-     "nb_offres": 354,
-     "reutilise": true
-    },
-    {
      "id": "26D009D",
      "nom": "10 jours diamants",
      "debut": "2026-10-20",
@@ -66,6 +56,16 @@
      "version": "60892f34c8e392dbfe81adf23c4e7e2f@2026-10-28T08:06:14Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26D009D/1067",
      "nb_offres": 0,
+     "reutilise": true
+    },
+    {
+     "id": "26G124G",
+     "nom": "Un automne en fête",
+     "debut": "2026-10-20",
+     "fin": "2026-10-31",
+     "version": "96a4c42bff10c8219b2775fd9f5c54cf@2026-10-28T08:17:27Z#lecture-5",
+     "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G124G/1067",
+     "nb_offres": 354,
      "reutilise": true
     },
     {
