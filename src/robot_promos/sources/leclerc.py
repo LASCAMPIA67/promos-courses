@@ -13,6 +13,7 @@ import re
 import unicodedata
 
 from robot_promos.config import LECLERC_NUMERO_MAGASIN as NUMERO
+from robot_promos.marques import cle_marque
 from robot_promos.offres import creer_offre
 from robot_promos.outils import aujourdhui, nombre
 from robot_promos.sources import Catalogue, Source
@@ -25,8 +26,29 @@ UNITES = {"le kg": "kg", "le l": "l", "la pièce": "pièce"}
 
 # Change quand la façon de lire un catalogue change : chaque catalogue est alors relu une fois, au
 # prochain passage, au lieu de garder les offres lues à l'ancienne (2 : photos fiables, 3 : logos,
-# 4 : marque d'après le logo).
-LECTURE = 4
+# 4 : marque d'après le logo, 5 : autres noms de logo).
+LECTURE = 5
+
+# Les logos du catalogue dont le nom de fichier n'est pas exactement la marque, regardés un par un à
+# l'œil (28/10/2026) : marque (comme cle_marque) -> noms de fichier acceptés, en plus de la marque.
+AUTRES_NOMS_DE_LOGO = {
+    "BRIOCHE PASQUIER": ["PASQUIER"],
+    "DISNEY - STITCH": ["LOGO HD Stitch (bleu)"],
+    "FLYBOTIC BY SILVERLIT": ["SILVERLIT"],
+    "HAVANA CLUB": ["HAVANA"],
+    "JEAN LARNAUDIE": ["LARNAUDIE-Jean"],
+    "L'ATELIER TRAITEUR": ["437541_ATELIER_REFONTE_Logos_isolés_logo_ATELIER_"],
+    "L'OR ESPRESSO": ["l'or"],
+    "LES MINIONS": ["MINIONS"],
+    "MAISON DELPEYRAT": ["DELPEYRAT"],
+    "NATURNES": ["NaturnesLogo_HD"],
+    "PANIER DE YOPLAIT": ["PANIER YOPLAIT"],
+    "PARIS SAINT GERMAIN": ["PSG"],
+    "PAW PATROL": ["PAT_PATROUILLE"],
+    "SODEBO": ["21G104G_3614706227189"],
+    "TOPI GAMES": ["TOPI"],
+    "TRANQUILLE": ["25G301G_3760060015723"],
+}
 
 
 class Leclerc(Source):
@@ -259,16 +281,19 @@ def logo_de_la_marque(p, marque):
     (« POMMES_DE_FRANCE ») ou des visuels publicitaires. On ne garde que celui dont le nom de fichier
     contient exactement la marque, en mots entiers qui se suivent (« LACTEL-LOGO », « PNG-LOGO
     INNOCENT », « AIRWICK » pour AIR WICK) ; jamais un nom qui la contient seulement en partie
-    (« Clementoni » n'est pas CLÉMENT).
+    (« Clementoni » n'est pas CLÉMENT). Ou l'un des autres noms vérifiés de AUTRES_NOMS_DE_LOGO.
     """
     cible = "".join(mots(marque))
     if not cible:
         return None
+    autres = {"".join(mots(nom)) for nom in AUTRES_NOMS_DE_LOGO.get(cle_marque(marque), [])}
     for logo in p.get("logosV2") or []:
         if logo.get("type") != "logo" or not logo.get("url"):
             continue
         nom = mots(logo.get("name"))
-        if any("".join(nom[debut:fin]) == cible for debut in range(len(nom)) for fin in range(debut + 1, len(nom) + 1)):
+        if "".join(nom) in autres or any(
+            "".join(nom[debut:fin]) == cible for debut in range(len(nom)) for fin in range(debut + 1, len(nom) + 1)
+        ):
             return logo["url"]
     return None
 

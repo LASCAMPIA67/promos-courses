@@ -57,7 +57,11 @@ label (« POMMES_DE_FRANCE ») ou un visuel publicitaire. Le robot ne garde que 
 fichier contient **exactement la marque**, en mots entiers qui se suivent (« LACTEL-LOGO », « PNG-LOGO
 INNOCENT », « AIRWICK » pour AIR WICK), jamais un nom qui la contient seulement en partie
 (« Clementoni » n'est pas la marque CLÉMENT, « DELPEYRAT » n'est pas toute la marque MAISON
-DELPEYRAT). Une marque n'a qu'un logo, repris pour toutes ses promos. Mesure du 28/10/2026 : 239
+DELPEYRAT). Seule exception : une courte liste de noms **regardés un par un à l'œil** (« PASQUIER »
+pour BRIOCHE PASQUIER, « l'or » pour L'OR ESPRESSO, « PAT_PATROUILLE » pour PAW PATROL, et même
+« 21G104G_3614706227189 », le logo Sodebo) : `AUTRES_NOMS_DE_LOGO` dans
+[`leclerc.py`](../src/robot_promos/sources/leclerc.py). Une marque n'a qu'un logo, repris pour
+toutes ses promos. Mesure du 28/10/2026 : 239
 marques sur 547 ont un logo sûr, soit 59 % des produits de marque. Les autres gardent leur nom, écrit
 en petit à la même place.
 

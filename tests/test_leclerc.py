@@ -223,13 +223,17 @@ def test_logo_de_la_marque_seulement_s_il_porte_exactement_son_nom():
         assert logo_de_la_marque(produit(logosV2=[logo(nom)]), marque) == "https://exemple/media/logo", marque
     douteux = {
         "CLÉMENT": "Clementoni",  # une autre marque qui commence pareil
-        "MAISON DELPEYRAT": "DELPEYRAT",  # pas toute la marque
+        "MAISON MONTFORT": "MONTFORT",  # pas toute la marque (et pas dans les noms vérifiés)
         "PANIER DU PRIMEUR": "POMMES_DE_FRANCE",  # un label
         "KELLOGG'S": "11 - DEPENSER MOINS 4 - MARQUES PREFEREES-1542-POU",  # un visuel publicitaire
         "": "LACTEL-LOGO",  # pas de marque
     }
     for marque, nom in douteux.items():
         assert logo_de_la_marque(produit(logosV2=[logo(nom)]), marque) is None, marque
+    # Les autres noms vérifiés à l'œil : seulement pour leur marque.
+    assert logo_de_la_marque(produit(logosV2=[logo("PASQUIER")]), "Brioche Pasquier") == "https://exemple/media/logo"
+    assert logo_de_la_marque(produit(logosV2=[logo("l’or")]), "L'OR ESPRESSO") == "https://exemple/media/logo"
+    assert logo_de_la_marque(produit(logosV2=[logo("PASQUIER")]), "PASQUIER FRÈRES") is None
     # Seulement les « logos » (pas les pictogrammes), avec une adresse.
     assert logo_de_la_marque(produit(logosV2=[{"type": "picto", "name": "LACTEL", "url": "x"}]), "LACTEL") is None
     assert logo_de_la_marque(produit(logosV2=[logo("LACTEL", url=None)]), "LACTEL") is None

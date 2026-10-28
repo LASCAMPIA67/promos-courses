@@ -14,6 +14,13 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+### Ajouté
+
+- **16 logos de plus pris dans le catalogue**, dont le nom de fichier n'est pas exactement celui de
+  la marque, regardés un par un à l'œil : Sodebo, Brioche Pasquier, L'Or, Havana Club, Naturnes,
+  Panier de Yoplait, Paw Patrol, Paris Saint-Germain, Les Minions, Tranquille, L'Atelier Traiteur…
+  Chaque catalogue est relu une fois (lecture n° 5).
+
 ## [0.14.0] - 2026-10-28
 
 ### Ajouté
