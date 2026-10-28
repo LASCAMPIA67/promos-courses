@@ -26,10 +26,10 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
   la marque, regardés un par un à l'œil : Sodebo, Brioche Pasquier, L'Or, Havana Club, Naturnes,
   Panier de Yoplait, Paw Patrol, Paris Saint-Germain, Les Minions, Tranquille, L'Atelier Traiteur…
   Chaque catalogue est relu une fois (lecture n° 5).
-- **Les logos à vérifier** : le robot télécharge, sans les montrer dans l'appli, les logos trouvés
-  dans les articles Wikipédia (grâce à DBpedia) pour une vingtaine de marques de plus (Danone,
-  Findus, Alpro, Tipiak, Petit Navire, Lutti, Nuxe, Weleda, Hennessy…), en attendant qu'on les
-  regarde à l'œil (`a_verifier` dans `logos.json`).
+- **14 logos de plus pris dans les articles Wikipédia** (trouvés grâce à DBpedia), regardés un par
+  un à l'œil : Alpro, Bandai, Findus, Grey Goose, Hendrick's, Hennessy, Jameson, Malibu, Nuxe,
+  Petit Navire, Puressentiel, Von Dutch, Weleda, Bushmills. Le robot les télécharge d'abord **sans
+  les montrer** (`a_verifier` dans `logos.json`), puis seulement une fois vérifiés.
 
 ## [0.14.0] - 2026-10-28
 
