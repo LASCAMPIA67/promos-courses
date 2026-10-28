@@ -1,7 +1,7 @@
 {
  "format": 2,
- "mise_a_jour": "2026-10-28T19:25:12+01:00",
- "version_robot": "0.15.0",
+ "mise_a_jour": "2026-10-28T23:15:03+01:00",
+ "version_robot": "0.16.0",
  "magasins": {
   "leclerc-geispolsheim": {
    "nom": "E.Leclerc Geispolsheim",
@@ -29,16 +29,6 @@
      "reutilise": true
     },
     {
-     "id": "26G310E",
-     "nom": "Plein pouvoirs d'achat (version courte)",
-     "debut": "2026-10-27",
-     "fin": "2026-11-07",
-     "version": "5a1e254d38373b2d261ef7340badfa64@2026-10-28T09:22:42Z#lecture-5",
-     "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310E/1067",
-     "nb_offres": 44,
-     "reutilise": true
-    },
-    {
      "id": "26G310G",
      "nom": "Plein pouvoirs d'achat",
      "debut": "2026-10-27",
@@ -46,6 +36,16 @@
      "version": "07da9b7ca474d937ebc986e4a3194029@2026-10-28T08:30:33Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
      "nb_offres": 270,
+     "reutilise": true
+    },
+    {
+     "id": "26G310E",
+     "nom": "Plein pouvoirs d'achat (version courte)",
+     "debut": "2026-10-27",
+     "fin": "2026-11-07",
+     "version": "5a1e254d38373b2d261ef7340badfa64@2026-10-28T09:22:42Z#lecture-5",
+     "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310E/1067",
+     "nb_offres": 44,
      "reutilise": true
     },
     {
