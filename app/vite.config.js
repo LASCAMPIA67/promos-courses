@@ -5,6 +5,7 @@ import { readFileSync } from "node:fs";
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
+import { URL_PRODUITS } from "./src/produits.js";
 import { URL_PROMOS } from "./src/promos.js";
 
 const { version } = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8"));
@@ -109,6 +110,23 @@ export default defineConfig({
               expiration: { maxEntries: 600, maxAgeSeconds: 60 * 24 * 3600, purgeOnQuotaError: true },
               cacheableResponse: { statuses: [200] },
             },
+          },
+          // Les photos des produits sans promo (Open Food Facts) : gardées aussi, pour le mode hors ligne.
+          {
+            urlPattern: ({ url }) => url.origin === "https://images.openfoodfacts.org",
+            handler: "CacheFirst",
+            options: {
+              cacheName: "photos-produits",
+              expiration: { maxEntries: 600, maxAgeSeconds: 60 * 24 * 3600, purgeOnQuotaError: true },
+              cacheableResponse: { statuses: [200] },
+            },
+          },
+          // Tous les produits (produits.json, quelques Mo, changé chaque semaine) : la copie gardée sert
+          // tout de suite, même sans réseau ; la nouvelle arrive pour la fois suivante.
+          {
+            urlPattern: new RegExp(`^${URL_PRODUITS.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")}$`),
+            handler: "StaleWhileRevalidate",
+            options: { cacheName: "produits", expiration: { maxEntries: 2 }, cacheableResponse: { statuses: [200] } },
           },
           {
             urlPattern: ({ url }) => url.pathname.includes("/ocr/"),

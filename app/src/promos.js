@@ -250,7 +250,8 @@ function trouver(index, motsCherches, aujourdhui, correspond) {
  */
 export function articleDepuisPromo(offre) {
   const nom = joliNom(offre.produit).slice(0, 100).trim();
-  return { nom, note: notePromo(offre), promo: offre.id };
+  const produit = /^\d{8,14}$/.test(offre.ean ?? "") ? { produit: offre.ean } : {};
+  return { nom, note: notePromo(offre), promo: offre.id, ...produit };
 }
 
 const notePromo = (offre) =>
@@ -259,17 +260,28 @@ const notePromo = (offre) =>
 /**
  * La promo choisie pour un article ajouté depuis les promos (« + Ajouter ») : retrouvée par son
  * identifiant, ou, pour un article ajouté par une ancienne version, d'après sa note (« Leclerc ·
- * 2,25 € »). Renvoie { offre, aVenir } ; { terminee: true } si elle n'est plus dans les promos ; null
- * pour un article écrit à la main (aucune promo n'est alors affichée), ou si les promos ne sont pas
- * encore lues.
+ * 2,25 € »). Un article venu d'un produit (son code-barres, « produit ») montre aussi la promo en
+ * cours de ce produit, dès qu'il y en a une. Renvoie { offre, aVenir } ; { terminee: true } si la
+ * promo choisie n'est plus dans les promos ; null pour un article écrit à la main ou un produit sans
+ * promo (rien n'est alors affiché), ou si les promos ne sont pas encore lues.
  */
 export function promoChoisie(article, index, aujourdhui) {
   // Espaces insécables ou non (« 2,25 € ») : la même note.
   const espaces = (texte) => texte?.replace(/[\u00a0\u202f]/g, " ");
   const note = espaces(noteCourte(article.note));
-  const depuisUneNote = /^Leclerc · /.test(note ?? "");
-  if (!index || (!article.promo && !depuisUneNote)) return null;
+  const depuisUneNote = !article.produit && /^Leclerc · /.test(note ?? "");
+  if (!index || (!article.promo && !article.produit && !depuisUneNote)) return null;
   const enCours = (o) => !o.date_fin || o.date_fin >= aujourdhui;
+  const aVenir = (o) => Boolean(o.date_debut && o.date_debut > aujourdhui);
+  if (article.produit) {
+    // La promo en cours de ce produit (celle choisie si elle l'est encore), sinon la prochaine.
+    const duProduit = index.filter(({ offre }) => offre.ean === article.produit && enCours(offre));
+    const choisie =
+      duProduit.find(({ offre }) => offre.id === article.promo) ?? duProduit.find(({ offre }) => !aVenir(offre));
+    const offre = (choisie ?? duProduit[0])?.offre;
+    if (offre) return { offre, aVenir: aVenir(offre) };
+    if (!article.promo) return null;
+  }
   const parIdentifiant = article.promo ? index.find(({ offre }) => offre.id === article.promo)?.offre : null;
   const offre =
     parIdentifiant && enCours(parIdentifiant)

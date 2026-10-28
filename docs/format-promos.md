@@ -105,11 +105,44 @@ prix comparé est le **prix le plus bas pour un article** : celui du lot quand i
 }
 ```
 
+- `prix_habituel` (facultatif) : le prix habituel d'un article, quand le catalogue le donne
+  (l'ancien prix barré ; pour une promo sur le lot, le prix d'un seul article) ; repris dans
+  `produits.json`.
 - `debut` : le premier passage enregistré. L'historique a commencé **vide** le 28/10/2026 : les
   comparaisons arrivent au fil des semaines, quand un produit revient en promo.
 - Une ligne par produit : le fichier reste lisible, et ses changements d'un jour à l'autre, petits.
 - Une promo n'est rangée qu'une fois (même catalogue, même date de début), même avec plusieurs
   passages par jour ; si son prix change, on garde le plus bas.
+
+## Tous les produits (`produits.json`)
+
+Écrit chaque semaine par le robot d'après Open Food Facts (voir
+[sources.md](sources.md#tous-les-produits-open-food-facts)), dans la branche `produits` :
+`https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/produits/produits.json`. Pour rester
+léger (plus de 100 000 produits), chaque produit est une liste de valeurs, dans l'ordre de
+`colonnes`, sur une ligne :
+
+```json
+{
+ "format": 1,
+ "mise_a_jour": "2026-11-02T04:31:12+01:00",
+ "source": "Open Food Facts (https://fr.openfoodfacts.org) : données sous licence ODbL, photos sous licence CC BY-SA.",
+ "photos": "https://images.openfoodfacts.org/images/products/",
+ "colonnes": ["ean", "nom", "marque", "quantite", "photo", "leclerc", "prix_habituel", "prix_vu_le"],
+ "produits": [
+["3564700000229","Brocolis en fleurette surgelés","Notre Jardin","1 kg","front_fr.9",2,null,null],
+["7613035000000","Arôme Maggi","Maggi","250 ml","front_fr.3",0,null,null]
+ ]
+}
+```
+
+| Colonne | Signification |
+|---|---|
+| `ean` | Code-barres. |
+| `nom`, `marque`, `quantite` | Nom du produit, sa marque (la gamme plutôt que « Marque Repère »), sa contenance (`null` si inconnues). |
+| `photo` | Fin du nom de la photo (`front_fr.9`) : l'adresse complète est `photos` + le code-barres en dossiers (`356/470/000/0229`) + `/front_fr.9.200.jpg`. `null` sans photo. |
+| `leclerc` | Ce qu'on sait du produit : `2` Marque Repère, `1` vu chez Leclerc (Open Food Facts ou un catalogue), `0` courant en France. Les produits sont rangés dans cet ordre, puis du plus scanné au moins scanné. |
+| `prix_habituel`, `prix_vu_le` | Le dernier prix habituel donné par un catalogue Leclerc, et la date de début de cette promo ; `null` sinon. |
 
 ## Comment l'appli s'en sert
 

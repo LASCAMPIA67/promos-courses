@@ -30,6 +30,17 @@ def prix_article(offre):
     return prix or None
 
 
+def prix_habituel(offre):
+    """Le prix habituel d'un article, quand le catalogue le donne : l'ancien prix barré (ou, pour un
+    Ticket E.Leclerc, le prix payé en caisse) ; pour une promo sur le lot (« 2e à -60 % »), le prix
+    d'un seul article. None sinon."""
+    if offre.get("ancien_prix"):
+        return offre["ancien_prix"]
+    if offre.get("lot") and offre.get("prix") and not offre.get("carte_fidelite"):
+        return offre["prix"]
+    return None
+
+
 def lire(chemin):
     """L'historique enregistré (vide s'il n'existe pas encore)."""
     try:
@@ -86,10 +97,14 @@ def ajouter(historique, offres, jour):
         produit = produits.setdefault(offre["ean"], {"produit": None, "marque": None, "promos": []})
         produit["produit"], produit["marque"] = offre["produit"], offre.get("marque")
         promo = {"catalogue": offre["catalogue"], "du": offre["date_debut"], "au": offre.get("date_fin"), "prix": prix}
+        if prix_habituel(offre):
+            promo["prix_habituel"] = prix_habituel(offre)
         deja = [p for p in produit["promos"] if (p["catalogue"], p["du"]) == (promo["catalogue"], promo["du"])]
         if deja:
             deja[0]["au"] = promo["au"]
             deja[0]["prix"] = min(deja[0]["prix"], prix)  # deux offres du même produit : la moins chère
+            if "prix_habituel" in promo:
+                deja[0]["prix_habituel"] = promo["prix_habituel"]
         else:
             produit["promos"].append(promo)
         produit["promos"].sort(key=lambda p: (p["du"], p["catalogue"]))

@@ -23,8 +23,10 @@ export function cle(nom) {
  * Prépare un article saisi : textes nettoyés, champs vides retirés.
  * Renvoie { article } si tout va bien, ou { erreur } avec un message en français.
  */
-export function preparerSaisie({ nom, quantite = "", note = "", promo = "" }) {
+export function preparerSaisie({ nom, quantite = "", note = "", promo = "", produit = "" }) {
   const article = { nom: nettoyer(nom), quantite: nettoyer(quantite), note: nettoyer(note), promo: nettoyer(promo) };
+  // Le code-barres du produit d'où vient l'article (sa photo, et sa promo quand il y en a une).
+  if (/^\d{8,14}$/.test(produit)) article.produit = produit;
   if (!article.nom) return { erreur: "Écrivez le nom de l'article." };
   for (const [champ, max] of Object.entries(LONGUEURS)) {
     if (article[champ].length > max) {

@@ -2,7 +2,7 @@
 
 import json
 
-from robot_promos.historique import ajouter, comparer, lire, mettre_a_jour, prix_article
+from robot_promos.historique import ajouter, comparer, lire, mettre_a_jour, prix_article, prix_habituel
 
 EAN = "3564700000017"
 
@@ -82,3 +82,13 @@ def test_mettre_a_jour_ecrit_un_fichier_json_d_une_ligne_par_produit(tmp_path):
     lu = json.loads(texte)
     assert lu["format"] == 1
     assert [p["catalogue"] for p in lu["produits"][EAN]["promos"]] == ["A", "B"]
+
+
+def test_le_prix_habituel_quand_le_catalogue_le_donne():
+    assert prix_habituel({"prix": 0.89, "ancien_prix": 1.05}) == 1.05  # l'ancien prix barré
+    assert prix_habituel({"prix": 6.12, "lot": {"quantite": 2, "prix": 9.18}}) == 6.12  # un seul article
+    assert prix_habituel({"prix": 6.12, "lot": {"quantite": 2, "prix": 9.18}, "carte_fidelite": True}) is None
+    assert prix_habituel({"prix": 2.15}) is None
+    historique = lire("/nexiste/pas.json")
+    ajouter(historique, [{**offre("A", "2026-10-20", 0.89), "ancien_prix": 1.05}], "2026-10-28")
+    assert historique["produits"][EAN]["promos"][0]["prix_habituel"] == 1.05

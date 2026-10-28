@@ -221,10 +221,25 @@
 
       <!-- Pendant qu'on écrit un article : les promos qui correspondent -->
       <section id="suggestions" class="suggestions" aria-labelledby="titre-suggestions" hidden>
-        <h2 id="titre-suggestions" class="cache">Promos trouvées</h2>
+        <h2 id="titre-suggestions" class="cache">Produits trouvés</h2>
         <p id="etat-recherche" class="etat-recherche discret" role="status"></p>
-        <ul id="resultats" class="promos resultats"></ul>
-        <button type="button" id="plus-de-resultats" class="bouton large" hidden>Voir plus de promos</button>
+        <!-- D'abord les produits en promo (fiches colorées), puis tous les autres, sans promo. -->
+        <section id="groupe-promos" class="groupe-resultats" aria-labelledby="titre-groupe-promos">
+          <h3 id="titre-groupe-promos" class="titre-groupe" data-genre="promo">En promo</h3>
+          <ul id="resultats" class="promos resultats"></ul>
+          <button type="button" id="plus-de-resultats" class="bouton large" hidden>Voir plus de promos</button>
+        </section>
+        <section id="groupe-produits" class="groupe-resultats" aria-labelledby="titre-groupe-produits" hidden>
+          <h3 id="titre-groupe-produits" class="titre-groupe">Sans promo</h3>
+          <p id="etat-produits" class="etat-produits discret" hidden></p>
+          <ul id="resultats-produits" class="produits resultats"></ul>
+          <button type="button" id="plus-de-produits" class="bouton large" hidden>Voir plus de produits</button>
+          <p class="credit-produits discret">
+            Produits et photos :
+            <a href="https://fr.openfoodfacts.org" target="_blank" rel="noopener noreferrer">Open Food Facts</a>
+            (licences ODbL et CC BY-SA).
+          </p>
+        </section>
       </section>
 
       <main id="contenu" class="contenu">

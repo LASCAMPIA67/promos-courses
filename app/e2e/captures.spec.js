@@ -6,7 +6,7 @@ import { expect, test } from "@playwright/test";
 import { choisirFichier, dessinerTicket, pdfExemple } from "./fichiers-exemple.js";
 import { CLE, simulerGitHub } from "./github-exemple.js";
 import { COMPTES, creerComptes, seConnecter, viderLaBase } from "./outils.js";
-import { servirPromos } from "./promos-exemple.js";
+import { servirProduits, servirPromos } from "./promos-exemple.js";
 
 const COMPTE = COMPTES.un;
 const AUTRE = COMPTES.deux;
@@ -34,6 +34,7 @@ for (const theme of ["light", "dark"]) {
   test(`captures en mode ${theme === "light" ? "clair" : "sombre"}`, async ({ page, context }) => {
     test.slow(); // la lecture du ticket en photo prend quelques secondes
     await servirPromos(context);
+    await servirProduits(context);
     await page.emulateMedia({ colorScheme: theme });
     const suffixe = theme === "light" ? "" : "-sombre";
     await page.goto("");
@@ -111,9 +112,15 @@ for (const theme of ["light", "dark"]) {
 
     // En écrivant un article : les promos qui correspondent.
     await page.getByLabel("Article à ajouter").fill("lait");
-    await expect(page.locator("#etat-recherche")).toHaveText("4 promos");
+    await expect(page.locator("#etat-recherche")).toHaveText("4 promos · 1 sans promo");
     await page.getByLabel("Article à ajouter").blur();
     await page.screenshot({ path: `${DOSSIER}recherche${suffixe}.png` });
+    // Plus bas : les produits sans promo, avec leur photo et leur prix habituel.
+    await page.locator("#groupe-produits").scrollIntoViewIfNeeded();
+    await expect
+      .poll(() => page.locator("#groupe-produits img.photo-produit").evaluate((i) => i.naturalWidth))
+      .toBe(256);
+    await page.screenshot({ path: `${DOSSIER}recherche-produits${suffixe}.png` });
     await page.getByRole("button", { name: "Effacer" }).click();
 
     if (theme === "light") {

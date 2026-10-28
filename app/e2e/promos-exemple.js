@@ -71,6 +71,7 @@ const OFFRES = [
     logo: `${LOGOS}candia.png`,
     produit: "Lait demi-écrémé",
     marque: "CANDIA",
+    ean: "3533630000001",
     description: "La bouteille de 1 L",
     prix: 0.89,
     ancien_prix: 1.05,
@@ -235,6 +236,42 @@ export function promosExemple({ miseAJour = new Date(), etatLeclerc = "ok", mult
     sources: [source("leclerc", "leclerc-geispolsheim", "Catalogues E.Leclerc Geispolsheim", etatLeclerc)],
     offres,
   };
+}
+
+/**
+ * Tous les produits (produits.json, comme l'écrit le robot d'après Open Food Facts) : un produit
+ * aussi en promo (le lait Candia, montré seulement en promo), des produits sans promo, avec ou sans
+ * photo, avec ou sans prix habituel. `en plus` : d'autres produits, au même format.
+ */
+export function produitsExemple({ enPlus = [] } = {}) {
+  return {
+    format: 1,
+    mise_a_jour: new Date().toISOString(),
+    source: "Open Food Facts (exemple)",
+    photos: "https://exemple.test/off/",
+    colonnes: ["ean", "nom", "marque", "quantite", "photo", "leclerc", "prix_habituel", "prix_vu_le"],
+    produits: [
+      ["3533630000001", "Lait demi-écrémé", "Candia", "1 l", "front_fr.4", 1, 1.05, jour(-20)],
+      ["3017620422003", "Nutella", "Ferrero", "750 g", "front_fr.12", 1, 6.25, jour(-20)],
+      ["7613035000000", "Arôme Maggi", "Maggi", "250 ml", "front_fr.3", 0, null, null],
+      ["7613035000017", "Bouillon cube volaille", "Maggi", null, null, 0, null, null],
+      ["3564700000229", "Brocolis surgelés", "Notre Jardin", "1 kg", "front_fr.9", 2, null, null],
+      ["3428270000002", "Lait entier bio", "Lactel", "1 l", "front_fr.5", 1, 1.29, jour(-20)],
+      ...enPlus,
+    ],
+  };
+}
+
+/** Sert tous les produits et leurs photos (comme images.openfoodfacts.org) à un navigateur de test. */
+export async function servirProduits(contexte, options) {
+  await contexte.route("**/produits-test.json", (requete) => requete.fulfill({ json: produitsExemple(options) }));
+  await contexte.route("https://exemple.test/off/**", (requete) =>
+    requete.fulfill({
+      contentType: "image/png",
+      headers: { "Access-Control-Allow-Origin": "*" },
+      body: photoProduitExemple([214, 120, 40]),
+    }),
+  );
 }
 
 /**

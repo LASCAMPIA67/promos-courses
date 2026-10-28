@@ -141,6 +141,54 @@ travail, c'est le robot qui télécharge ces logos, en deux temps :
 > produit en promo : la même zone grise que les logos du catalogue, acceptée par Emilio le
 > 28/10/2026. La page de chaque fichier est notée dans `logos.json`.
 
+## Tous les produits (Open Food Facts)
+
+Pour trouver **tous les produits**, même sans promo (l'arôme Maggi, le Nutella…), avec leur photo,
+l'appli lit `produits.json`, que le robot écrit **une fois par semaine** (le lundi à 4 h 23,
+workflow [`produits.yml`](../.github/workflows/produits.yml), code
+[`produits.py`](../src/robot_promos/produits.py)).
+
+**D'où viennent les produits.** Les catalogues Leclerc ne donnent que les produits en promo. Le seul
+endroit qui a tous les produits du magasin, avec leurs prix, est **Leclerc Drive** : il est protégé
+par une vérification anti-robot (« Please enable JS and disable any ad blocker ») ; y aller quand
+même, ce serait la contourner : écarté le 28/10/2026, comme l'application Leclerc. Le site
+`e.leclerc` ne vend en ligne que du non-alimentaire (Kinder ou Doritos n'y sont pas). Les produits
+viennent donc d'[**Open Food Facts**](https://fr.openfoodfacts.org), la base libre des produits
+alimentaires et d'hygiène, faite par ses utilisateurs : son fichier complet (1,5 Go,
+`https://static.openfoodfacts.org/data/`, permis par son `robots.txt`) est lu **au fil du
+téléchargement, sans être gardé**, une fois par semaine. Le robot garde les produits vendus en
+France qui ont un nom :
+
+- ceux dont on est **sûr qu'ils sont chez Leclerc** : Marque Repère (code-barres `356470…`, plus de
+  10 000), ceux qu'Open Food Facts dit vendus chez Leclerc, et ceux déjà vus dans un catalogue
+  Leclerc (l'[historique des prix](format-promos.md#lhistorique-des-prix-historiquejson)) ;
+- les **produits courants** : scannés par au moins 3 personnes dans Open Food Facts, avec une
+  photo, d'un pays dont les produits se vendent en France (le début du code-barres) ;
+- **sans** les marques propres des autres enseignes, qu'on ne trouve pas chez Leclerc : Carrefour,
+  U, Auchan, Intermarché (Pâturages, Chabrior…), Lidl (Milbona…), Aldi, Monoprix, Casino… d'après
+  leur nom et le début de leur code-barres (vérifié sur Open Food Facts : `3560070`, `3270190`
+  Carrefour ; `325622` U ; `3596710` Auchan ; `325039` Intermarché et Netto ; `4056489` Lidl).
+
+Simulation du 28/10/2026 sur le vrai fichier : **100 169 produits**, dont 12 915 sûrs d'être chez
+Leclerc ; 9 Mo (2,7 Mo à télécharger) ; la recherche les parcourt en moins d'un dixième de seconde
+(mesuré sur un ordinateur ; un peu plus sur un téléphone).
+
+**Les prix.** Seuls ceux qu'un catalogue Leclerc a donnés : le **prix habituel** (l'ancien prix
+barré, ou le prix d'un seul article pour une promo sur le lot), gardé dans l'historique des prix et
+repris dans `produits.json`. Les autres produits affichent « Prix en magasin ».
+
+**Rangement.** `produits.json` est dans la branche `produits` du dépôt, réécrite chaque semaine en un
+seul enregistrement : le dépôt ne grossit pas. L'appli le garde sur le téléphone (la recherche
+marche sans réseau, et ce qu'on tape ne sort pas du téléphone) ; les photos viennent directement
+du site d'Open Food Facts (`images.openfoodfacts.org`) et restent aussi sur le téléphone, une fois
+vues.
+
+> **Licences.** Les données d'Open Food Facts sont sous licence
+> [ODbL](https://opendatacommons.org/licenses/odbl/1-0/) (citer la source, partager à l'identique :
+> `produits.json` l'est donc aussi), les photos sous licence
+> [CC BY-SA](https://creativecommons.org/licenses/by-sa/3.0/deed.fr). L'appli le dit sous les
+> produits sans promo (« Produits et photos : Open Food Facts »).
+
 ## L'avancée d'un passage
 
 Pendant un passage, le robot écrit où il en est (« Catalogue 3 sur 9 : … », « Photos : 312 sur

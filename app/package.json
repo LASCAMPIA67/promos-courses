@@ -1,7 +1,7 @@
 {
   "name": "promos-courses-appli",
   "private": true,
-  "version": "0.15.0",
+  "version": "0.16.0",
   "description": "Appli web (iPhone) : liste de courses commune et promos de nos magasins.",
   "type": "module",
   "scripts": {

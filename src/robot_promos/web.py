@@ -57,7 +57,9 @@ class Navigateur:
                 r.raise_for_status()
         return self.robots[hote]
 
-    def get(self, url, params=None, headers=None, timeout=60):
+    def get(self, url, params=None, headers=None, timeout=60, stream=False):
+        """Télécharge `url` si robots.txt l'autorise, après la pause. `stream` : la réponse est lue
+        au fur et à mesure (pour un très gros fichier), au lieu d'être gardée en entier."""
         url = requests.Request("GET", url, params=params).prepare().url
         morceaux = urlsplit(url)
         regles, delai = self._regles(morceaux.netloc)
@@ -65,7 +67,7 @@ class Navigateur:
         if not est_autorise(regles, chemin):
             raise Interdit(f"robots.txt interdit {url}")
         self._attendre(delai)
-        r = self.session.get(url, headers=headers, timeout=timeout)
+        r = self.session.get(url, headers=headers, timeout=timeout, stream=stream)
         r.raise_for_status()
         return r
 

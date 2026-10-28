@@ -53,6 +53,7 @@ Un document par article, pour que deux modifications en même temps ne se gênen
 | `quantite` | texte (30 caractères max.) | non | « 2 L », « 1 kg », « 6 »… |
 | `note` | texte (200 caractères max.) | non | Précision libre : « sans lactose », « marque Milbona »… |
 | `promo` | texte (100 caractères max.) | non | Identifiant de la promo (dans `promos.json`) quand l'article a été ajouté depuis une promo (« + Ajouter ») : l'appli affiche cette promo à droite de l'article. |
+| `produit` | texte (8 à 14 chiffres) | non | Code-barres du produit d'où vient l'article (une promo ou un produit sans promo, « + Ajouter ») : l'appli montre sa photo dans la liste, et sa promo dès qu'il y en a une. |
 | `achete` | vrai / faux | oui | Coché quand c'est dans le caddie. |
 | `ajoute_par` | identifiant de compte | oui | Qui a ajouté l'article (ne peut plus changer ensuite). |
 | `cree_le` | date du serveur | oui | Date d'ajout (ne peut plus changer ensuite). |
@@ -111,7 +112,8 @@ Les préférences du foyer, une fiche par réglage :
 Elles se trouvent dans [`firebase/firestore.rules`](../firebase/firestore.rules) et garantissent que :
 
 - seuls les deux comptes du foyer peuvent lire ou modifier quoi que ce soit ;
-- un article a toujours la bonne forme (champs connus, longueurs raisonnables, dates du serveur) ;
+- un article a toujours la bonne forme (champs connus, longueurs raisonnables, code-barres fait de
+  chiffres, dates du serveur) ;
 - on ne peut pas ajouter un article au nom de l'autre, ni changer son auteur ou sa date d'ajout ;
 - chacun ne modifie que sa propre fiche `membres` (prénom et couleur), toujours de la bonne forme ;
 - un ticket de caisse a toujours la bonne forme ; son fichier ne change jamais une fois envoyé (seuls

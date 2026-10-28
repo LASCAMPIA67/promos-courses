@@ -185,21 +185,43 @@ Pas de ligne : le produit n'a pas encore été vu en promo avant. L'historique a
 28/10/2026 : les lignes apparaissent au fil des semaines. Détails :
 [format-promos.md](format-promos.md#lhistorique-des-prix-historiquejson).
 
-### Les promos en écrivant un article
+### Tous les produits en écrivant un article
 
-Dès 2 lettres écrites dans « Ajouter un article… », les promos qui correspondent s'affichent sous
-le champ, à la place de la liste (la croix ✕ efface et fait revenir la liste) :
+Dès 2 lettres écrites dans « Ajouter un article… », les produits qui correspondent s'affichent sous
+le champ, à la place de la liste (la croix ✕ efface et fait revenir la liste), en **deux parties**
+bien séparées :
+
+- **En promo** (titre orange) : les promos Leclerc, sur leurs fiches colorées (prix, type de promo,
+  dates, historique des prix) ;
+- **Sans promo** (titre gris) : **tous les autres produits**, même sans promo, sur des lignes plus
+  sobres : leur photo, leur nom, leur marque (son logo quand une promo en cours de la marque en a
+  un) et leur contenance ; leur **prix habituel** quand un catalogue Leclerc l'a donné (« Prix
+  habituel 1,29 € (vu le 8 oct.) »), sinon « Prix en magasin ». Un produit en promo n'apparaît
+  qu'en promo.
+
+![Plus bas, les produits sans promo](captures/recherche-produits.png)
+
+En haut, le nombre de résultats : « 4 promos · 12 sans promo ».
 
 - les résultats suivent ce qu'on tape, et le début d'un mot suffit (« fro » trouve « Fromage »,
   « nute » trouve les produits Nutella) ; les mots entiers passent d'abord (« lait » montre « Lait
   demi-écrémé » avant « Laitue ») ;
-- **« + »** ou **« OK »** sur le clavier ajoute ce qu'on a écrit, **qu'il y ait des promos ou non** ;
+- **« + »** ou **« OK »** sur le clavier ajoute ce qu'on a écrit, **qu'il y ait des produits ou non** ;
 - le bouton **« + Ajouter »** d'une promo ajoute ce produit-là, avec une **note** courte qui
   rappelle le prix (« 0,89 € » ; elle est enregistrée « Leclerc · 0,89 € », mais la liste n'écrit
   plus le magasin) ; le type de promo et ses dates s'affichent,
   toujours à jour, sous l'étiquette de l'article ;
-  s'il est déjà dans la liste, le bouton l'indique (« ✓ Dans la liste ») ;
-- les promos s'affichent par 30 ; « Voir plus de promos » montre les suivantes.
+- le bouton **« + Ajouter »** d'un produit sans promo l'ajoute avec sa **photo** et, s'il est connu,
+  son prix habituel en note ; **dès que ce produit passe en promo**, l'étiquette « Promo » apparaît
+  à côté de l'article, toute seule ;
+- s'il est déjà dans la liste, le bouton l'indique (« ✓ Dans la liste ») ;
+- les promos et les produits s'affichent par 30 ; « Voir plus de promos » et « Voir plus de
+  produits » montrent les suivants.
+
+D'où viennent les produits sans promo, et pourquoi pas tous leurs prix : voir
+[sources.md](sources.md#tous-les-produits-open-food-facts). Le fichier (quelques Mo) est gardé sur le
+téléphone : la recherche marche aussi sans réseau, et **rien de ce qu'on tape ne sort du
+téléphone**. Les photos viennent du site d'Open Food Facts.
 
 ### Les familles de produits
 

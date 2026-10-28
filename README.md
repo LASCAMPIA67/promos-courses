@@ -110,6 +110,11 @@ Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
   du produit) ; sinon un emplacement neutre, jamais une photo trompeuse. En haut à droite, le
   **logo de la marque** (celui du catalogue, sinon le logo officiel pris sur Wikipédia ; le logo
   Marque Repère pour tous les produits Marque Repère), sinon son nom en petit.
+- **Tous les produits, même sans promo** : en écrivant un article, l'appli montre d'abord les
+  promos Leclerc (« En promo »), puis tous les autres produits (« Sans promo ») avec leur photo, leur
+  marque, leur contenance et leur prix habituel quand un catalogue Leclerc l'a donné : plus de
+  100 000 produits, d'après [Open Food Facts](https://fr.openfoodfacts.org). Un produit ajouté sans
+  promo montre sa promo dès qu'il y en a une.
 - **L'historique des prix** : le robot garde chaque jour les promos vues ; quand un produit revient
   en promo, une ligne dit si c'est le prix le plus bas vu, aussi bas que le meilleur, ou déjà vu
   moins cher (et à combien).
@@ -288,6 +293,7 @@ promos-courses/
 │   ├── offres.py                   ← format d'une offre, doublons, vérification
 │   ├── photos.py                   ← vignettes des photos et des logos (branche « photos »)
 │   ├── historique.py               ← historique des prix (historique.json)
+│   ├── produits.py                 ← tous les produits, d'après Open Food Facts (branche « produits »)
 │   ├── marques.py                  ← produits Marque Repère, logos pris sur Wikipédia
 │   ├── logos.json                  ← liste des logos de Wikipédia, vérifiés un par un
 │   ├── avancee.py                  ← où en est le robot, pour l'appli

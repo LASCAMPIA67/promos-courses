@@ -14,6 +14,24 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+### Ajouté
+
+- **Tous les produits, même sans promo** : en écrivant un article, l'appli montre d'abord les
+  promos (« En promo », titre orange, fiches colorées), puis tous les autres produits (« Sans
+  promo », lignes sobres) avec leur photo, leur nom, leur marque (son logo quand une promo en cours
+  de la marque en a un), leur contenance et leur prix habituel quand un catalogue Leclerc l'a donné
+  (« Prix habituel 1,29 € (vu le 8 oct.) »). Plus de 100 000 produits, d'après Open Food Facts
+  (base libre ; données ODbL, photos CC BY-SA) : les produits Marque Repère, ceux vus chez Leclerc
+  et les produits courants en France, sans les marques propres des autres enseignes. Le robot
+  écrit `produits.json` chaque semaine (workflow « Produits », branche `produits`) ; l'appli le
+  garde sur le téléphone : la recherche marche sans réseau et ce qu'on tape ne sort pas du
+  téléphone. Les prix de tous les produits ne sont que sur Leclerc Drive, protégé contre les
+  robots : pas question de contourner cette protection.
+- **Un article venu d'un produit garde son code-barres** (nouveau champ facultatif `produit`) :
+  sa photo dans la liste, et l'étiquette « Promo » dès que ce produit passe en promo. Il faut
+  **republier les règles Firebase** ; en attendant, l'article est ajouté sans.
+- L'historique des prix garde aussi le **prix habituel** quand le catalogue le donne.
+
 ## [0.15.0] - 2026-10-28
 
 ### Ajouté

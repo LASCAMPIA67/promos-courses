@@ -1060,7 +1060,8 @@ dialog h2 {
   overflow-wrap: anywhere;
 }
 
-.promos {
+.promos,
+.produits {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -1101,7 +1102,12 @@ dialog h2 {
 }
 
 /* Les photos des produits sont sur fond blanc, même en mode sombre : un petit carré blanc arrondi. */
-.photo-promo {
+.photo-produit {
+  --taille-photo: 56px;
+}
+
+.photo-promo,
+.photo-produit {
   display: grid;
   place-items: center;
   width: var(--taille-photo);
@@ -1112,12 +1118,14 @@ dialog h2 {
   object-fit: contain;
 }
 
-.photo-promo.sans-photo {
+.photo-promo.sans-photo,
+.photo-produit.sans-photo {
   background: var(--fond);
   color: var(--discret);
 }
 
-.photo-promo svg {
+.photo-promo svg,
+.photo-produit svg {
   width: 26px;
   height: 26px;
   stroke-width: 1.6;
@@ -1295,6 +1303,103 @@ dialog h2 {
 
 .suggestions {
   margin-top: 8px;
+}
+
+/* Les résultats en deux parties : d'abord en promo (titre de la couleur des promos), puis sans
+   promo, plus sobres (pas de pastille de couleur). */
+.groupe-resultats + .groupe-resultats {
+  margin-top: 18px;
+}
+
+.titre-groupe {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 4px 8px;
+  color: var(--discret);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.titre-groupe[data-genre="promo"] {
+  color: var(--promo);
+}
+
+.titre-groupe[data-genre="promo"]::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentcolor;
+}
+
+.etat-produits {
+  margin: 0 4px 8px;
+}
+
+.produit {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+}
+
+.produit + .produit {
+  border-top: 1px solid var(--bordure);
+}
+
+.produit p {
+  margin: 0;
+}
+
+.produit-textes {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.produit-nom {
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.produit-precisions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  color: var(--discret);
+  font-size: 0.82rem;
+}
+
+.produit-marque {
+  font-size: 0.7rem;
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.logo-produit {
+  height: 22px;
+  max-width: 72px;
+}
+
+.produit-prix {
+  color: var(--discret);
+  font-size: 0.82rem;
+}
+
+.credit-produits {
+  margin: 8px 4px 0;
+  font-size: 0.75rem;
+}
+
+.credit-produits a {
+  color: var(--accent-texte);
 }
 
 .etat-recherche {

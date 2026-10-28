@@ -1,0 +1,61 @@
+# Met à jour la base des produits (produits.json) une fois par semaine, et à la demande. Source :
+# Open Food Facts, dont le fichier complet (1,5 Go) est lu au fil du téléchargement, sans être gardé
+# (voir src/robot_promos/produits.py). Le fichier est rangé dans la branche « produits », réécrite à
+# chaque fois en un seul enregistrement : le dépôt ne grossit pas d'une semaine à l'autre.
+name: Produits Leclerc
+
+on:
+  schedule:
+    # Le lundi à 4 h 23, heure de Paris : une fois par semaine suffit, les produits changent peu.
+    - cron: "23 4 * * 1"
+      timezone: "Europe/Paris"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Le même groupe que le robot des promos : jamais deux enregistrements en même temps dans le dépôt.
+concurrency:
+  group: robot-promos
+
+jobs:
+  produits:
+    name: Mettre à jour les produits
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write # pour enregistrer produits.json dans la branche « produits »
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Installer Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Installer le robot
+        run: pip install .
+
+      - name: Lire Open Food Facts
+        run: |
+          mkdir -p "$RUNNER_TEMP/produits"
+          python -m robot_promos.produits --sortie "$RUNNER_TEMP/produits/produits.json"
+
+      - name: Enregistrer les produits
+        run: |
+          printf '%s\n' "# Produits" "" \
+            "La base des produits pour l'appli (produits.json), écrite chaque semaine par le robot d'après" \
+            "Open Food Facts (données sous licence ODbL, photos sous licence CC BY-SA). Voir" \
+            "src/robot_promos/produits.py sur la branche main. Cette branche est réécrite à chaque fois :" \
+            "ne rien y modifier à la main." > "$RUNNER_TEMP/produits/LISEZMOI.md"
+          depot="$PWD/.git"
+          cd "$RUNNER_TEMP/produits"
+          export GIT_DIR="$depot" GIT_WORK_TREE="$PWD" GIT_INDEX_FILE="$RUNNER_TEMP/index-produits"
+          git add -A .
+          enregistrement=$(git -c user.name="github-actions[bot]" \
+            -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit-tree "$(git write-tree)" -m "Produits du $(TZ=Europe/Paris date +%d/%m/%Y)")
+          git push --force origin "$enregistrement:refs/heads/produits"

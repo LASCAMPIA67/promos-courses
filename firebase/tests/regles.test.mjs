@@ -119,6 +119,14 @@ describe("ajouter un article", () => {
     await assertFails(setDoc(doc(base(COMPTE_1), "articles/c"), nouvelArticle(COMPTE_1, { promo: 42 })));
   });
 
+  test("le code-barres du produit d'où vient l'article est facultatif, et rien que des chiffres", async () => {
+    const depuisUnProduit = nouvelArticle(COMPTE_1, { produit: "3017620422003" });
+    await assertSucceeds(setDoc(doc(base(COMPTE_1), "articles/a"), depuisUnProduit));
+    await assertFails(setDoc(doc(base(COMPTE_1), "articles/b"), nouvelArticle(COMPTE_1, { produit: "301762042200x" })));
+    await assertFails(setDoc(doc(base(COMPTE_1), "articles/c"), nouvelArticle(COMPTE_1, { produit: "1".repeat(15) })));
+    await assertFails(setDoc(doc(base(COMPTE_1), "articles/d"), nouvelArticle(COMPTE_1, { produit: 3017620422003 })));
+  });
+
   test("les champs inconnus sont refusés", async () => {
     await assertFails(setDoc(doc(base(COMPTE_1), "articles/a"), nouvelArticle(COMPTE_1, { pirate: true })));
   });

@@ -20,11 +20,13 @@ service cloud.firestore {
     // Forme d'un article de la liste de courses.
     function articleValide(a) {
       return a.keys().hasAll(['nom', 'achete', 'ajoute_par', 'cree_le', 'modifie_le'])
-        && a.keys().hasOnly(['nom', 'quantite', 'note', 'promo', 'achete', 'ajoute_par', 'cree_le', 'modifie_le'])
+        && a.keys().hasOnly(['nom', 'quantite', 'note', 'promo', 'produit', 'achete', 'ajoute_par', 'cree_le', 'modifie_le'])
         && a.nom is string && a.nom.size() > 0 && a.nom.size() <= 100
         && texteOuAbsent(a, 'quantite', 30)
         && texteOuAbsent(a, 'note', 200)
         && texteOuAbsent(a, 'promo', 100)
+        // Le code-barres du produit d'où vient l'article (pour sa photo, et sa promo quand il y en a une).
+        && (!('produit' in a) || (a.produit is string && a.produit.matches('^[0-9]{8,14}$')))
         && a.achete is bool
         && a.ajoute_par is string
         && a.cree_le is timestamp

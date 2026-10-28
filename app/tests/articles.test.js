@@ -25,6 +25,14 @@ describe("nettoyer et cle", () => {
 });
 
 describe("preparerSaisie", () => {
+  test("garde le code-barres du produit, seulement s'il est fait de chiffres", () => {
+    expect(preparerSaisie({ nom: "Nutella", produit: "3017620422003" }).article).toEqual({
+      nom: "Nutella",
+      produit: "3017620422003",
+    });
+    expect(preparerSaisie({ nom: "Nutella", produit: "abc" }).article).toEqual({ nom: "Nutella" });
+  });
+
   test("nettoie et retire les champs vides", () => {
     expect(preparerSaisie({ nom: " Pain  complet ", quantite: " ", note: "" })).toEqual({
       article: { nom: "Pain complet" },

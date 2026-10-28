@@ -48,6 +48,16 @@ import {
   sourcesEnDifficulte,
   typePromo,
 } from "./promos.js";
+import {
+  CHEZ_LECLERC,
+  URL_PRODUITS,
+  articleDepuisProduit,
+  indexerProduitsPeuAPeu,
+  nomDuProduit,
+  phrasePrix,
+  produitDuCode,
+  rechercherProduits,
+} from "./produits.js";
 import { AUTRES, RAYONS, cleRayon, rangerParRayon, rayonDe } from "./rayons.js";
 import {
   ADRESSE_NOUVELLE_CLE,
@@ -77,7 +87,9 @@ const $ = (id) => document.getElementById(id);
 
 // Pour les tests, les promos viennent d'un fichier d'exemple au lieu du vrai promos.json.
 const ADRESSE_PROMOS = import.meta.env.MODE === "emulateurs" ? "promos-test.json" : URL_PROMOS;
+const ADRESSE_PRODUITS = import.meta.env.MODE === "emulateurs" ? "produits-test.json" : URL_PRODUITS;
 const RELIRE_LES_PROMOS_APRES = 60 * 60 * 1000; // 1 heure
+const RELIRE_LES_PRODUITS_APRES = 24 * 60 * 60 * 1000; // 1 jour : le robot les change chaque semaine
 const PROMOS_PAR_PAGE = 30;
 /** Entre deux nouvelles du robot lancé depuis l'appli : il met de 2 minutes à une heure (photos). */
 const ATTENTE_ROBOT = import.meta.env.MODE === "emulateurs" ? 300 : 10_000;
@@ -99,7 +111,11 @@ const etat = {
   ligneOuverte: null, // article dont le bouton « Supprimer » est visible (glissé vers la gauche)
   promos: null, // { donnees, index, luesLe }
   promosIndisponibles: false,
-  recherche: { texte: "", nombre: PROMOS_PAR_PAGE }, // promos trouvées pendant qu'on écrit
+  produits: null, // { index, luesLe } : tous les produits, même sans promo (produits.json)
+  produitsEnCours: null, // la lecture de produits.json, pendant qu'elle se fait
+  produitsIndisponibles: false,
+  // Ce qu'on a trouvé pendant qu'on écrit : combien de promos et de produits sans promo montrer.
+  recherche: { texte: "", nombre: PROMOS_PAR_PAGE, nombreProduits: PROMOS_PAR_PAGE },
 };
 
 // Le robot lancé depuis l'appli : sa clé GitHub (lue dans Firebase), son suivi, ce qu'il fait.
@@ -146,10 +162,14 @@ onAuthStateChanged(auth, (utilisateur) => {
   $("email-compte").textContent = utilisateur.email ?? "";
   afficherEcran("appli");
   dessinerListe();
+  // Tous les produits, en arrière-plan : prêts quand on cherche un article.
+  setTimeout(chargerProduitsSiBesoin, 3000);
   etat.arreterSuivi = suivreArticles(
     db,
     (articles, { depuisLeTelephone }) => {
       etat.articles = articles;
+      // Des articles venus d'un produit : sa photo est dans tous les produits.
+      if (articles.some((article) => article.produit)) chargerProduitsSiBesoin();
       dessinerListe();
       mettreAJourBoutonsAjout();
       mettreAJourBandeau(depuisLeTelephone);
@@ -320,11 +340,15 @@ function ligneArticle(article, promo = null) {
   const devant = document.createElement("div");
   devant.className = "article-devant";
   devant.append(caseACocher);
-  // La photo du produit de la promo choisie, en petit (rien sans photo sûre) ; la toucher montre la promo.
+  // La photo du produit, en petit (rien sans photo sûre) : celle de sa promo (la toucher montre la
+  // promo), sinon celle du produit d'où vient l'article.
   if (adresseSure(promo?.offre?.photo)) {
     const photo = imageDuRobot(promo.offre.photo, "photo-article", "", (image) => image.remove());
     photo.addEventListener("click", () => ouvrirPromo(article, promo));
     devant.append(photo);
+  } else if (adresseSure(produitDuCode(etat.produits?.index, article.produit)?.photo)) {
+    const photo = produitDuCode(etat.produits.index, article.produit).photo;
+    devant.append(imageDuRobot(photo, "photo-article", "", (image) => image.remove()));
   }
   devant.append(contenu);
   if (promo?.terminee) devant.append(element("span", "promo-terminee", "Promo terminée"));
@@ -443,6 +467,30 @@ function relirePromosSiBesoin() {
   if (!etat.promos || Date.now() - etat.promos.luesLe > RELIRE_LES_PROMOS_APRES) chargerPromos();
 }
 
+/**
+ * Lit produits.json (tous les produits, même sans promo : quelques Mo, gardés sur le téléphone par le
+ * service de l'appli, voir vite.config.js) la première fois qu'on en a besoin, puis une fois par jour.
+ */
+function chargerProduitsSiBesoin() {
+  const recents = etat.produits && Date.now() - etat.produits.luesLe < RELIRE_LES_PRODUITS_APRES;
+  if (recents || etat.produitsEnCours) return;
+  etat.produitsEnCours = (async () => {
+    try {
+      const reponse = await fetch(ADRESSE_PRODUITS, { signal: AbortSignal.timeout(60_000) });
+      if (!reponse.ok) throw new Error(`produits.json : erreur ${reponse.status}`);
+      etat.produits = { index: await indexerProduitsPeuAPeu(await reponse.json()), luesLe: Date.now() };
+      etat.produitsIndisponibles = false;
+    } catch (erreur) {
+      console.warn("Produits indisponibles :", erreur);
+      etat.produitsIndisponibles = !etat.produits; // si on en avait déjà, on les garde
+    } finally {
+      etat.produitsEnCours = null;
+    }
+    dessinerListe();
+    dessinerSuggestions();
+  })();
+}
+
 /** Prévient si les promos manquent, sont anciennes ou incomplètes ; rappelle leur date en bas. */
 function dessinerEtatPromos() {
   // Pendant que le robot travaille (« Mettre à jour les promos »), on suit son avancée ici.
@@ -554,26 +602,54 @@ function dessinerSuggestions() {
   const texte = $("ajout-nom").value.trim();
   $("effacer-saisie").hidden = !texte;
   const index = etat.promos?.index;
-  const actives = texte.length >= LETTRES_MINIMUM && Boolean(index);
+  const actives = texte.length >= LETTRES_MINIMUM && Boolean(index || etat.produits || etat.produitsEnCours);
   $("suggestions").hidden = !actives;
   $("contenu").hidden = actives; // la liste revient dès que le champ est vide
   if (!actives) return;
 
-  if (texte !== etat.recherche.texte) etat.recherche = { texte, nombre: PROMOS_PAR_PAGE };
+  if (texte !== etat.recherche.texte) {
+    etat.recherche = { texte, nombre: PROMOS_PAR_PAGE, nombreProduits: PROMOS_PAR_PAGE };
+  }
   const aujourdhui = dateDuJour();
-  const resultats = rechercherPromos(index, texte, aujourdhui);
+  const resultats = index ? rechercherPromos(index, texte, aujourdhui) : [];
   const n = resultats.length;
-  $("etat-recherche").textContent = n === 0 ? "Aucune promo · + pour l'ajouter" : pluriel(n, "promo");
+  $("groupe-promos").hidden = n === 0;
   $("resultats").replaceChildren(
     ...resultats
       .slice(0, etat.recherche.nombre)
       .map(({ offre, aVenir }) => cartePromo(offre, aVenir, aujourdhui, { avecAjout: true })),
   );
   $("plus-de-resultats").hidden = n <= etat.recherche.nombre;
+
+  // Puis tous les autres produits, sans promo (un produit en promo n'est montré qu'en promo).
+  const sansPromo = etat.produits ? produitsSansPromo(texte, aujourdhui) : [];
+  const m = sansPromo.length;
+  $("groupe-produits").hidden = !etat.produits && !etat.produitsEnCours;
+  afficherMessage($("etat-produits"), etat.produits ? (m ? "" : "Aucun autre produit") : "Chargement des produits…");
+  $("resultats-produits").replaceChildren(
+    ...sansPromo.slice(0, etat.recherche.nombreProduits).map((produit) => carteProduit(produit)),
+  );
+  $("plus-de-produits").hidden = m <= etat.recherche.nombreProduits;
+
+  const promos = n === 0 ? "Aucune promo" : pluriel(n, "promo");
+  const produits = etat.produits ? ` · ${m === 0 ? "aucun" : m} sans promo` : "";
+  const ajout = n === 0 && m === 0 ? " · + pour l'ajouter" : "";
+  $("etat-recherche").textContent = `${promos}${produits}${ajout}`;
+}
+
+/** Les produits qui correspondent à ce qu'on écrit, sauf ceux en promo en ce moment. */
+function produitsSansPromo(texte, aujourdhui) {
+  const enPromo = new Set(
+    (etat.promos?.index ?? [])
+      .filter(({ offre }) => offre.ean && (!offre.date_fin || offre.date_fin >= aujourdhui))
+      .map(({ offre }) => offre.ean),
+  );
+  return rechercherProduits(etat.produits.index, texte, { exclure: enPromo });
 }
 
 let attenteRecherche;
 $("ajout-nom").addEventListener("input", () => {
+  chargerProduitsSiBesoin(); // la première fois qu'on écrit : tous les produits, même sans promo
   afficherMessage($("message-ajout"), "");
   $("effacer-saisie").hidden = !$("ajout-nom").value.trim();
   clearTimeout(attenteRecherche);
@@ -593,6 +669,11 @@ $("ajout-nom").addEventListener("keydown", (evenement) => {
 
 $("plus-de-resultats").addEventListener("click", () => {
   etat.recherche.nombre += PROMOS_PAR_PAGE;
+  dessinerSuggestions();
+});
+
+$("plus-de-produits").addEventListener("click", () => {
+  etat.recherche.nombreProduits += PROMOS_PAR_PAGE;
   dessinerSuggestions();
 });
 
@@ -635,17 +716,37 @@ function imageDuRobot(adresse, classe, texte, siIntrouvable) {
  * emplacement neutre : jamais une photo qui pourrait tromper. Décorative : le nom est juste à côté.
  */
 function photoPromo(offre) {
-  const sansPhoto = () => {
-    const cadre = element("span", "photo-promo sans-photo");
-    cadre.innerHTML =
-      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2z" /><path d="M9 8V6.5a3 3 0 0 1 6 0V8" /></svg>';
-    return cadre;
-  };
-  if (!adresseSure(offre.photo)) return sansPhoto();
-  return imageDuRobot(offre.photo, "photo-promo", "", (image) => image.replaceWith(sansPhoto()));
+  if (!adresseSure(offre.photo)) return sansPhoto("photo-promo");
+  return imageDuRobot(offre.photo, "photo-promo", "", (image) => image.replaceWith(sansPhoto("photo-promo")));
+}
+
+/** L'emplacement neutre (un sac), quand il n'y a pas de photo sûre. */
+function sansPhoto(classe) {
+  const cadre = element("span", `${classe} sans-photo`);
+  cadre.innerHTML =
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2z" /><path d="M9 8V6.5a3 3 0 0 1 6 0V8" /></svg>';
+  return cadre;
 }
 
 /** « Ajouter à la liste », ou « Dans la liste » si l'article y est déjà. */
+/**
+ * Ajoute un article venu d'une promo ou d'un produit. Comme pour l'ajout dans la liste : sans réseau,
+ * il part plus tard. Si les règles d'accès publiées dans Firebase ne connaissent pas encore le champ
+ * « produit » (ou « promo »), l'article est ajouté sans : sa promo est alors retrouvée d'après sa
+ * note (« Leclerc · 2,25 € »).
+ */
+function ajouterAvecRepli(article) {
+  const { produit, ...sansProduit } = article;
+  const { promo, ...sansRien } = sansProduit;
+  const essais = [article, ...(produit ? [sansProduit] : []), ...(promo ? [sansRien] : [])];
+  const essayer = ([premier, ...suivants]) =>
+    ajouterArticle(db, etat.utilisateur.uid, premier).catch((refus) => {
+      if (refus?.code !== "permission-denied" || !suivants.length) throw refus;
+      return essayer(suivants);
+    });
+  essayer(essais).catch(signalerErreur);
+}
+
 function boutonAjouter(offre) {
   const bouton = element("button", "bouton-ajouter");
   bouton.type = "button";
@@ -654,16 +755,81 @@ function boutonAjouter(offre) {
   bouton.addEventListener("click", () => {
     const { article, erreur } = preparerSaisie(articleDepuisPromo(offre));
     if (erreur) return;
-    // Comme pour l'ajout dans la liste : sans réseau, l'article part plus tard. Si les règles d'accès
-    // publiées dans Firebase ne connaissent pas encore le champ « promo », l'article est ajouté sans :
-    // sa promo est alors retrouvée d'après sa note (« Leclerc · 2,25 € »).
-    ajouterArticle(db, etat.utilisateur.uid, article)
-      .catch((refus) => {
-        if (refus?.code !== "permission-denied") throw refus;
-        const { promo, ...sansPromo } = article;
-        return ajouterArticle(db, etat.utilisateur.uid, sansPromo);
-      })
-      .catch(signalerErreur);
+    ajouterAvecRepli(article);
+    bouton.disabled = true;
+    bouton.textContent = "✓ Ajouté";
+  });
+  return bouton;
+}
+
+/**
+ * Un produit sans promo, trouvé dans tous les produits : sa photo, son nom, sa marque (son logo
+ * quand on le connaît) et sa contenance, son prix habituel quand un catalogue Leclerc l'a donné, et
+ * de quoi l'ajouter à la liste. Plus sobre qu'une promo : pas de pastille de couleur.
+ */
+function carteProduit(produit) {
+  const carte = element("li", "produit");
+  const photo = adresseSure(produit.photo)
+    ? imageDuRobot(produit.photo, "photo-produit", "", (image) => image.replaceWith(sansPhoto("photo-produit")))
+    : sansPhoto("photo-produit");
+  const textes = element("div", "produit-textes");
+  textes.append(element("p", "produit-nom", nomDuProduit(produit)));
+  // La marque (son logo quand on le connaît, sinon son nom) et la contenance.
+  const precisions = element("p", "produit-precisions");
+  const logo = logoDuProduit(produit);
+  if (logo) precisions.append(logo);
+  else if (produit.marque) precisions.append(element("span", "produit-marque", produit.marque));
+  if (produit.quantite) precisions.append(element("span", "produit-quantite", produit.quantite));
+  if (precisions.childElementCount) textes.append(precisions);
+  textes.append(element("p", "produit-prix", phrasePrix(produit) ?? "Prix en magasin"));
+  carte.append(photo, textes, boutonAjouterProduit(produit));
+  return carte;
+}
+
+/** Le logo de la marque d'un produit sans promo, quand une promo en cours de cette marque en a un. */
+function logoDuProduit(produit) {
+  const logos = logosDesMarques();
+  const logo =
+    produit.leclerc === CHEZ_LECLERC.marqueRepere ? logos.marqueRepere : logos.parMarque.get(cleMarque(produit.marque));
+  if (!logo) return null;
+  const texte = produit.leclerc === CHEZ_LECLERC.marqueRepere ? `Marque Repère (${produit.marque})` : produit.marque;
+  return imageDuRobot(logo, "logo-marque logo-produit", texte, (image) =>
+    image.replaceWith(element("span", "produit-marque", produit.marque ?? "")),
+  );
+}
+
+const cleMarque = (marque) =>
+  String(marque ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/gi, " ")
+    .trim()
+    .toUpperCase();
+
+/** Les logos connus, d'après les promos en cours : par marque, et celui de Marque Repère. */
+function logosDesMarques() {
+  const index = etat.promos?.index;
+  if (logosDesMarques.index === index) return logosDesMarques.connus;
+  const connus = { parMarque: new Map(), marqueRepere: null };
+  for (const { offre } of index ?? []) {
+    if (!adresseSure(offre.logo)) continue;
+    if (offre.logo_marque === "Marque Repère") connus.marqueRepere ??= offre.logo;
+    else if (!offre.logo_marque && offre.marque) connus.parMarque.set(cleMarque(offre.marque), offre.logo);
+  }
+  logosDesMarques.index = index;
+  logosDesMarques.connus = connus;
+  return connus;
+}
+
+function boutonAjouterProduit(produit) {
+  const bouton = element("button", "bouton-ajouter");
+  bouton.type = "button";
+  bouton.dataset.nom = nomDuProduit(produit);
+  mettreAJourBoutonAjout(bouton);
+  bouton.addEventListener("click", () => {
+    const { article, erreur } = preparerSaisie(articleDepuisProduit(produit));
+    if (erreur) return;
+    ajouterAvecRepli(article);
     bouton.disabled = true;
     bouton.textContent = "✓ Ajouté";
   });
@@ -679,7 +845,7 @@ function mettreAJourBoutonAjout(bouton) {
 }
 
 function mettreAJourBoutonsAjout() {
-  for (const bouton of document.querySelectorAll("#resultats .bouton-ajouter")) mettreAJourBoutonAjout(bouton);
+  for (const bouton of document.querySelectorAll("#suggestions .bouton-ajouter")) mettreAJourBoutonAjout(bouton);
 }
 
 chargerPromos();
