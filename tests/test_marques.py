@@ -15,7 +15,9 @@ def test_cle_marque():
 def test_est_marque_repere():
     assert est_marque_repere({"marque": "TURINI", "ean": "3564700123456"})  # code-barres Scamark
     assert est_marque_repere({"marque": "Tradilège", "ean": "3661112057565"})  # une gamme, nommée
-    assert est_marque_repere({"marque": "Mots d’Enfants", "ean": None})
+    assert est_marque_repere({"marque": "Volandrie", "ean": None})
+    assert est_marque_repere({"marque": "Mots d’Enfants", "ean": "3564700000017"})  # des couches
+    assert not est_marque_repere({"marque": "MOTS D'ENFANTS", "ean": "3603313613515"})  # un vêtement
     assert not est_marque_repere({"marque": "ECO+", "ean": "3564700123456"})  # une autre marque de Leclerc
     assert not est_marque_repere({"marque": "Nos Régions ont du Talent", "ean": "3564706000000"})
     assert not est_marque_repere({"marque": "LACTEL", "ean": "3428270000000"})

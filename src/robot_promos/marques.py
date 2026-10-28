@@ -3,8 +3,9 @@
 Les produits Marque Repère (la marque des centres E.Leclerc) se reconnaissent à leur code-barres :
 ceux de Scamark, qui les fabrique pour Leclerc, commencent par 356470. Quelques gammes de la marque
 ont d'autres codes-barres : elles sont reconnues à leur nom, tel qu'il figure dans le dossier de
-presse des 25 ans de Marque Repère (2022). Eco+ et Nos Régions ont du Talent sont d'autres marques de
-Leclerc : elles gardent leur logo. Voir docs/sources.md.
+presse des 25 ans de Marque Repère (2022). Mots d'Enfants n'est Marque Repère que pour ses couches et
+ses soins (au code-barres de Scamark), pas pour ses vêtements. Eco+ et Nos Régions ont du Talent sont
+d'autres marques de Leclerc : elles gardent leur logo. Voir docs/sources.md.
 """
 
 import json
@@ -17,7 +18,6 @@ GAMMES_MARQUE_REPERE = {
     "BIO VILLAGE",
     "COPAINS COPINES",
     "DÉLISSE",
-    "MOTS D'ENFANTS",
     "ŒUFS DE NOS RÉGIONS",
     "POM'LISSE",
     "RÉCOLTONS L'AVENIR",

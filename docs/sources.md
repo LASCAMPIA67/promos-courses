@@ -73,8 +73,9 @@ même quand le catalogue joint celui de leur gamme (Bio Village, Délisse…) : 
 produits de la marque pour Leclerc, commencent par `356470`. Quelques gammes ont d'autres
 codes-barres (la charcuterie Tradilège : `3661112…`) : elles sont reconnues à leur nom, tel qu'il
 figure dans le [dossier de presse des 25 ans de Marque Repère](https://www.mouvement.leclerc/sites/default/files/2022-03/DP_25%20ans_Marque%20Repe%C4%9Are_vdef_1.pdf)
-(2022) : Bio Village, Copains Copines, Délisse, Mots d'Enfants, Œufs de nos Régions, Pom'lisse,
-Récoltons l'Avenir, Smicy, Soutenons nos Agriculteurs, Tradilège, Volandrie. Eco+ et Nos Régions
+(2022) : Bio Village, Copains Copines, Délisse, Œufs de nos Régions, Pom'lisse, Récoltons l'Avenir,
+Smicy, Soutenons nos Agriculteurs, Tradilège, Volandrie. Mots d'Enfants n'est Marque Repère que pour
+ses couches et ses soins (au code-barres de Scamark), pas pour ses vêtements. Eco+ et Nos Régions
 ont du Talent sont d'autres marques de Leclerc : elles gardent leur logo. Le détail est dans
 [`marques.py`](../src/robot_promos/marques.py). Dans l'appli, VoiceOver lit « Marque Repère
 (DÉLISSE) » : le nom de la gamme n'est pas perdu.
@@ -102,7 +103,7 @@ dans la présentation du robot (« User-Agent »). La liste vient des logos que 
 Wikipédia) indique pour l'article Wikipédia de chaque marque, puis d'une vérification à l'œil :
 les photos (une bouteille, une vitrine), les anciens logos, les logos d'une autre gamme
 (« Paysan Breton, les surgelés » pour un fromage) et ceux d'une maison mère qui n'est pas la marque
-du produit ont été écartés. Mesure du 28/10/2026 : 29 marques de plus ont un logo, et 42 promos ont
+du produit ont été écartés. Mesure du 28/10/2026 : 29 marques de plus ont un logo, et 37 promos ont
 le logo Marque Repère ; en tout, 288 marques sur 540 et **70 % des produits de marque** ont un logo
 (59 % avec le catalogue seul).
 

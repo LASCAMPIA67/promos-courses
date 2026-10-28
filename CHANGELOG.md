@@ -20,7 +20,7 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
   logo de leur gamme (Bio Village, Délisse…). Ils sont reconnus à leur code-barres (ceux de
   Scamark commencent par 356470), ou au nom de leur gamme quand elle a un autre code-barres
   (Tradilège). Eco+ et Nos Régions ont du Talent gardent leur logo. VoiceOver lit « Marque Repère
-  (DÉLISSE) ». 42 promos (28/10/2026). Nouveau champ facultatif `logo_marque` dans `promos.json`
+  (DÉLISSE) ». 37 promos (28/10/2026). Nouveau champ facultatif `logo_marque` dans `promos.json`
   (format inchangé).
 - **Les logos pris sur Wikipédia** pour les marques dont le catalogue ne donne pas de logo, d'après
   une liste vérifiée à la main (`src/robot_promos/logos.json`) : la recherche automatique par nom
