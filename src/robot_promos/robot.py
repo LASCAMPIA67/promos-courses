@@ -1,4 +1,4 @@
-"""Chef d'orchestre : interroge chaque source, puis écrit promos.json.
+"""Chef d'orchestre : interroge chaque source, puis écrit promos.json (et l'historique des prix).
 
 Lancement : python -m robot_promos   (options : --help)
 """
@@ -14,6 +14,7 @@ from pathlib import Path
 from robot_promos import __version__
 from robot_promos.avancee import Avancee, sans_nouvelles
 from robot_promos.config import MAGASINS
+from robot_promos.historique import mettre_a_jour
 from robot_promos.offres import dedoublonner, verifier
 from robot_promos.outils import aujourdhui, maintenant
 from robot_promos.sources.leclerc import Leclerc
@@ -133,6 +134,10 @@ def main(argv=None):
         for catalogue in etat["catalogues"]:
             catalogue["nb_offres"] = compte[(etat["id"], catalogue["id"])]
         etat["nb_offres"] = sum(c["nb_offres"] for c in etat["catalogues"])
+    # L'historique des prix, rangé à côté de promos.json : chaque promo est comparée à celles d'avant
+    # du même produit, puis ajoutée (voir historique.py).
+    comparees = mettre_a_jour(Path(args.sortie).with_name("historique.json"), offres, aujourdhui())
+    print(f"Historique des prix : {comparees} promos comparées à des promos plus anciennes.", flush=True)
     # Les photos de ces offres sont faites à part, juste après (python -m robot_promos.photos).
     document = {
         "format": FORMAT,

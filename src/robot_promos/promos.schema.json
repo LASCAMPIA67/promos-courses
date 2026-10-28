@@ -98,7 +98,20 @@
         "logo_catalogue": {"type": ["string", "null"], "description": "Logo de la marque donné par le catalogue (original), seulement s'il est sûr (facultatif)."},
         "logo": {"type": ["string", "null"], "description": "Vignette du logo de la marque pour l'appli (facultatif)."},
         "logo_marque": {"type": ["string", "null"], "description": "La marque que montre le logo, quand ce n'est pas celle du produit : « Marque Repère » (facultatif)."},
-        "page": {"type": ["integer", "null"], "minimum": 1}
+        "page": {"type": ["integer", "null"], "minimum": 1},
+        "historique": {
+          "description": "Ce que dit l'historique des prix de cette promo (facultatif ; null faute de promo plus ancienne du même produit).",
+          "type": ["object", "null"],
+          "required": ["verdict", "depuis", "promos", "meilleur_prix", "meilleur_le"],
+          "additionalProperties": false,
+          "properties": {
+            "verdict": {"enum": ["plus_bas", "egal", "plus_cher"], "description": "Le prix pour un article, comparé aux promos d'avant : plus bas que toutes, égal à la meilleure, ou plus cher."},
+            "depuis": {"$ref": "#/$defs/date", "description": "Début de la plus ancienne promo connue de ce produit."},
+            "promos": {"type": "integer", "minimum": 1, "description": "Nombre de promos d'avant."},
+            "meilleur_prix": {"type": "number", "minimum": 0, "description": "Le prix le plus bas pour un article dans les promos d'avant."},
+            "meilleur_le": {"$ref": "#/$defs/date", "description": "Début de la promo d'avant la moins chère (la dernière, à égalité)."}
+          }
+        }
       }
     }
   }

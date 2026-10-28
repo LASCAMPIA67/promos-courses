@@ -34,7 +34,9 @@ class FausseSource(Source):
                 magasin="leclerc-geispolsheim",
                 catalogue="semaine",
                 produit=f"Banane {self.version}",
+                ean="3000000000001",
                 prix=0.95,
+                date_debut="2026-10-22",
                 date_fin="2099-12-31",
             )
         ]
@@ -55,6 +57,10 @@ def test_premier_passage(tmp_path, monkeypatch):
     assert doc["sources"][0]["etat"] == "ok"
     assert [o["produit"] for o in doc["offres"]] == ["Banane v1"]
     assert doc["sources"][0]["catalogues"][0]["reutilise"] is False
+    # L'historique des prix, rangé à côté : vide jusque-là, donc rien à comparer.
+    assert doc["offres"][0]["historique"] is None
+    historique = json.loads((tmp_path / "historique.json").read_text())
+    assert historique["produits"]["3000000000001"]["promos"][0]["prix"] == 0.95
 
 
 def test_catalogue_inchange_non_relu(tmp_path, monkeypatch):

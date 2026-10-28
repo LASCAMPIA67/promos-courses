@@ -84,6 +84,32 @@ Son format est décrit précisément (et vérifié à chaque passage) par le sch
 | `logo` | | Vignette du logo de la marque pour l'appli (PNG, 96 pixels de haut au plus), dans `logos/` de la branche `photos` : la même pour toutes les promos de la marque, même celles dont le produit n'a pas de logo dans le catalogue. Sinon le logo officiel pris sur Wikipédia (liste vérifiée à la main) ; le logo Marque Repère pour tous les produits Marque Repère. `null` sans logo sûr. Facultatif. |
 | `logo_marque` | | La marque que montre le logo quand ce n'est pas celle du produit : `"Marque Repère"` (pour une gamme comme Délisse) ; `null` sinon. Facultatif. |
 | `page` | `null` | Numéro de page dans le catalogue, si connu. |
+| `historique` | `{"verdict": "plus_bas", "depuis": "2026-09-01", "promos": 3, "meilleur_prix": 1.99, "meilleur_le": "2026-10-01"}` | Ce que dit l'**historique des prix** de cette promo (voir ci-dessous) : `verdict` vaut `plus_bas` (jamais vue aussi basse), `egal` (le même prix que la meilleure) ou `plus_cher` (déjà vue moins chère), comparé aux `promos` d'avant du même produit, connues depuis `depuis` ; `meilleur_prix` et `meilleur_le` : la moins chère d'entre elles (prix pour un article, date de début). `null` faute de promo plus ancienne du même produit. Facultatif. |
+
+## L'historique des prix (`historique.json`)
+
+À chaque passage, le robot range à côté de `promos.json` les promos vues, produit par produit
+(par code-barres), et les garde deux ans après leur fin. Avant de ranger les promos du jour, il
+compare chacune aux promos d'avant du même produit : c'est le champ `historique` de l'offre. Le
+prix comparé est le **prix le plus bas pour un article** : celui du lot quand il est moins cher
+(« 2e à -40 % » : 3,70 € les 2, soit 1,85 € l'article), sinon `prix`. Code :
+[`historique.py`](../src/robot_promos/historique.py).
+
+```json
+{
+ "format": 1,
+ "debut": "2026-10-28",
+ "produits": {
+  "3564700000017": {"produit": "PIZZA FRAÎCHE JAMBON FROMAGE", "marque": "TURINI", "promos": [{"catalogue": "26G310G", "du": "2026-10-27", "au": "2026-11-07", "prix": 1.85}]}
+ }
+}
+```
+
+- `debut` : le premier passage enregistré. L'historique a commencé **vide** le 28/10/2026 : les
+  comparaisons arrivent au fil des semaines, quand un produit revient en promo.
+- Une ligne par produit : le fichier reste lisible, et ses changements d'un jour à l'autre, petits.
+- Une promo n'est rangée qu'une fois (même catalogue, même date de début), même avec plusieurs
+  passages par jour ; si son prix change, on garde le plus bas.
 
 ## Comment l'appli s'en sert
 
@@ -100,5 +126,8 @@ Le code est dans [`app/src/promos.js`](../app/src/promos.js) ; le détail côté
 - **Fraîcheur des données** : si `mise_a_jour` date de plus de 36 heures (le robot a manqué au moins un
   passage), un bandeau jaune prévient que les promos ont pu changer (voir le README, section
   « Dépannage »).
+- **Historique des prix** : sous le prix, une ligne dit si la promo est la moins chère vue depuis
+  le début de l'historique de ce produit, aussi basse que la meilleure, ou déjà vue moins chère
+  (champ `historique`).
 - **Source en difficulté** : si l'`etat` n'est pas `ok`, l'appli signale que les promos du magasin
   sont incomplètes (`partiel`) ou pas à jour (`erreur`).
