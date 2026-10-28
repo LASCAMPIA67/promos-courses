@@ -47,6 +47,18 @@ def test_dedoublonner_garde_la_plus_complete_et_des_id_uniques():
     assert len({o["id"] for o in resultat}) == 2
 
 
+def test_dedoublonner_reconnait_le_code_barres_meme_avec_une_autre_marque():
+    # La même promo dans deux catalogues, la marque écrite différemment.
+    sirop = {"produit": "SIROP PÊCHE ZÉRO", "ean": "3092718638016", "prix": 2.75, "date_fin": "2026-10-31"}
+    un = offre(id="a", catalogue="26G124E", marque="FRUIT SHOOT", **sirop)
+    deux = offre(id="b", catalogue="26G124G", marque="TEISSEIRE", description="60 cl. Existe aussi", **sirop)
+    assert [o["id"] for o in dedoublonner([un, deux])] == ["b"]
+    # Sans code-barres, deux marques différentes restent deux promos.
+    assert len(dedoublonner([offre(id="c", marque="A"), offre(id="d", marque="B")])) == 2
+    # Même code-barres mais autre prix : deux promos différentes.
+    assert len(dedoublonner([un, offre(id="e", **(sirop | {"prix": 2.10}))])) == 2
+
+
 def document(offres):
     return {
         "format": 2,

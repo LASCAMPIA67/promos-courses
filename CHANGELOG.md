@@ -35,6 +35,16 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 - La recherche des promos ne range plus par magasin : les plus proches d'abord, celles en cours avant
   celles à venir.
 
+### Corrigé
+
+- **Une même promo affichée deux fois** (« Sirop pêche zéro » Fruit Shoot et Teisseire) : elle
+  paraissait dans deux catalogues avec la marque écrite différemment. Le robot reconnaît maintenant
+  une même promo à son code-barres (même prix, mêmes dates), quelle que soit la marque écrite ; le
+  fichier des promos du jour est corrigé. Ajouter l'une ne fait donc plus croire que l'autre est
+  « Dans la liste ».
+- Description d'une promo : plus de « · . » mal placé (« 60 cl · Existe aussi : Différentes
+  variétés »).
+
 ### Supprimé
 
 - **Lidl Lingolsheim est retiré du projet** : nous ne faisons nos courses que chez E.Leclerc

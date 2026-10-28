@@ -358,6 +358,9 @@ describe("resumeDescription", () => {
         "Le produit de 75 cl : 3,99 € (1 L = 5,32 €) Les 3 produits dont 1 OFFERT : 7,98 € (1 L = 3,55 €) au lieu de 11,97 € (1 L = 5,32 €) 12,5 % Vol",
       ),
     ).toBe("75 cl · 12,5 % Vol");
+    expect(resumeDescription("60 cl.Le L : 4,58 €. Existe aussi : Différentes variétés")).toBe(
+      "60 cl · Existe aussi : Différentes variétés",
+    );
     expect(resumeDescription("8/9 parts. 300 g.Le kg : 56,53 €. Même promotion disponible sur d'autres produits")).toBe(
       "8/9 parts · 300 g",
     );

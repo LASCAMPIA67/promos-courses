@@ -82,17 +82,16 @@ def creer_offre(
 
 
 def dedoublonner(offres):
-    """Enlève les offres en double (même produit, même prix, mêmes dates) en gardant la plus complète."""
+    """Enlève les offres en double (même produit, même prix, mêmes dates) en gardant la plus complète.
+
+    Le code-barres suffit à reconnaître le produit : une même promo peut paraître dans deux catalogues
+    avec une marque écrite différemment (« FRUIT SHOOT » et « TEISSEIRE »). Sans code-barres, on
+    compare le nom et la marque.
+    """
     gardees = {}
     for o in offres:
-        cle = (
-            o["magasin"],
-            o["ean"] or (o["produit"] or "").lower(),
-            (o["marque"] or "").lower(),
-            o["prix"],
-            o["date_debut"],
-            o["date_fin"],
-        )
+        produit = ("ean", o["ean"]) if o["ean"] else ("nom", (o["produit"] or "").lower(), (o["marque"] or "").lower())
+        cle = (o["magasin"], produit, o["prix"], o["date_debut"], o["date_fin"])
         avant = gardees.get(cle)
         if avant is None or len(json.dumps(o, ensure_ascii=False)) > len(json.dumps(avant, ensure_ascii=False)):
             gardees[cle] = o

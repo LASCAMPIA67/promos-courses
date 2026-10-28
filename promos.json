@@ -15,7 +15,7 @@
    "magasin": "leclerc-geispolsheim",
    "nom": "Catalogues E.Leclerc Geispolsheim",
    "etat": "ok",
-   "nb_offres": 1394,
+   "nb_offres": 1393,
    "remarque": "9 catalogue(s) ; 9 inchangé(s) depuis le dernier passage",
    "catalogues": [
     {
@@ -55,7 +55,7 @@
      "fin": "2026-10-31",
      "version": "875a3f1e8a7ff843ff831af550030135@2026-10-21T09:45:29Z",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G124E/1067",
-     "nb_offres": 19,
+     "nb_offres": 18,
      "reutilise": true
     },
     {
@@ -16326,13 +16326,13 @@
    "page": null
   },
   {
-   "id": "leclerc-26g124e-14da3f8a1a3b",
+   "id": "leclerc-26g124g-5e6473f2af7d",
    "source": "leclerc",
    "magasin": "leclerc-geispolsheim",
-   "catalogue": "26G124E",
+   "catalogue": "26G124G",
    "produit": "SIROP PÊCHE ZÉRO",
-   "marque": "FRUIT SHOOT",
-   "description": "60 cl.Le L : 4,58 €",
+   "marque": "TEISSEIRE",
+   "description": "60 cl.Le L : 4,58 €. Existe aussi : Différentes variétés",
    "categorie": "LES BOISSONS À PRIX E.LECLERC",
    "ean": "3092718638016",
    "prix": 2.75,
@@ -16348,7 +16348,7 @@
    "carte_fidelite": false,
    "date_debut": "2026-10-20",
    "date_fin": "2026-10-31",
-   "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G124E/1067",
+   "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G124G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/f5e59baca4f0cdd0d0bbeb76338942d3",
    "page": null
   },
@@ -23612,33 +23612,6 @@
    "date_fin": "2026-10-31",
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G124G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/ff4fbb832ee715e0ff3ee6731f85cdf2",
-   "page": null
-  },
-  {
-   "id": "leclerc-26g124g-5e6473f2af7d",
-   "source": "leclerc",
-   "magasin": "leclerc-geispolsheim",
-   "catalogue": "26G124G",
-   "produit": "SIROP PÊCHE ZÉRO",
-   "marque": "TEISSEIRE",
-   "description": "60 cl.Le L : 4,58 €. Existe aussi : Différentes variétés",
-   "categorie": "LES BOISSONS À PRIX E.LECLERC",
-   "ean": "3092718638016",
-   "prix": 2.75,
-   "ancien_prix": null,
-   "prix_unitaire": 4.58,
-   "unite": "l",
-   "reduction": "-50 % sur le 2e",
-   "lot": {
-    "quantite": 2,
-    "prix": 4.12,
-    "prix_unitaire": 3.43
-   },
-   "carte_fidelite": false,
-   "date_debut": "2026-10-20",
-   "date_fin": "2026-10-31",
-   "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G124G/1067",
-   "image": "https://nos-catalogues-promos-v2.e.leclerc/media/f5e59baca4f0cdd0d0bbeb76338942d3",
    "page": null
   },
   {

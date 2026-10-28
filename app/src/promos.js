@@ -525,7 +525,7 @@ export function resumeDescription(texte) {
     .replace(new RegExp(String.raw`\s*:\s*${PRIX}`, "g"), " · ")
     .replace(/(?:Même promotion disponible|[EÉ]galement disponible)[^.]*\.?/gi, " · ")
     .replace(/(?<!\d)\.\s*(?=\d)/g, " · ") // « 4 tranches. 140 g » → « 4 tranches · 140 g », mais pas « 1.98 L »
-    .replace(/\s*\.?\s*(?:·\s*)+/g, " · ")
+    .replace(/\s*\.?\s*(?:·\s*\.?\s*)+/g, " · ") // « 60 cl. · . Existe aussi » → « 60 cl · Existe aussi »
     .replace(/\s+/g, " ")
     .replace(/^[\s·.,;:]+|[\s·,;:]+$/g, "")
     .replace(/\.$/, "");
