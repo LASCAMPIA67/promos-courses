@@ -23,7 +23,7 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
   (« Prix habituel 1,29 € (vu le 8 oct.) »). Plus de 100 000 produits, d'après Open Food Facts
   (base libre ; données ODbL, photos CC BY-SA) : les produits Marque Repère, ceux vus chez Leclerc
   et les produits courants en France, sans les marques propres des autres enseignes. Le robot
-  écrit `produits.json` chaque semaine (workflow « Produits », branche `produits`) ; l'appli le
+  écrit `produits.json` chaque semaine (workflow « Produits Leclerc », branche `produits`) ; l'appli le
   garde sur le téléphone : la recherche marche sans réseau et ce qu'on tape ne sort pas du
   téléphone. Les prix de tous les produits ne sont que sur Leclerc Drive, protégé contre les
   robots : pas question de contourner cette protection.
