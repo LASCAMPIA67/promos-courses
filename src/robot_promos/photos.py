@@ -29,7 +29,7 @@ from PIL import Image, ImageChops, ImageOps
 
 from robot_promos.avancee import Avancee, sans_nouvelles
 from robot_promos.config import ADRESSE_PHOTOS
-from robot_promos.marques import MARQUE_REPERE, cle_marque, est_marque_repere, logos_officiels
+from robot_promos.marques import MARQUE_REPERE, SOUS_MARQUES, cle_marque, est_marque_repere, logos_officiels
 from robot_promos.offres import verifier
 from robot_promos.web import Navigateur
 
@@ -157,7 +157,8 @@ def preparer_logos(nav, offres, dossier, budget=None, horloge=time.monotonic, av
     """Fait les vignettes des logos (dans `dossier`/logos) et indique dans chaque offre celui de sa
     marque (« logo »), ou None. Une marque n'a qu'un logo : celui que le catalogue joint le plus
     souvent à ses produits, repris pour tous, même ceux qui n'en ont pas ; sinon son logo officiel
-    pris sur Wikipédia (`officiels`, par défaut ceux de logos.json). Les produits Marque Repère ont
+    pris sur Wikipédia (`officiels`, par défaut ceux de logos.json) ; sinon celui de la marque dont
+    elle est une gamme (SOUS_MARQUES, dans marques.py). Les produits Marque Repère ont
     tous le logo Marque Repère, et « logo_marque » le dit. Renvoie un petit bilan.
     """
     officiels = logos_officiels() if officiels is None else officiels
@@ -174,7 +175,8 @@ def preparer_logos(nav, offres, dossier, budget=None, horloge=time.monotonic, av
             return None, None
         if marque_repere and est_marque_repere(offre):
             return marque_repere, MARQUE_REPERE
-        return choisis.get(cle_marque(offre["marque"])), None
+        marque = cle_marque(offre["marque"])
+        return choisis.get(marque) or choisis.get(SOUS_MARQUES.get(marque)), None
 
     logos = [logo_de(offre) for offre in offres]
     a_faire = {nom_logo(adresse): adresse for adresse, _ in logos if adresse}

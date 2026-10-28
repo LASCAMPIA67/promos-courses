@@ -28,6 +28,15 @@ GAMMES_MARQUE_REPERE = {
 }
 AUTRES_MARQUES_LECLERC = {"ECO+", "NOS RÉGIONS ONT DU TALENT"}
 
+# Les gammes que le catalogue écrit comme une marque à part, vérifiées une par une : sans logo à elles,
+# elles prennent celui de leur marque. Pas de règle automatique : « LOTUS BABY » (des couches) n'est
+# pas une gamme de LOTUS (des biscuits).
+SOUS_MARQUES = {
+    "DISNEY - STITCH": "DISNEY",
+    "MONSTER MUNCH CRAZY": "MONSTER MUNCH",
+    "PANIER DE YOPLAIT": "YOPLAIT",
+}
+
 
 def cle_marque(marque):
     """La même marque, écrite « Foxter », « FOXTER » ou « Mots d’Enfants » : « FOXTER », « MOTS D'ENFANTS »."""

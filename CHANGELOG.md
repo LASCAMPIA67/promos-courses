@@ -31,6 +31,8 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
   (Doritos, Monster Munch, Kinder Schoko-Bons), quand le nom du produit commence exactement par le
   nom de ce logo : la marque et son logo s'affichent. Chaque catalogue est relu une fois (lecture
   n° 4).
+- **Le logo de la marque pour ses gammes** écrites à part dans le catalogue (Monster Munch Crazy,
+  Panier de Yoplait, Disney - Stitch), d'après une courte liste vérifiée à la main.
 
 ## [0.13.0] - 2026-10-28
 

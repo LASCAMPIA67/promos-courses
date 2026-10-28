@@ -195,11 +195,15 @@ def test_preparer_logos_marque_repere_et_logos_de_wikipedia(tmp_path):
         {"marque": "Haribo", "ean": "4001686000000", "logo_catalogue": None},
         {"marque": "LACTEL", "ean": "3428270000000", "logo_catalogue": f"{MEDIA}{'a' * 32}"},
         {"marque": "ECO+", "ean": "3564700099999", "logo_catalogue": None},  # une autre marque de Leclerc
+        {"marque": "PANIER DE YOPLAIT", "ean": "3329770000000", "logo_catalogue": None},  # une gamme
+        {"marque": "YOPLAIT", "ean": "3329770000001", "logo_catalogue": f"{MEDIA}{'c' * 32}"},
     ]
     nav = FauxNavigateur(logo_png())
     bilan = preparer_logos(nav, offres, tmp_path, officiels=officiels)
 
-    assert sorted(nav.demandes) == sorted([f"{WIKI}mr.png", f"{WIKI}haribo.png", f"{MEDIA}{'a' * 32}"])
+    assert sorted(nav.demandes) == sorted(
+        [f"{WIKI}mr.png", f"{WIKI}haribo.png", f"{MEDIA}{'a' * 32}", f"{MEDIA}{'c' * 32}"]
+    )
     repere = f"{ADRESSE_PHOTOS}logos/{nom_logo(f'{WIKI}mr.png')}"
     assert [o["logo"] for o in offres] == [
         repere,
@@ -208,7 +212,9 @@ def test_preparer_logos_marque_repere_et_logos_de_wikipedia(tmp_path):
         f"{ADRESSE_PHOTOS}logos/{nom_logo(f'{WIKI}haribo.png')}",
         f"{ADRESSE_PHOTOS}logos/{'a' * 32}.png",
         None,
+        f"{ADRESSE_PHOTOS}logos/{'c' * 32}.png",  # le logo de YOPLAIT
+        f"{ADRESSE_PHOTOS}logos/{'c' * 32}.png",
     ]
-    assert [o["logo_marque"] for o in offres] == ["Marque Repère"] * 3 + [None] * 3
+    assert [o["logo_marque"] for o in offres] == ["Marque Repère"] * 3 + [None] * 5
     assert bilan["marque_repere"] == 3
     assert bilan["sans_logo"] == ["ECO+"]

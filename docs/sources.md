@@ -67,6 +67,12 @@ du produit commence exactement par le nom du logo, en mots entiers (un label com
 « POMMES_DE_FRANCE » ne devient jamais la marque des « POMMES GALA »). Voir `marque_du_logo` dans
 [`leclerc.py`](../src/robot_promos/sources/leclerc.py).
 
+Quelques **gammes** sont écrites comme une marque à part (« MONSTER MUNCH CRAZY », « PANIER DE
+YOPLAIT », « DISNEY - STITCH ») : sans logo à elles, elles prennent celui de leur marque, d'après une
+courte liste vérifiée à la main (`SOUS_MARQUES` dans [`marques.py`](../src/robot_promos/marques.py)).
+Pas de règle automatique du genre « même début de nom, même marque » : LOTUS BABY (des couches)
+n'est pas une gamme de LOTUS (des biscuits).
+
 Le robot en fait une petite image PNG (96 pixels de haut au plus, 1 à 12 Ko), rangée dans `logos/` de
 la branche `photos`, avec la même règle que les photos (téléchargée une seule fois, retirée quand
 plus aucune promo n'en a besoin).
