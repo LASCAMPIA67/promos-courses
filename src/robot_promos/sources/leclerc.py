@@ -24,8 +24,9 @@ ENTETES = {"Origin": VISIONNEUSE, "Referer": VISIONNEUSE + "/", "Accept": "appli
 UNITES = {"le kg": "kg", "le l": "l", "la pièce": "pièce"}
 
 # Change quand la façon de lire un catalogue change : chaque catalogue est alors relu une fois, au
-# prochain passage, au lieu de garder les offres lues à l'ancienne (2 : photos fiables, 3 : logos).
-LECTURE = 3
+# prochain passage, au lieu de garder les offres lues à l'ancienne (2 : photos fiables, 3 : logos,
+# 4 : marque d'après le logo).
+LECTURE = 4
 
 
 class Leclerc(Source):
@@ -87,6 +88,7 @@ def convertir(p, catalogue):
         return None  # seulement sur internet
 
     nom = (p.get("name") or "").strip() or p.get("brand") or "?"
+    marque = p.get("brand") or marque_du_logo(p, nom)
     toute_la_gamme = nom.upper().startswith("SUR LES PRODUITS")
     libelle = sans_accents(p.get("discountLabel") or "").upper()
     montant = nombre(p.get("discountAmount"))
@@ -159,7 +161,7 @@ def convertir(p, catalogue):
         magasin="leclerc-geispolsheim",
         catalogue=catalogue.id,
         produit=nom,
-        marque=p.get("brand"),
+        marque=marque,
         description=description,
         categorie=p.get("section") or p.get("thematic"),
         ean=p.get("ean"),
@@ -174,7 +176,7 @@ def convertir(p, catalogue):
         date_fin=fin,
         lien=catalogue.lien,
         image=None if toute_la_gamme else photo_fiable(p, nom),
-        logo_catalogue=logo_de_la_marque(p, p.get("brand")),
+        logo_catalogue=logo_de_la_marque(p, marque),
     )
 
 
@@ -268,4 +270,23 @@ def logo_de_la_marque(p, marque):
         nom = mots(logo.get("name"))
         if any("".join(nom[debut:fin]) == cible for debut in range(len(nom)) for fin in range(debut + 1, len(nom) + 1)):
             return logo["url"]
+    return None
+
+
+def marque_du_logo(p, nom):
+    """Pour un produit sans marque : celle de son logo, quand le nom du produit commence par le nom de ce
+    logo, en mots entiers (le produit DORITOS et son logo « DORITOS », MONSTER MUNCH et « MONSTER
+    MUNCH »). Renvoie le début du nom, tel qu'il est écrit, ou None.
+    """
+    debut = mots(nom)
+    for logo in p.get("logosV2") or []:
+        if logo.get("type") != "logo":
+            continue
+        cible = [mot for mot in mots(logo.get("name")) if mot not in {"logo", "png"}]
+        if cible and debut[: len(cible)] == cible:
+            vus = 0
+            for trouve in re.finditer(r"[^\W_]+", nom):
+                vus += len(mots(trouve.group()))
+                if vus >= len(cible):
+                    return nom[: trouve.end()]
     return None

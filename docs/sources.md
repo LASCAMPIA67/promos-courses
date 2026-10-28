@@ -61,6 +61,12 @@ DELPEYRAT). Une marque n'a qu'un logo, repris pour toutes ses promos. Mesure du 
 marques sur 547 ont un logo sûr, soit 59 % des produits de marque. Les autres gardent leur nom, écrit
 en petit à la même place.
 
+Le catalogue donne parfois un produit **sans marque** (« DORITOS », « MONSTER MUNCH », « KINDER
+SCHOKOBONS »), mais avec son logo. Le robot lui donne alors la marque de ce logo, seulement si le nom
+du produit commence exactement par le nom du logo, en mots entiers (un label comme
+« POMMES_DE_FRANCE » ne devient jamais la marque des « POMMES GALA »). Voir `marque_du_logo` dans
+[`leclerc.py`](../src/robot_promos/sources/leclerc.py).
+
 Le robot en fait une petite image PNG (96 pixels de haut au plus, 1 à 12 Ko), rangée dans `logos/` de
 la branche `photos`, avec la même règle que les photos (téléchargée une seule fois, retirée quand
 plus aucune promo n'en a besoin).

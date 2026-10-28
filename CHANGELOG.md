@@ -27,6 +27,10 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
   se trompe trop souvent. 29 marques de plus ont un logo (Bioderma, Kinder, McCain, Purina,
   Trolli…) : en tout, 70 % des produits de marque (59 % avant). Le résumé de chaque passage du
   robot liste les marques encore sans logo.
+- **Une marque pour les produits que le catalogue donne sans marque** mais avec leur logo
+  (Doritos, Monster Munch, Kinder Schoko-Bons), quand le nom du produit commence exactement par le
+  nom de ce logo : la marque et son logo s'affichent. Chaque catalogue est relu une fois (lecture
+  n° 4).
 
 ## [0.13.0] - 2026-10-28
 

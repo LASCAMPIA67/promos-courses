@@ -1,7 +1,7 @@
 import pytest
 
 from robot_promos.sources import Catalogue
-from robot_promos.sources.leclerc import completer_lot, convertir, logo_de_la_marque, photo_fiable
+from robot_promos.sources.leclerc import completer_lot, convertir, logo_de_la_marque, marque_du_logo, photo_fiable
 
 CATALOGUE = Catalogue(id="26G124G", nom="Nos promos", debut="2026-10-20", fin="2026-10-31", version="v1", lien="l")
 
@@ -240,3 +240,14 @@ def test_l_offre_garde_le_logo_de_sa_marque():
         produit(brand="LACTEL", logosV2=[logo("POMMES_DE_FRANCE", "label"), logo("LACTEL-LOGO", "ok")]), CATALOGUE
     )
     assert o["logo_catalogue"] == "ok"
+
+
+def test_un_produit_sans_marque_prend_celle_de_son_logo():
+    assert marque_du_logo(produit(logosV2=[logo("DORITOS")]), "DORITOS") == "DORITOS"
+    assert marque_du_logo(produit(logosV2=[logo("MONSTER MUNCH")]), "MONSTER MUNCH BARBECUE") == "MONSTER MUNCH"
+    assert marque_du_logo(produit(logosV2=[logo("LOGO-CÔTE D'OR.png")]), "CÔTE D'OR NOIR 70 %") == "CÔTE D'OR"
+    assert marque_du_logo(produit(logosV2=[logo("POMMES_DE_FRANCE")]), "POMMES GALA") is None  # un label
+    assert marque_du_logo(produit(logosV2=[logo("KINDER")]), "SCHOKOBONS KINDER") is None  # pas au début
+    assert marque_du_logo(produit(logosV2=[logo("LU")]), "LUTTI") is None  # en mots entiers
+    o = convertir(produit(name="KINDER SCHOKOBONS", brand=None, logosV2=[logo("KINDER SCHOKOBONS", "ok")]), CATALOGUE)
+    assert (o["marque"], o["logo_catalogue"]) == ("KINDER SCHOKOBONS", "ok")
