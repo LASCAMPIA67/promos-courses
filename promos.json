@@ -1,7 +1,7 @@
 {
  "format": 2,
- "mise_a_jour": "2026-10-28T09:25:22+01:00",
- "version_robot": "0.10.0",
+ "mise_a_jour": "2026-10-28T09:28:06+01:00",
+ "version_robot": "0.11.0",
  "magasins": {
   "leclerc-geispolsheim": {
    "nom": "E.Leclerc Geispolsheim",
@@ -16,14 +16,14 @@
    "nom": "Catalogues E.Leclerc Geispolsheim",
    "etat": "ok",
    "nb_offres": 1393,
-   "remarque": "9 catalogue(s)",
+   "remarque": "9 catalogue(s) ; 4 inchangé(s) depuis le dernier passage",
    "catalogues": [
     {
      "id": "26C409N",
      "nom": "FOIRE AU GRAS",
      "debut": "2026-10-27",
      "fin": "2026-10-31",
-     "version": "18660164073aa70d5bbccfa015b22a2f@2026-10-27T08:06:34Z#lecture-2",
+     "version": "18660164073aa70d5bbccfa015b22a2f@2026-10-28T08:04:33Z#lecture-2",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26C409N/1067",
      "nb_offres": 29,
      "reutilise": false
@@ -36,7 +36,7 @@
      "version": "5a1e254d38373b2d261ef7340badfa64@2026-10-26T10:10:21Z#lecture-2",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310E/1067",
      "nb_offres": 44,
-     "reutilise": false
+     "reutilise": true
     },
     {
      "id": "26G310G",
@@ -46,14 +46,14 @@
      "version": "07da9b7ca474d937ebc986e4a3194029@2026-10-27T08:31:07Z#lecture-2",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
      "nb_offres": 270,
-     "reutilise": false
+     "reutilise": true
     },
     {
      "id": "26G124G",
      "nom": "Un automne en fête",
      "debut": "2026-10-20",
      "fin": "2026-10-31",
-     "version": "96a4c42bff10c8219b2775fd9f5c54cf@2026-10-27T08:22:49Z#lecture-2",
+     "version": "96a4c42bff10c8219b2775fd9f5c54cf@2026-10-28T08:17:27Z#lecture-2",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G124G/1067",
      "nb_offres": 354,
      "reutilise": false
@@ -63,7 +63,7 @@
      "nom": "10 jours diamants",
      "debut": "2026-10-20",
      "fin": "2026-10-31",
-     "version": "60892f34c8e392dbfe81adf23c4e7e2f@2026-10-27T08:08:47Z#lecture-2",
+     "version": "60892f34c8e392dbfe81adf23c4e7e2f@2026-10-28T08:06:14Z#lecture-2",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26D009D/1067",
      "nb_offres": 0,
      "reutilise": false
@@ -76,14 +76,14 @@
      "version": "875a3f1e8a7ff843ff831af550030135@2026-10-21T09:45:29Z#lecture-2",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G124E/1067",
      "nb_offres": 4,
-     "reutilise": false
+     "reutilise": true
     },
     {
      "id": "26G047G",
      "nom": "Jouets de Noël",
      "debut": "2026-10-20",
      "fin": "2026-12-05",
-     "version": "ef5e6e393e883b27666cab63ed125268@2026-10-27T08:16:39Z#lecture-2",
+     "version": "ef5e6e393e883b27666cab63ed125268@2026-10-28T08:12:10Z#lecture-2",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G047G/1067",
      "nb_offres": 646,
      "reutilise": false
@@ -93,7 +93,7 @@
      "nom": "Parapharmacie d'automne",
      "debut": "2026-10-06",
      "fin": "2026-10-31",
-     "version": "fffae2e102be2e77a7b735c039a3fc5d@2026-10-27T08:13:56Z#lecture-2",
+     "version": "fffae2e102be2e77a7b735c039a3fc5d@2026-10-28T08:09:54Z#lecture-2",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G009P/1067",
      "nb_offres": 46,
      "reutilise": false
@@ -106,7 +106,7 @@
      "version": "8d9c7659c709c6c978dc152b9f08f0f3@2026-04-17T16:30:47Z#lecture-2",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26D001D/1067",
      "nb_offres": 0,
-     "reutilise": false
+     "reutilise": true
     }
    ]
   }
@@ -31450,7 +31450,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/86f95a75b6f359faa2b115501d0ea482",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/86f95a75b6f359faa2b115501d0ea482.jpg"
   },
   {
    "id": "leclerc-26g310g-f4ab61387454",
@@ -31474,7 +31474,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/05cf4b4f2b6e15d695e13409091bbdee",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/05cf4b4f2b6e15d695e13409091bbdee.jpg"
   },
   {
    "id": "leclerc-26g310g-e3d573664731",
@@ -31498,7 +31498,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/02c448e647c3bf173100494e1b93227a",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/02c448e647c3bf173100494e1b93227a.jpg"
   },
   {
    "id": "leclerc-26g310g-b4e128449cdc",
@@ -31522,7 +31522,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/78d22f3a93edbd4b4eb35826f5e6235c",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/78d22f3a93edbd4b4eb35826f5e6235c.jpg"
   },
   {
    "id": "leclerc-26g310g-379126a89417",
@@ -31570,7 +31570,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/5436ff8279e2d40bdba4837c651c9f8b",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/5436ff8279e2d40bdba4837c651c9f8b.jpg"
   },
   {
    "id": "leclerc-26g310g-53ddebfb43a4",
@@ -31642,7 +31642,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/a00252d3bebbd91235735c44f9669f02",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/a00252d3bebbd91235735c44f9669f02.jpg"
   },
   {
    "id": "leclerc-26g310g-d0118affd10b",
@@ -31670,7 +31670,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/5131a8c161c5d0b9946992275162b02c",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/5131a8c161c5d0b9946992275162b02c.jpg"
   },
   {
    "id": "leclerc-26g310g-ef175e382eef",
@@ -31718,7 +31718,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/2f4a020fa8fab1f696896ebde26f4641",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/2f4a020fa8fab1f696896ebde26f4641.jpg"
   },
   {
    "id": "leclerc-26g310g-890b5f0a01fa",
@@ -31742,7 +31742,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/9a3ba2f49a4076b5fe33f83857326580",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/9a3ba2f49a4076b5fe33f83857326580.jpg"
   },
   {
    "id": "leclerc-26g310g-de9ade0c588a",
@@ -31766,7 +31766,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/fb642fc39114bc4b5cc39886336d4130",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/fb642fc39114bc4b5cc39886336d4130.jpg"
   },
   {
    "id": "leclerc-26g310g-df0a6b9491d2",
@@ -31790,7 +31790,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/5bd825cade843f714c63ef39b83a2742",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/5bd825cade843f714c63ef39b83a2742.jpg"
   },
   {
    "id": "leclerc-26g310g-35207a68df80",
@@ -31814,7 +31814,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/53ea839ad5608247048fbf1e3e1037d3",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/53ea839ad5608247048fbf1e3e1037d3.jpg"
   },
   {
    "id": "leclerc-26g310g-819c3bcda19c",
@@ -31838,7 +31838,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/5bc4d92046c8ebdf058fcb56a4df2a0f",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/5bc4d92046c8ebdf058fcb56a4df2a0f.jpg"
   },
   {
    "id": "leclerc-26g310g-4fc275a736f9",
@@ -31862,7 +31862,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/204591194a4599f881e727fb6d8d12f1",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/204591194a4599f881e727fb6d8d12f1.jpg"
   },
   {
    "id": "leclerc-26g310g-d72b499576b7",
@@ -31886,7 +31886,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/5fa8408fee6b420da56f1591df8ef89e",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/5fa8408fee6b420da56f1591df8ef89e.jpg"
   },
   {
    "id": "leclerc-26g310g-d00ea482fbcf",
@@ -31910,7 +31910,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/2b581754ecd501239904b975236bffeb",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/2b581754ecd501239904b975236bffeb.jpg"
   },
   {
    "id": "leclerc-26g310g-38eae80ef863",
@@ -31934,7 +31934,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/a388d944f44e088696099edc60555d89",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/a388d944f44e088696099edc60555d89.jpg"
   },
   {
    "id": "leclerc-26g310g-db83ae2c73d8",
@@ -31958,7 +31958,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/59ab34bb776459a594b7a693cfb91606",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/59ab34bb776459a594b7a693cfb91606.jpg"
   },
   {
    "id": "leclerc-26g310g-3e19d8cf2356",
@@ -31982,7 +31982,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/2700dd04c4d46027e627a5d6eb0a2df3",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/2700dd04c4d46027e627a5d6eb0a2df3.jpg"
   },
   {
    "id": "leclerc-26g310g-3be8cc2dfb7b",
@@ -32006,7 +32006,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/805c66640fe5fe038f7ee9f0ae6bca86",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/805c66640fe5fe038f7ee9f0ae6bca86.jpg"
   },
   {
    "id": "leclerc-26g310g-6e560ad59a3b",
@@ -32030,7 +32030,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/3451208f5a2f597f8e0523cefc2fe015",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/3451208f5a2f597f8e0523cefc2fe015.jpg"
   },
   {
    "id": "leclerc-26g310g-2a1d1f657693",
@@ -32054,7 +32054,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/334bf70feb90897dec26c7659583c775",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/334bf70feb90897dec26c7659583c775.jpg"
   },
   {
    "id": "leclerc-26g310g-de177344d611",
@@ -32078,7 +32078,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/61a30603f2258123985513e11bec6abb",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/61a30603f2258123985513e11bec6abb.jpg"
   },
   {
    "id": "leclerc-26g310g-43d5e79ff292",
@@ -32102,7 +32102,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/703e4071a97fb63acde553c96723dcb7",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/703e4071a97fb63acde553c96723dcb7.jpg"
   },
   {
    "id": "leclerc-26g310g-10c4608589cf",
@@ -32126,7 +32126,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/d5a14bc4902d46f3ba5c3e1e4806974d",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/d5a14bc4902d46f3ba5c3e1e4806974d.jpg"
   },
   {
    "id": "leclerc-26g310g-38ec674cbea1",
@@ -32150,7 +32150,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/df6cf8f5c284a14d06dc477d7a5f4a23",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/df6cf8f5c284a14d06dc477d7a5f4a23.jpg"
   },
   {
    "id": "leclerc-26g310g-3970190e1b81",
@@ -32174,7 +32174,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/818d7609f307df7bbd9cae9a097376e8",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/818d7609f307df7bbd9cae9a097376e8.jpg"
   },
   {
    "id": "leclerc-26g310g-82d607a297fe",
@@ -32202,7 +32202,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/623e9c9c897b03d178145b3786bb3a24",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/623e9c9c897b03d178145b3786bb3a24.jpg"
   },
   {
    "id": "leclerc-26g310g-8b30775cf46c",
@@ -32230,7 +32230,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/b8993b924f98a7368da595c410d83741",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/b8993b924f98a7368da595c410d83741.jpg"
   },
   {
    "id": "leclerc-26g310g-2a8149a5b3bc",
@@ -32254,7 +32254,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/bd9f9b7a0caa44663ef0110fac86ab52",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/bd9f9b7a0caa44663ef0110fac86ab52.jpg"
   },
   {
    "id": "leclerc-26g310g-aa73008b851a",
@@ -32282,7 +32282,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/4efcc5277d94ce6d0a9e8c4f2b94159d",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/4efcc5277d94ce6d0a9e8c4f2b94159d.jpg"
   },
   {
    "id": "leclerc-26g310g-94732342d048",
@@ -32306,7 +32306,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/a17756e9a1f948f15b0ebf80e049318c",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/a17756e9a1f948f15b0ebf80e049318c.jpg"
   },
   {
    "id": "leclerc-26g310g-fa67905a49c9",
@@ -32874,7 +32874,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/a25174cff8e8fb115c58029278b7b608",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/a25174cff8e8fb115c58029278b7b608.jpg"
   },
   {
    "id": "leclerc-26g310g-c69321b3f261",
@@ -32898,7 +32898,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/d899a35bd72eb1e070cd42bacd96a6e2",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/d899a35bd72eb1e070cd42bacd96a6e2.jpg"
   },
   {
    "id": "leclerc-26g310g-7c78526ca975",
@@ -32926,7 +32926,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/109127ca58e11e02c25536ae8ed2a976",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/109127ca58e11e02c25536ae8ed2a976.jpg"
   },
   {
    "id": "leclerc-26g310g-a7b456190faa",
@@ -32950,7 +32950,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/3871201bffc0a5cf881a96fc4abccb51",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/3871201bffc0a5cf881a96fc4abccb51.jpg"
   },
   {
    "id": "leclerc-26g310g-70b95ecb5c8c",
@@ -32974,7 +32974,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/531531bb72cb4141a00753da58f0b68e",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/531531bb72cb4141a00753da58f0b68e.jpg"
   },
   {
    "id": "leclerc-26g310g-43cb6c21f608",
@@ -32998,7 +32998,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/8d1ef37732bfe7e28e5e2f00e5724452",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/8d1ef37732bfe7e28e5e2f00e5724452.jpg"
   },
   {
    "id": "leclerc-26g310g-eea40d79e4b3",
@@ -33022,7 +33022,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/ed0c6dfb1fe628f4e973a15a8f59d7eb",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/ed0c6dfb1fe628f4e973a15a8f59d7eb.jpg"
   },
   {
    "id": "leclerc-26g310g-6abb7ced2ca0",
@@ -33046,7 +33046,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/512e716e0f8a3edbde5654b215b5870e",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/512e716e0f8a3edbde5654b215b5870e.jpg"
   },
   {
    "id": "leclerc-26g310g-b52644df5412",
@@ -33070,7 +33070,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/20ab91235bb45484059641b30ec910dd",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/20ab91235bb45484059641b30ec910dd.jpg"
   },
   {
    "id": "leclerc-26g310g-23aeb786d819",
@@ -33094,7 +33094,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/d4259aba8c7139e4491f10afbca195a9",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/d4259aba8c7139e4491f10afbca195a9.jpg"
   },
   {
    "id": "leclerc-26g310g-6c67d9ad2deb",
@@ -33118,7 +33118,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/d3cb759d9f4f8b6840b6e95105925993",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/d3cb759d9f4f8b6840b6e95105925993.jpg"
   },
   {
    "id": "leclerc-26g310g-526243aaf913",
@@ -33142,7 +33142,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/d3cb759d9f4f8b6840b6e95105925993",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/d3cb759d9f4f8b6840b6e95105925993.jpg"
   },
   {
    "id": "leclerc-26g310g-a712e0332e18",
@@ -33214,7 +33214,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/b4476823cf3eca4ac86c18fdeb159949",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/b4476823cf3eca4ac86c18fdeb159949.jpg"
   },
   {
    "id": "leclerc-26g310g-60187a4c15c2",
@@ -33238,7 +33238,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/44dcedf85440f8d0d9a85ec1470d2f29",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/44dcedf85440f8d0d9a85ec1470d2f29.jpg"
   },
   {
    "id": "leclerc-26g310g-79ff5902f668",
@@ -33262,7 +33262,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/fe9941801f3bbcb70dbe8702401398a1",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/fe9941801f3bbcb70dbe8702401398a1.jpg"
   },
   {
    "id": "leclerc-26g310g-8d9433c49bba",
@@ -33286,7 +33286,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/14e3ceec5a98fd136b970d94ecc62c32",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/14e3ceec5a98fd136b970d94ecc62c32.jpg"
   },
   {
    "id": "leclerc-26g310g-2fdca005c66f",
@@ -33310,7 +33310,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/a32da032e3441ad2f1ffd6c670f090d2",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/a32da032e3441ad2f1ffd6c670f090d2.jpg"
   },
   {
    "id": "leclerc-26g310g-fab7004973e4",
@@ -33334,7 +33334,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/f9db91fddef7a0a76e4880ab7fc632b3",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/f9db91fddef7a0a76e4880ab7fc632b3.jpg"
   },
   {
    "id": "leclerc-26g310g-8d858b803778",
@@ -33358,7 +33358,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/b19124d91f80b61bcda2c2a2d7c1bb75",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/b19124d91f80b61bcda2c2a2d7c1bb75.jpg"
   },
   {
    "id": "leclerc-26g310g-7c983ca33a8c",
@@ -33382,7 +33382,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/3a3135dc771cc31bde475ae256bc9a9b",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/3a3135dc771cc31bde475ae256bc9a9b.jpg"
   },
   {
    "id": "leclerc-26g310g-fb00b402e9ba",
@@ -33406,7 +33406,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/d972305bf83faa11c960b4387afde63a",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/d972305bf83faa11c960b4387afde63a.jpg"
   },
   {
    "id": "leclerc-26g310g-93067f8a9a08",
@@ -33430,7 +33430,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/d5168cd5c35029e13f7075d4ce7b0f53",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/d5168cd5c35029e13f7075d4ce7b0f53.jpg"
   },
   {
    "id": "leclerc-26g310g-a412b1a3c575",
@@ -33454,7 +33454,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/f03a776e6d955c5c77ca215df9c56a70",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/f03a776e6d955c5c77ca215df9c56a70.jpg"
   },
   {
    "id": "leclerc-26g310g-9173dfebc450",
@@ -33478,7 +33478,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/083a7acd572a3c56a1167776f7757b72",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/083a7acd572a3c56a1167776f7757b72.jpg"
   },
   {
    "id": "leclerc-26g310g-8f10d3fb875f",
@@ -33502,7 +33502,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/4fb4d006629443f2eb547971ccdd4204",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/4fb4d006629443f2eb547971ccdd4204.jpg"
   },
   {
    "id": "leclerc-26g310g-748c69dad0fa",
@@ -33526,7 +33526,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/6879a76d253e8f5058ec9736f642c570",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/6879a76d253e8f5058ec9736f642c570.jpg"
   },
   {
    "id": "leclerc-26g310g-834f5062c4c9",
@@ -33550,7 +33550,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/def0be972e889fbf1287ab6eb9ec8b7d",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/def0be972e889fbf1287ab6eb9ec8b7d.jpg"
   },
   {
    "id": "leclerc-26g310g-b08a35458e53",
@@ -33574,7 +33574,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/68a5ccfc3b7d367ba97e72bd4a424071",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/68a5ccfc3b7d367ba97e72bd4a424071.jpg"
   },
   {
    "id": "leclerc-26g310g-1c0b75bd6c98",
@@ -33598,7 +33598,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/841203ac5cd0cba21590d0fb34bad22f",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/841203ac5cd0cba21590d0fb34bad22f.jpg"
   },
   {
    "id": "leclerc-26g310g-8e7611bd8655",
@@ -33622,7 +33622,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/7c700f39feb24f43193f5f97a866ab62",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/7c700f39feb24f43193f5f97a866ab62.jpg"
   },
   {
    "id": "leclerc-26g310g-feefaa74a956",
@@ -33646,7 +33646,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/894ef41a8b071aa7140198be7ed72c3f",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/894ef41a8b071aa7140198be7ed72c3f.jpg"
   },
   {
    "id": "leclerc-26g310g-6e33f1344989",
@@ -33670,7 +33670,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/c3fd1eb0241ac49b74c74d51348b536c",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/c3fd1eb0241ac49b74c74d51348b536c.jpg"
   },
   {
    "id": "leclerc-26g310g-95c11da8fcc8",
@@ -33694,7 +33694,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/e1989e8bb14079cf55cf5766fcf75153",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/e1989e8bb14079cf55cf5766fcf75153.jpg"
   },
   {
    "id": "leclerc-26g310g-280e583ebc0b",
@@ -33718,7 +33718,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/60f1120fad32183a287968b8b216f404",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/60f1120fad32183a287968b8b216f404.jpg"
   },
   {
    "id": "leclerc-26g310g-07987df68e9d",
@@ -33742,7 +33742,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/bf985868a512315f39c0195b3e3c807a",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/bf985868a512315f39c0195b3e3c807a.jpg"
   },
   {
    "id": "leclerc-26g310g-ba9895c8a45c",
@@ -33766,7 +33766,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/3d2d90defe8383624bfb50d8f7b904b2",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/3d2d90defe8383624bfb50d8f7b904b2.jpg"
   },
   {
    "id": "leclerc-26g310g-e956e88189c1",
@@ -33790,7 +33790,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/02a15371725ebdb7baaedc3ed6949984",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/02a15371725ebdb7baaedc3ed6949984.jpg"
   },
   {
    "id": "leclerc-26g310g-cb4b9d1311f1",
@@ -33814,7 +33814,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/0cfc7616e27d8d95aaa07dcdc4b5c6f9",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/0cfc7616e27d8d95aaa07dcdc4b5c6f9.jpg"
   },
   {
    "id": "leclerc-26g310g-fcd9d2c30a16",
@@ -33838,7 +33838,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/7fb3b797b95e7845173428e0fe66fde7",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/7fb3b797b95e7845173428e0fe66fde7.jpg"
   },
   {
    "id": "leclerc-26g310g-38c908f1428c",
@@ -33862,7 +33862,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/2bb3e09c74b01247229b4762dbc8726c",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/2bb3e09c74b01247229b4762dbc8726c.jpg"
   },
   {
    "id": "leclerc-26g310g-a024689c8b6b",
@@ -33886,7 +33886,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/96095257f713bd4607bf94d38da11107",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/96095257f713bd4607bf94d38da11107.jpg"
   },
   {
    "id": "leclerc-26g310g-b9628e4e83d4",
@@ -33910,7 +33910,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/2139faaabb04cad3759675a6dd8d7b34",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/2139faaabb04cad3759675a6dd8d7b34.jpg"
   },
   {
    "id": "leclerc-26g310g-a5d77194a97b",
@@ -33934,7 +33934,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/b1d8d89f64e4a2a1765f6e1b8cdc2f71",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/b1d8d89f64e4a2a1765f6e1b8cdc2f71.jpg"
   },
   {
    "id": "leclerc-26g310g-58c2c61f04b8",
@@ -33958,7 +33958,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/3eddd1395eba753a0d2bd683247e4c49",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/3eddd1395eba753a0d2bd683247e4c49.jpg"
   },
   {
    "id": "leclerc-26g310g-4d77c8fa9c5e",
@@ -33982,7 +33982,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/880b2d953f6fc74eb1f8a31d00eecbe1",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/880b2d953f6fc74eb1f8a31d00eecbe1.jpg"
   },
   {
    "id": "leclerc-26g310g-ed768d84093a",
@@ -34006,7 +34006,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/060fcb18fc681dfe0d8f71f55478d6e7",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/060fcb18fc681dfe0d8f71f55478d6e7.jpg"
   },
   {
    "id": "leclerc-26g310g-10d88c2aae4e",
@@ -34030,7 +34030,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/1d1efa1fca801bdc089120bba24b8a5a",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/1d1efa1fca801bdc089120bba24b8a5a.jpg"
   },
   {
    "id": "leclerc-26g310g-05317276a6b4",
@@ -34054,7 +34054,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/3c1f7f25c534e5c7594e575ba88dd894",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/3c1f7f25c534e5c7594e575ba88dd894.jpg"
   },
   {
    "id": "leclerc-26g310g-02480a05807c",
@@ -34078,7 +34078,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/c28f33cb7249806a29c0ce2f22dbf46b",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/c28f33cb7249806a29c0ce2f22dbf46b.jpg"
   },
   {
    "id": "leclerc-26g310g-da66231e7bdd",
@@ -34102,7 +34102,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/7fdc18361c49f86c2f0ec1e53db478ab",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/7fdc18361c49f86c2f0ec1e53db478ab.jpg"
   },
   {
    "id": "leclerc-26g310g-5091134153c7",
@@ -34126,7 +34126,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/f83d64932449d5393548eb0446f8c08c",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/f83d64932449d5393548eb0446f8c08c.jpg"
   },
   {
    "id": "leclerc-26g310g-d64cfe3d83bd",
@@ -34150,7 +34150,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/7197ec9b699d4c1aae65459951ee32c8",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/7197ec9b699d4c1aae65459951ee32c8.jpg"
   },
   {
    "id": "leclerc-26g310g-a1ab489185cc",
@@ -34178,7 +34178,7 @@
    "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
    "image": "https://nos-catalogues-promos-v2.e.leclerc/media/b2484bdb1288ed918b0004a467cca750",
    "page": null,
-   "photo": null
+   "photo": "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/b2484bdb1288ed918b0004a467cca750.jpg"
   }
  ]
 }
