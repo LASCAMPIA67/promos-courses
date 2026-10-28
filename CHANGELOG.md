@@ -14,6 +14,8 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+## [0.13.0] - 2026-10-28
+
 ### Ajouté
 
 - **Le logo de la marque**, en haut à droite de chaque promo (sur une petite étiquette blanche,
@@ -382,7 +384,8 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 - Version antérieure à la mise en place des publications : pas de page « Release » (voir le lien
   ci-dessous vers son enregistrement d'origine).
 
-[Non publié]: https://github.com/lascampia67/promos-courses/compare/v0.12.0...HEAD
+[Non publié]: https://github.com/lascampia67/promos-courses/compare/v0.13.0...HEAD
+[0.13.0]: https://github.com/lascampia67/promos-courses/compare/v0.12.0...v0.13.0
 [0.12.0]: https://github.com/lascampia67/promos-courses/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/lascampia67/promos-courses/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/lascampia67/promos-courses/compare/v0.9.0...v0.10.0
