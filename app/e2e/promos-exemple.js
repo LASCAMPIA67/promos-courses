@@ -60,6 +60,7 @@ function offre(id, champs) {
     logo: null,
     logo_marque: null,
     page: 3,
+    historique: null,
     ...champs,
   };
 }
@@ -76,6 +77,8 @@ const OFFRES = [
     prix_unitaire: 0.89,
     unite: "l",
     reduction: "-15 %",
+    // Déjà vu en promo, plus cher : le meilleur prix vu.
+    historique: { verdict: "plus_bas", depuis: jour(-40), promos: 2, meilleur_prix: 0.95, meilleur_le: jour(-12) },
   }),
   offre("lait-leclerc", {
     photo: `${PHOTOS}lait-uht.jpg`,
@@ -88,6 +91,7 @@ const OFFRES = [
     unite: "l",
     reduction: "-50 % sur le 2e",
     lot: { quantite: 2, prix: 9.18, prix_unitaire: 0.77 },
+    historique: { verdict: "plus_cher", depuis: jour(-60), promos: 3, meilleur_prix: 4.29, meilleur_le: jour(-20) },
     date_debut: jour(2),
     date_fin: jour(9),
   }),

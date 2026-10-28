@@ -17,13 +17,17 @@ DUREE = 2 * 365  # une promo est gardée deux ans après sa fin
 
 
 def prix_article(offre):
-    """Le prix le plus bas pour un article : celui du lot quand il est moins cher, sinon le prix."""
-    prix = [offre.get("prix")]
-    lot = offre.get("lot")
-    if lot and lot.get("prix") and lot.get("quantite"):
-        prix.append(round(lot["prix"] / lot["quantite"], 2))
-    prix = [p for p in prix if p]
-    return min(prix) if prix else None
+    """Le prix le plus bas pour un article : celui du lot quand il est moins cher, sinon le prix.
+
+    Comme l'appli, on ne croit pas un lot qui coûte moins qu'un seul article (« -50 % sur le 2e » au
+    prix d'un seul : une erreur du catalogue), sauf pour un article offert.
+    """
+    prix, lot = offre.get("prix"), offre.get("lot")
+    offert = "offert" in (offre.get("reduction") or "").lower()
+    if lot and lot.get("prix") and lot.get("quantite") and (prix is None or lot["prix"] > prix or offert):
+        par_article = round(lot["prix"] / lot["quantite"], 2)
+        return min(prix, par_article) if prix else par_article
+    return prix or None
 
 
 def lire(chemin):

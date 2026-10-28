@@ -39,6 +39,7 @@ import {
   joliNom,
   noteAffichee,
   periode,
+  phraseHistorique,
   phraseSource,
   rechercherPromos,
   periodeCourte,
@@ -480,7 +481,7 @@ function element(balise, classe, texte) {
 /**
  * Une promo, rangée pour se lire d'un coup d'œil : la photo du produit et, à côté, jusqu'à quand, le
  * produit et sa taille ; dessous, le prix, le type de promo (couleur selon l'endroit où va la
- * réduction) et le détail utile.
+ * réduction), le détail utile et ce qu'en dit l'historique des prix.
  */
 function cartePromo(offre, aVenir, aujourdhui, { avecAjout = false } = {}) {
   const carte = element("li", "promo");
@@ -530,6 +531,14 @@ function cartePromo(offre, aVenir, aujourdhui, { avecAjout = false } = {}) {
     bas.append(type);
     if (explication.detail) bas.append(element("span", "detail", explication.detail));
     carte.append(bas);
+  }
+
+  // L'historique des prix : le prix le plus bas vu, aussi bas que le meilleur, ou déjà vu moins cher.
+  const historique = phraseHistorique(offre);
+  if (historique) {
+    const ligne = element("p", "historique-prix", historique.texte);
+    ligne.dataset.genre = historique.genre;
+    carte.append(ligne);
   }
   return carte;
 }

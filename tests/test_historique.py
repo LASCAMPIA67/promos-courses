@@ -24,6 +24,9 @@ def test_prix_article_le_lot_quand_il_est_moins_cher():
     assert prix_article(offre("A", "2026-10-01", 2.31)) == 2.31
     assert prix_article(offre("A", "2026-10-01", 2.31, lot={"quantite": 2, "prix": 3.70})) == 1.85
     assert prix_article(offre("A", "2026-10-01", None)) is None  # « tous les produits de la marque »
+    douteux = offre("A", "2026-10-01", 2.31, lot={"quantite": 2, "prix": 2.31})  # le prix d'un seul
+    assert prix_article(douteux) == 2.31
+    assert prix_article({**douteux, "reduction": "1 + 1 offert"}) == 1.16
 
 
 def test_comparer_aux_promos_d_avant():

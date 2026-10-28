@@ -171,6 +171,13 @@ test("chaque promo montre la photo de son produit et, dans le coin, le logo de s
   await expect(promos.nth(2).locator(".photo-promo")).toHaveClass(/sans-photo/);
   await expect(promos.nth(2).locator("img")).toHaveCount(0);
 
+  // L'historique des prix : seulement pour les produits déjà vus en promo.
+  await expect(promos.first().locator(".historique-prix")).toHaveText(/^Prix le plus bas vu depuis le \S+ \S+$/);
+  await expect(promos.nth(1).locator(".historique-prix")).toHaveText(
+    /^Déjà vu moins cher : 4,29\u00a0€ l'article, le \S+ \S+$/,
+  );
+  await expect(promos.nth(2).locator(".historique-prix")).toHaveCount(0);
+
   // Un produit Marque Repère : le logo Marque Repère ; VoiceOver lit aussi le nom de la gamme.
   await page.getByLabel("Article à ajouter").fill("jambon");
   await expect(promos.locator(".promo-nom")).toHaveText(["Jambon cuit supérieur"]);

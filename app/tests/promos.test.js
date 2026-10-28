@@ -18,6 +18,7 @@ import {
   noteCourte,
   periode,
   periodeCourte,
+  phraseHistorique,
   phraseSource,
   prixUnitaire,
   promoChoisie,
@@ -536,5 +537,28 @@ describe("affichage", () => {
     expect(phraseSource({ nom: "E.Leclerc Geispolsheim", etat: "partiel" })).toBe(
       "Promos E.Leclerc Geispolsheim incomplètes.",
     );
+  });
+});
+
+describe("phraseHistorique", () => {
+  const historique = (verdict) => ({
+    historique: { verdict, depuis: "2026-09-01", promos: 3, meilleur_prix: 1.85, meilleur_le: "2026-10-01" },
+  });
+
+  test("le prix le plus bas vu, aussi bas que le meilleur, ou déjà vu moins cher", () => {
+    expect(phraseHistorique(historique("plus_bas"))).toEqual({
+      genre: "plus_bas",
+      texte: "Prix le plus bas vu depuis le 1er sept.",
+    });
+    expect(phraseHistorique(historique("egal")).texte).toBe("Aussi bas que le meilleur prix vu (le 1er oct.)");
+    expect(phraseHistorique(historique("plus_cher")).texte).toBe(
+      "Déjà vu moins cher : 1,85\u00a0€ l'article, le 1er oct.",
+    );
+  });
+
+  test("rien sans historique (il commence vide) ou avec un verdict inconnu", () => {
+    expect(phraseHistorique({})).toBeNull();
+    expect(phraseHistorique({ historique: null })).toBeNull();
+    expect(phraseHistorique(historique("bizarre"))).toBeNull();
   });
 });

@@ -515,6 +515,26 @@ export function typePromo(offre) {
 }
 
 /**
+ * Ce que dit l'historique des prix d'une promo (champ « historique » écrit par le robot), en une
+ * phrase : { genre, texte }, ou null faute de promo plus ancienne du même produit. Le prix comparé
+ * est le plus bas pour un article (celui du lot quand il est moins cher).
+ */
+export function phraseHistorique(offre) {
+  const historique = offre.historique;
+  if (!historique) return null;
+  const { verdict, depuis, meilleur_prix: meilleurPrix, meilleur_le: meilleurLe } = historique;
+  if (verdict === "plus_bas") return { genre: verdict, texte: `Prix le plus bas vu depuis le ${jourCourt(depuis)}` };
+  if (verdict === "egal") {
+    return { genre: verdict, texte: `Aussi bas que le meilleur prix vu (le ${jourCourt(meilleurLe)})` };
+  }
+  if (verdict === "plus_cher") {
+    const texte = `Déjà vu moins cher : ${formaterPrix(meilleurPrix)} l'article, le ${jourCourt(meilleurLe)}`;
+    return { genre: verdict, texte };
+  }
+  return null;
+}
+
+/**
  * La description d'une promo sans ce qui répète le prix (prix au kilo, « Par 2 : … », « au lieu
  * de … ») : « 4 tranches. 140 g.Le kg : 11,36 €.Par 2 (280 g) : 2,38 € au lieu de 3,18 € » →
  * « 4 tranches · 140 g ».

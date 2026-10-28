@@ -169,6 +169,22 @@ est toujours celui **payé en caisse**.
 Sans pastille : c'est le prix du catalogue, sans réduction particulière. Le même type de promo est
 écrit en petit sous l'étiquette « Promo » de la liste.
 
+### Le prix est-il bon ? L'historique des prix
+
+Chaque jour, le robot garde les promos vues, produit par produit. Quand un produit revient en
+promo, une ligne sous le prix le compare à ses promos d'avant (le prix pour un article, celui du
+lot quand il est moins cher) :
+
+| Ligne | Ce que ça veut dire |
+|---|---|
+| **Prix le plus bas vu depuis le 3 sept.** (en vert) | Jamais vu aussi bas depuis la première promo connue de ce produit. |
+| **Aussi bas que le meilleur prix vu (le 12 sept.)** (en vert) | Le même prix que sa meilleure promo. |
+| Déjà vu moins cher : 1,85 € l'article, le 12 sept. | Une promo d'avant était meilleure : on peut attendre la prochaine. |
+
+Pas de ligne : le produit n'a pas encore été vu en promo avant. L'historique a commencé le
+28/10/2026 : les lignes apparaissent au fil des semaines. Détails :
+[format-promos.md](format-promos.md#lhistorique-des-prix-historiquejson).
+
 ### Les promos en écrivant un article
 
 Dès 2 lettres écrites dans « Ajouter un article… », les promos qui correspondent s'affichent sous

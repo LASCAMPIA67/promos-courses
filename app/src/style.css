@@ -1244,6 +1244,20 @@ dialog h2 {
   color: var(--discret);
 }
 
+/* L'historique des prix, sous le type de promo : en vert quand c'est le meilleur prix vu (le texte
+   le dit aussi : la couleur n'est qu'un repère). */
+.historique-prix {
+  margin: 6px 0 0;
+  color: var(--discret);
+  font-size: 0.82rem;
+}
+
+.historique-prix[data-genre="plus_bas"],
+.historique-prix[data-genre="egal"] {
+  color: var(--accent-texte);
+  font-weight: 650;
+}
+
 .lien-catalogue {
   flex: 0 0 auto;
   padding: 8px 0;

@@ -21,7 +21,9 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
   jour aux promos d'avant du même produit : la moins chère jamais vue, aussi basse que la
   meilleure, ou déjà vue moins chère (nouveau champ facultatif `historique` des offres, format
   inchangé). Le prix comparé est le plus bas pour un article (celui du lot quand il est moins
-  cher). L'historique commence vide le 28/10/2026.
+  cher). L'historique commence vide le 28/10/2026. Dans l'appli, une ligne sous le prix le dit :
+  « Prix le plus bas vu depuis le 3 sept. », « Aussi bas que le meilleur prix vu (le 12 sept.) »
+  ou « Déjà vu moins cher : 1,85 € l'article, le 12 sept. ».
 - **16 logos de plus pris dans le catalogue**, dont le nom de fichier n'est pas exactement celui de
   la marque, regardés un par un à l'œil : Sodebo, Brioche Pasquier, L'Or, Havana Club, Naturnes,
   Panier de Yoplait, Paw Patrol, Paris Saint-Germain, Les Minions, Tranquille, L'Atelier Traiteur…
