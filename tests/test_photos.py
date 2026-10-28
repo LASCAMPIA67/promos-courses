@@ -239,3 +239,69 @@ def test_les_logos_a_verifier_sont_telecharges_sans_etre_montres(tmp_path):
     trouves = preparer_logos_a_verifier(FauxNavigateur(logo_png()), candidats, tmp_path)
     assert trouves == {"ALPRO": nom_logo(f"{WIKI}en/alpro.png"), "INTROUVABLE": None}
     assert sorted(f.name for f in (tmp_path / "logos-a-verifier").iterdir()) == [nom_logo(f"{WIKI}en/alpro.png")]
+
+
+def test_les_vignettes_des_produits_deja_vus_restent_pour_l_appli(tmp_path, monkeypatch):
+    """vignettes.json garde la photo et le logo de chaque produit encore dans l'historique, même sans
+    promo aujourd'hui ; ceux sortis de l'historique s'en vont, avec leur fichier."""
+    dossier = tmp_path / "vignettes"
+    (dossier / "logos").mkdir(parents=True)
+    for nom in ("d" * 32, "e" * 32):  # Nutella (encore dans l'historique), Ancien (sorti)
+        (dossier / f"{nom}.jpg").write_bytes(b"vignette")
+    for nom in ("1" * 32, "2" * 32, "3" * 32):  # Ferrero, Ancienne marque, Marque Repère
+        (dossier / "logos" / f"{nom}.png").write_bytes(b"logo")
+    anciennes = {
+        "format": 1,
+        "adresse": ADRESSE_PHOTOS,
+        "photos": {"3017620422003": f"{'d' * 32}.jpg", "3000000000009": f"{'e' * 32}.jpg"},
+        "logos": {"FERRERO": f"logos/{'1' * 32}.png", "ANCIENNE": f"logos/{'2' * 32}.png"},
+        "marque_repere": f"logos/{'3' * 32}.png",
+    }
+    (dossier / "vignettes.json").write_text(json.dumps(anciennes), encoding="utf-8")
+    historique = {
+        "format": 1,
+        "debut": "2026-10-28",
+        "produits": {
+            "3017620422003": {"produit": "NUTELLA", "marque": "FERRERO", "promos": []},
+            "3428270000000": {"produit": "LAIT", "marque": "LACTEL", "promos": []},
+        },
+    }
+    (tmp_path / "historique.json").write_text(json.dumps(historique), encoding="utf-8")
+    lait = creer_offre(
+        id="lait",
+        source="leclerc",
+        magasin="leclerc-geispolsheim",
+        catalogue="c",
+        produit="Lait",
+        marque="LACTEL",
+        ean="3428270000000",
+        prix=1.05,
+        image=f"{MEDIA}{'a' * 32}",
+        logo_catalogue=f"{MEDIA}{'b' * 32}",
+    )
+    promos = tmp_path / "promos.json"
+    document = {
+        "format": 2,
+        "mise_a_jour": "2026-10-28T06:00:00+01:00",
+        "version_robot": "0.16.0",
+        "magasins": MAGASINS,
+        "sources": [],
+        "offres": [lait],
+    }
+    promos.write_text(json.dumps(document), encoding="utf-8")
+    monkeypatch.setattr(photos, "Navigateur", lambda: FauxNavigateur(logo_png()))
+    monkeypatch.setattr(photos, "Avancee", lambda: photos.sans_nouvelles)
+    monkeypatch.setattr(photos, "logos_officiels", dict)
+    monkeypatch.delenv("GITHUB_STEP_SUMMARY", raising=False)
+
+    assert photos.main([str(dossier), "--promos", str(promos)]) == 0
+    vignettes = json.loads((dossier / "vignettes.json").read_text(encoding="utf-8"))
+    assert vignettes == {
+        "format": 1,
+        "adresse": ADRESSE_PHOTOS,
+        "photos": {"3017620422003": f"{'d' * 32}.jpg", "3428270000000": f"{'a' * 32}.jpg"},
+        "logos": {"FERRERO": f"logos/{'1' * 32}.png", "LACTEL": f"logos/{'b' * 32}.png"},
+        "marque_repere": f"logos/{'3' * 32}.png",
+    }
+    assert sorted(f.name for f in dossier.glob("*.jpg")) == [f"{'a' * 32}.jpg", f"{'d' * 32}.jpg"]
+    assert sorted(f.name for f in (dossier / "logos").iterdir()) == [f"{n * 32}.png" for n in "13b"]

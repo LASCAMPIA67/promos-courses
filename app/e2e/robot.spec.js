@@ -98,7 +98,7 @@ test("« Mettre à jour les promos » : la clé une seule fois, puis l'avancée 
   await expect(telephone1.locator("#etat-promos")).toContainText("Promos mises à jour.");
   await avancee(telephone1).getByRole("button", { name: "Fermer" }).click();
   await telephone1.getByLabel("Article à ajouter").fill("lait");
-  await expect(telephone1.locator("#etat-recherche")).toHaveText("8 promos");
+  await expect(telephone1.locator("#etat-recherche")).toHaveText("8 produits en promo");
 
   // L'autre téléphone a la clé aussi : un seul geste.
   await telephone2.getByRole("button", { name: "Mon compte" }).click();

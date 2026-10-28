@@ -131,13 +131,16 @@ export function chercherPromos(index, nom, aujourdhui) {
  * Recherche dans toutes les promos, pendant qu'on tape : chaque mot cherché doit être le début d'un
  * mot du produit ou de sa marque (« fro » trouve « Fromage »), ou un nom de famille complet
  * (« chips » trouve aussi « Pringles »). Sans rien à chercher : toutes les promos, celles en cours
- * d'abord. Même ordre que chercherPromos. Renvoie [{ offre, aVenir }].
+ * d'abord. Même ordre que chercherPromos. `approches` : les mots connus qui ressemblent à un mot
+ * mal écrit (voir ressemblance.js), comme équivalents. Renvoie [{ offre, aVenir, proximite, eans }] :
+ * `proximite` dit pourquoi elle est trouvée (pour la ranger parmi les autres produits), `eans` les
+ * codes-barres de la promo et de ses variantes.
  */
-export function rechercherPromos(index, texte, aujourdhui) {
+export function rechercherPromos(index, texte, aujourdhui, { approches } = {}) {
   const mots = motsCles(texte);
   return regrouperVariantes(
     mots.length
-      ? trouver(index, mots, aujourdhui, (motCherche, mot) => mot.startsWith(motCherche))
+      ? trouver(index, mots, aujourdhui, (motCherche, mot) => mot.startsWith(motCherche), approches)
       : toutes(index, aujourdhui),
   );
 }
@@ -167,10 +170,11 @@ export function regrouperVariantes(resultats) {
       o.date_fin,
     ].join("|");
     if (groupes.has(cle)) groupes.get(cle).offres.push(o);
-    else groupes.set(cle, { aVenir: resultat.aVenir, offres: [o] });
+    else groupes.set(cle, { aVenir: resultat.aVenir, proximite: resultat.proximite, offres: [o] });
   }
-  return [...groupes.values()].map(({ aVenir, offres }) => {
-    if (offres.length === 1) return { offre: offres[0], aVenir };
+  return [...groupes.values()].map(({ aVenir, proximite, offres }) => {
+    const eans = offres.map((o) => o.ean).filter(Boolean);
+    if (offres.length === 1) return { offre: offres[0], aVenir, proximite, eans };
     const plusCourt = offres.reduce((a, b) => (b.produit.length < a.produit.length ? b : a));
     const avecPrixAuKilo = offres.find((o) => o.prix_unitaire != null) ?? offres[0];
     return {
@@ -183,6 +187,8 @@ export function regrouperVariantes(resultats) {
         variantes: offres.length,
       },
       aVenir,
+      proximite,
+      eans,
     };
   });
 }
@@ -196,8 +202,19 @@ function toutes(index, aujourdhui) {
 
 const egal = (motCherche, mot) => mot === motCherche;
 
-function trouver(index, motsCherches, aujourdhui, correspond) {
+/** Les groupes de mots cherchés, avec, pour un mot mal écrit, les mots connus qui lui ressemblent. */
+export function regrouperAvecApproches(motsCherches, approches) {
   const groupes = regrouper(motsCherches);
+  if (!approches?.size) return groupes;
+  return groupes.map((groupe) =>
+    groupe.mots.length === 1 && approches.has(groupe.mots[0])
+      ? { ...groupe, equivalents: [...groupe.equivalents, ...approches.get(groupe.mots[0])] }
+      : groupe,
+  );
+}
+
+function trouver(index, motsCherches, aujourdhui, correspond, approches) {
+  const groupes = regrouperAvecApproches(motsCherches, approches);
   if (!index || groupes.length === 0) return [];
   const trouvees = [];
   for (const { offre, motsProduit, motsMarque } of index) {
@@ -223,24 +240,33 @@ function trouver(index, motsCherches, aujourdhui, correspond) {
     trouvees.push({
       offre,
       aVenir: Boolean(offre.date_debut && offre.date_debut > aujourdhui),
-      parFamille,
-      position: position === -1 ? Number.MAX_SAFE_INTEGER : position,
-      // Le mot entier avant les mots qui commencent pareil : « Lait » avant « Laitue ».
-      exact: contient(premier, egal),
+      proximite: {
+        parFamille,
+        position: position === -1 ? Number.MAX_SAFE_INTEGER : position,
+        // Le mot entier avant les mots qui commencent pareil : « Lait » avant « Laitue ».
+        exact: contient(premier, egal),
+      },
       longueur: motsProduit.length,
     });
   }
   // Les plus proches d'abord.
   trouvees.sort(
     (a, b) =>
-      Number(a.parFamille) - Number(b.parFamille) ||
-      a.position - b.position ||
-      Number(b.exact) - Number(a.exact) ||
+      comparerProximite(a.proximite, b.proximite) ||
       Number(a.aVenir) - Number(b.aVenir) ||
       a.longueur - b.longueur ||
       (a.offre.prix ?? Infinity) - (b.offre.prix ?? Infinity),
   );
-  return trouvees.map(({ offre, aVenir }) => ({ offre, aVenir }));
+  return trouvees.map(({ offre, aVenir, proximite }) => ({ offre, aVenir, proximite }));
+}
+
+/**
+ * Le plus proche de ce qu'on cherche d'abord : trouvé par ses propres mots avant par sa famille (ou
+ * un mot qui ressemble), le premier mot cherché tôt dans le nom, puis le mot entier (« Lait » avant
+ * « Laitue »). Pour les promos comme pour les autres produits (voir produits.js).
+ */
+export function comparerProximite(a, b) {
+  return Number(a.parFamille) - Number(b.parFamille) || a.position - b.position || Number(b.exact) - Number(a.exact);
 }
 
 /**

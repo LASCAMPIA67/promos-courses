@@ -107,14 +107,16 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: python -m robot_promos.photos "$RUNNER_TEMP/photos" --minutes 60
 
-      # La branche « photos » est réécrite à chaque fois, en un seul enregistrement : elle ne garde que
-      # les photos des promos en cours, sans historique (le dépôt ne grossit pas). Elle est publiée
-      # avant promos.json, pour que l'appli ne cherche jamais une photo qui n'existe pas encore.
+      # La branche « photos » est réécrite à chaque fois, en un seul enregistrement, sans historique :
+      # elle garde les photos des promos en cours et celles des produits déjà vus en promo (deux ans,
+      # comme historique.json), avec vignettes.json. Elle est publiée avant promos.json, pour que
+      # l'appli ne cherche jamais une photo qui n'existe pas encore.
       - name: Enregistrer les photos
         if: steps.aujourdhui.outputs.deja_passe != 'oui'
         run: |
           printf '%s\n' "# Photos des produits et logos des marques" "" \
-            "Vignettes des photos des promos en cours (et logos des marques, dans logos/), écrites chaque matin par le robot" \
+            "Vignettes des photos des promos en cours et des produits déjà vus en promo (et logos des marques," \
+            "dans logos/), écrites chaque matin par le robot ; vignettes.json dit laquelle va avec quel produit" \
             "(voir src/robot_promos/photos.py sur la branche main). Cette branche est réécrite à" \
             "chaque passage : ne rien y modifier à la main." > "$RUNNER_TEMP/photos/LISEZMOI.md"
           depot="$PWD/.git"

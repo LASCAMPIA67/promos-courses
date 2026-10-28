@@ -239,16 +239,18 @@ export function promosExemple({ miseAJour = new Date(), etatLeclerc = "ok", mult
 }
 
 /**
- * Tous les produits (produits.json, comme l'écrit le robot d'après Open Food Facts) : un produit
- * aussi en promo (le lait Candia, montré seulement en promo), des produits sans promo, avec ou sans
- * photo, avec ou sans prix habituel. `en plus` : d'autres produits, au même format.
+ * Tous les produits (produits.json, comme l'écrit le robot d'après Open Food Facts et ses bases
+ * sœurs) : un produit aussi en promo (le lait Candia, montré une seule fois, avec sa promo), des
+ * produits sans promo, avec ou sans photo, avec ou sans prix habituel, et un dentifrice d'Open Beauty
+ * Facts. `en plus` : d'autres produits, au même format.
  */
 export function produitsExemple({ enPlus = [] } = {}) {
   return {
     format: 1,
     mise_a_jour: new Date().toISOString(),
-    source: "Open Food Facts (exemple)",
-    photos: "https://exemple.test/off/",
+    licence: "Open Food Facts (exemple)",
+    sources: [{ nom: "Open Food Facts", etat: "ok", produits: 7 }],
+    photos: { off: "https://exemple.test/off/", obf: "https://exemple.test/obf/" },
     colonnes: ["ean", "nom", "marque", "quantite", "photo", "leclerc", "prix_habituel", "prix_vu_le"],
     produits: [
       ["3533630000001", "Lait demi-écrémé", "Candia", "1 l", "front_fr.4", 1, 1.05, jour(-20)],
@@ -257,27 +259,54 @@ export function produitsExemple({ enPlus = [] } = {}) {
       ["7613035000017", "Bouillon cube volaille", "Maggi", null, null, 0, null, null],
       ["3564700000229", "Brocolis surgelés", "Notre Jardin", "1 kg", "front_fr.9", 2, null, null],
       ["3428270000002", "Lait entier bio", "Lactel", "1 l", "front_fr.5", 1, 1.29, jour(-20)],
+      ["8714789000007", "Dentifrice blancheur", "Signal", "75 ml", "obf:front_fr.2", 0, null, null],
       ...enPlus,
     ],
   };
 }
 
-/** Sert tous les produits et leurs photos (comme images.openfoodfacts.org) à un navigateur de test. */
-export async function servirProduits(contexte, options) {
-  await contexte.route("**/produits-test.json", (requete) => requete.fulfill({ json: produitsExemple(options) }));
-  await contexte.route("https://exemple.test/off/**", (requete) =>
-    requete.fulfill({
-      contentType: "image/png",
-      headers: { "Access-Control-Allow-Origin": "*" },
-      body: photoProduitExemple([214, 120, 40]),
-    }),
-  );
+/**
+ * Les vignettes des produits déjà vus en promo (vignettes.json, comme l'écrit le robot) : la photo du
+ * catalogue Leclerc du lait entier bio, et les logos de Maggi et de Marque Repère.
+ */
+export const VIGNETTES = "https://exemple.test/vignettes/";
+export const VIGNETTE_LAIT_ENTIER = `${"1".repeat(32)}.jpg`;
+export function vignettesExemple() {
+  return {
+    format: 1,
+    adresse: VIGNETTES,
+    photos: { 3428270000002: VIGNETTE_LAIT_ENTIER },
+    logos: { MAGGI: `logos/${"2".repeat(32)}.png` },
+    marque_repere: `logos/${"3".repeat(32)}.png`,
+  };
 }
 
-/**
- * Sert ce fichier à la place de promos-test.json pour tous les onglets d'un navigateur de test, avec
- * ses photos (comme raw.githubusercontent.com : lisibles depuis l'appli, « absente.jpg » introuvable).
- */
+/** Sert tous les produits, leurs photos (comme images.openfoodfacts.org…) et les vignettes à un navigateur de test. */
+export async function servirProduits(contexte, options) {
+  await contexte.route("**/produits-test.json", (requete) => requete.fulfill({ json: produitsExemple(options) }));
+  await contexte.route("**/vignettes-test.json", (requete) => requete.fulfill({ json: vignettesExemple() }));
+  for (const [site, couleur] of [
+    ["off", [214, 120, 40]],
+    ["obf", [40, 120, 214]],
+  ]) {
+    await contexte.route(`https://exemple.test/${site}/**`, (requete) =>
+      requete.fulfill({
+        contentType: "image/png",
+        headers: { "Access-Control-Allow-Origin": "*" },
+        body: photoProduitExemple(couleur),
+      }),
+    );
+  }
+  await contexte.route(`${VIGNETTES}**`, (requete) => {
+    const logo = new URL(requete.request().url()).pathname.includes("/logos/");
+    return requete.fulfill({
+      contentType: "image/png",
+      headers: { "Access-Control-Allow-Origin": "*" },
+      body: logo ? logoExemple([200, 30, 40]) : photoProduitExemple([46, 158, 91]),
+    });
+  });
+}
+
 export async function servirPromos(contexte, options) {
   await contexte.route("**/promos-test.json", (requete) => requete.fulfill({ json: promosExemple(options) }));
   await contexte.route(`${LOGOS}**`, (requete) => {

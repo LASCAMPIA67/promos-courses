@@ -16,17 +16,28 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ### Ajouté
 
-- **Tous les produits, même sans promo** : en écrivant un article, l'appli montre d'abord les
-  promos (« En promo », titre orange, fiches colorées), puis tous les autres produits (« Sans
-  promo », lignes sobres) avec leur photo, leur nom, leur marque (son logo quand une promo en cours
-  de la marque en a un), leur contenance et leur prix habituel quand un catalogue Leclerc l'a donné
-  (« Prix habituel 1,29 € (vu le 8 oct.) »). Plus de 100 000 produits, d'après Open Food Facts
-  (base libre ; données ODbL, photos CC BY-SA) : les produits Marque Repère, ceux vus chez Leclerc
-  et les produits courants en France, sans les marques propres des autres enseignes. Le robot
-  écrit `produits.json` chaque semaine (workflow « Produits Leclerc », branche `produits`) ; l'appli le
-  garde sur le téléphone : la recherche marche sans réseau et ce qu'on tape ne sort pas du
-  téléphone. Les prix de tous les produits ne sont que sur Leclerc Drive, protégé contre les
-  robots : pas question de contourner cette protection.
+- **Tous les produits, même sans promo, dans une seule liste** : en écrivant un article, l'appli
+  montre tous les produits qui correspondent, les plus proches d'abord. Un produit en promo a sa
+  fiche avec sa promo dessous (prix, type de promo, dates, historique) ; un produit sans promo a la
+  même fiche, sans la partie promo : sa photo, sa marque (son logo quand on le connaît), son nom, sa
+  contenance et son prix habituel quand un catalogue Leclerc l'a donné (« Prix habituel 1,29 € (vu
+  le 8 oct.) »). En haut : « 12 produits, dont 3 en promo ». Plus de 100 000 produits, d'après
+  Open Food Facts et ses bases sœurs, Open Beauty Facts (hygiène, beauté), Open Products Facts
+  (maison) et Open Pet Food Facts (animaux) (bases libres ; données ODbL, photos CC BY-SA) : les
+  produits Marque Repère, ceux vus chez Leclerc et les produits courants en France, sans les
+  marques propres des autres enseignes. Le robot écrit `produits.json` chaque semaine (workflow
+  « Produits Leclerc », branche `produits`) ; une base sœur injoignable n'empêche rien (c'est noté
+  dans le fichier). L'appli le garde sur le téléphone : la recherche marche sans réseau et ce
+  qu'on tape ne sort pas du téléphone. Les prix de tous les produits ne sont que sur Leclerc Drive,
+  protégé contre les robots : pas question de contourner cette protection.
+- **Les produits qui ressemblent** : un mot mal écrit (« nutela », « arome magi », « moutrade »,
+  « cocacola ») ne trouve rien ; l'appli propose alors les produits qui ressemblent à ce qu'on a
+  écrit, avec leur photo, pour choisir le bon (« Rien pour « nutela » · 12 produits qui
+  ressemblent »).
+- **Les photos et logos des produits déjà vus en promo restent** : la branche `photos` garde la
+  vignette de chaque produit encore dans l'historique des prix (deux ans) et le logo de sa marque ;
+  `vignettes.json` dit laquelle va avec quel produit. Dans l'appli, un produit sans promo prend la
+  photo du catalogue Leclerc quand on l'a déjà vu en promo, et sa marque a son logo.
 - **Un article venu d'un produit garde son code-barres** (nouveau champ facultatif `produit`) :
   sa photo dans la liste, et l'étiquette « Promo » dès que ce produit passe en promo. Il faut
   **republier les règles Firebase** ; en attendant, l'article est ajouté sans.

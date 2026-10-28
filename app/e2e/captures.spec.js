@@ -110,17 +110,14 @@ for (const theme of ["light", "dark"]) {
     await page.screenshot({ path: `${DOSSIER}promos${suffixe}.png` });
     await page.getByRole("button", { name: "Fermer" }).click();
 
-    // En écrivant un article : les promos qui correspondent.
+    // En écrivant un article : tous les produits qui correspondent, en une seule liste.
     await page.getByLabel("Article à ajouter").fill("lait");
-    await expect(page.locator("#etat-recherche")).toHaveText("4 promos · 1 sans promo");
+    await expect(page.locator("#etat-recherche")).toHaveText("5 produits, dont 4 en promo");
+    // Parmi les promos, un produit sans promo : la même fiche sans la promo, avec sa photo et son prix habituel.
+    const laitEntier = page.locator("#resultats .promo").filter({ hasText: "Lait entier bio" });
+    await expect.poll(() => laitEntier.locator("img.photo-promo").evaluate((i) => i.naturalWidth)).toBe(256);
     await page.getByLabel("Article à ajouter").blur();
     await page.screenshot({ path: `${DOSSIER}recherche${suffixe}.png` });
-    // Plus bas : les produits sans promo, avec leur photo et leur prix habituel.
-    await page.locator("#groupe-produits").scrollIntoViewIfNeeded();
-    await expect
-      .poll(() => page.locator("#groupe-produits img.photo-produit").evaluate((i) => i.naturalWidth))
-      .toBe(256);
-    await page.screenshot({ path: `${DOSSIER}recherche-produits${suffixe}.png` });
     await page.getByRole("button", { name: "Effacer" }).click();
 
     if (theme === "light") {

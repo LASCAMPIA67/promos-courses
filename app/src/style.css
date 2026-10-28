@@ -1060,14 +1060,14 @@ dialog h2 {
   overflow-wrap: anywhere;
 }
 
-.promos,
-.produits {
+.promos {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-/* Une promo se lit de haut en bas : dates, produit, taille, prix, type de promo. */
+/* Une promo se lit de haut en bas : dates, produit, taille, prix, type de promo. Un produit sans
+   promo a la même fiche, sans la partie promo (dates, prix, type de promo). */
 .promo {
   display: grid;
   gap: 3px;
@@ -1102,12 +1102,7 @@ dialog h2 {
 }
 
 /* Les photos des produits sont sur fond blanc, même en mode sombre : un petit carré blanc arrondi. */
-.photo-produit {
-  --taille-photo: 56px;
-}
-
-.photo-promo,
-.photo-produit {
+.photo-promo {
   display: grid;
   place-items: center;
   width: var(--taille-photo);
@@ -1118,14 +1113,12 @@ dialog h2 {
   object-fit: contain;
 }
 
-.photo-promo.sans-photo,
-.photo-produit.sans-photo {
+.photo-promo.sans-photo {
   background: var(--fond);
   color: var(--discret);
 }
 
-.photo-promo svg,
-.photo-produit svg {
+.photo-promo svg {
   width: 26px;
   height: 26px;
   stroke-width: 1.6;
@@ -1159,6 +1152,11 @@ dialog h2 {
 .promo-haut .periode {
   flex: 1 1 auto;
   min-width: 0;
+}
+
+/* Sans promo, pas de dates : la marque reste dans le coin. */
+.promo-haut > :only-child {
+  margin-left: auto;
 }
 
 /* Les logos sont faits pour un fond blanc, même en mode sombre : une petite étiquette blanche. */
@@ -1217,7 +1215,8 @@ dialog h2 {
 }
 
 .ancien-prix,
-.prix-unitaire {
+.prix-unitaire,
+.prix-habituel {
   color: var(--discret);
   font-size: 0.85rem;
 }
@@ -1299,98 +1298,14 @@ dialog h2 {
 }
 
 /* ------------------------------------------------------------------------------------------ */
-/* Les promos trouvées pendant qu'on écrit un article */
+/* Les produits trouvés pendant qu'on écrit un article */
 
 .suggestions {
   margin-top: 8px;
 }
 
-/* Les résultats en deux parties : d'abord en promo (titre de la couleur des promos), puis sans
-   promo, plus sobres (pas de pastille de couleur). */
-.groupe-resultats + .groupe-resultats {
-  margin-top: 18px;
-}
-
-.titre-groupe {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0 4px 8px;
-  color: var(--discret);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.titre-groupe[data-genre="promo"] {
-  color: var(--promo);
-}
-
-.titre-groupe[data-genre="promo"]::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: currentcolor;
-}
-
 .etat-produits {
-  margin: 0 4px 8px;
-}
-
-.produit {
-  display: grid;
-  grid-template-columns: 56px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 16px;
-}
-
-.produit + .produit {
-  border-top: 1px solid var(--bordure);
-}
-
-.produit p {
-  margin: 0;
-}
-
-.produit-textes {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-
-.produit-nom {
-  font-weight: 600;
-  line-height: 1.25;
-  overflow-wrap: anywhere;
-}
-
-.produit-precisions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 2px 8px;
-  color: var(--discret);
-  font-size: 0.82rem;
-}
-
-.produit-marque {
-  font-size: 0.7rem;
-  font-weight: 650;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-
-.logo-produit {
-  height: 22px;
-  max-width: 72px;
-}
-
-.produit-prix {
-  color: var(--discret);
-  font-size: 0.82rem;
+  margin: 10px 4px 0;
 }
 
 .credit-produits {

@@ -188,25 +188,31 @@ Pas de ligne : le produit n'a pas encore été vu en promo avant. L'historique a
 ### Tous les produits en écrivant un article
 
 Dès 2 lettres écrites dans « Ajouter un article… », les produits qui correspondent s'affichent sous
-le champ, à la place de la liste (la croix ✕ efface et fait revenir la liste), en **deux parties**
-bien séparées :
+le champ, à la place de la liste (la croix ✕ efface et fait revenir la liste), en **une seule
+liste** de fiches, les plus proches de ce qu'on a écrit d'abord :
 
-- **En promo** (titre orange) : les promos Leclerc, sur leurs fiches colorées (prix, type de promo,
-  dates, historique des prix) ;
-- **Sans promo** (titre gris) : **tous les autres produits**, même sans promo, sur des lignes plus
-  sobres : leur photo, leur nom, leur marque (son logo quand une promo en cours de la marque en a
-  un) et leur contenance ; leur **prix habituel** quand un catalogue Leclerc l'a donné (« Prix
-  habituel 1,29 € (vu le 8 oct.) »), sinon « Prix en magasin ». Un produit en promo n'apparaît
-  qu'en promo.
+- un produit **en promo** a sa fiche complète : la photo, la marque dans le coin, le nom, la
+  taille, puis **dessous, sa promo** : jusqu'à quand, le prix payé en caisse, le type de promo en
+  couleur et l'historique des prix ;
+- un produit **sans promo** a **la même fiche, sans la partie promo** : sa photo, sa marque (son
+  logo quand on le connaît), son nom et sa contenance ; dessous, son **prix habituel** quand un
+  catalogue Leclerc l'a donné (« Prix habituel 1,29 € (vu le 8 oct.) »).
 
-![Plus bas, les produits sans promo](captures/recherche-produits.png)
+On les distingue d'un coup d'œil : seules les fiches en promo ont un prix en gros et une pastille
+de couleur (« -15 % en caisse »). Un produit en promo n'apparaît qu'une fois, avec sa promo.
 
-En haut, le nombre de résultats : « 4 promos · 12 sans promo ».
+![Une seule liste : les promos et les autres produits](captures/recherche.png)
+
+En haut, le nombre de résultats : « 12 produits, dont 3 en promo ».
 
 - les résultats suivent ce qu'on tape, et le début d'un mot suffit (« fro » trouve « Fromage »,
   « nute » trouve les produits Nutella) ; les mots entiers passent d'abord (« lait » montre « Lait
-  demi-écrémé » avant « Laitue ») ;
-- **« + »** ou **« OK »** sur le clavier ajoute ce qu'on a écrit, **qu'il y ait des produits ou non** ;
+  demi-écrémé » avant « Laitue ») ; à égalité, la promo d'abord ;
+- **un mot mal écrit** (« nutela », « arome magi », « moutrade ») : rien ne correspond, alors
+  l'appli propose **les produits qui y ressemblent**, avec leur photo : « Rien pour « nutela » ·
+  12 produits qui ressemblent ». On choisit le bon d'un geste ;
+- **« + »** ou **« OK »** sur le clavier ajoute ce qu'on a écrit, tel quel, **qu'il y ait des
+  produits ou non** ;
 - le bouton **« + Ajouter »** d'une promo ajoute ce produit-là, avec une **note** courte qui
   rappelle le prix (« 0,89 € » ; elle est enregistrée « Leclerc · 0,89 € », mais la liste n'écrit
   plus le magasin) ; le type de promo et ses dates s'affichent,
@@ -215,13 +221,13 @@ En haut, le nombre de résultats : « 4 promos · 12 sans promo ».
   son prix habituel en note ; **dès que ce produit passe en promo**, l'étiquette « Promo » apparaît
   à côté de l'article, toute seule ;
 - s'il est déjà dans la liste, le bouton l'indique (« ✓ Dans la liste ») ;
-- les promos et les produits s'affichent par 30 ; « Voir plus de promos » et « Voir plus de
-  produits » montrent les suivants.
+- les produits s'affichent par 30 ; « Voir plus de produits » montre les suivants.
 
-D'où viennent les produits sans promo, et pourquoi pas tous leurs prix : voir
-[sources.md](sources.md#tous-les-produits-open-food-facts). Le fichier (quelques Mo) est gardé sur le
-téléphone : la recherche marche aussi sans réseau, et **rien de ce qu'on tape ne sort du
-téléphone**. Les photos viennent du site d'Open Food Facts.
+D'où viennent les produits et leurs photos, et pourquoi pas tous leurs prix : voir
+[sources.md](sources.md#tous-les-produits-open-food-facts). Les fichiers (quelques Mo) sont gardés
+sur le téléphone : la recherche marche aussi sans réseau, et **rien de ce qu'on tape ne sort du
+téléphone**. Les photos viennent des sites d'Open Food Facts et de ses bases sœurs, ou du catalogue
+Leclerc pour les produits déjà vus en promo.
 
 ### Les familles de produits
 
@@ -333,6 +339,9 @@ tout moment : sur GitHub, **Settings** → **Developer settings** → **Personal
 | [`app/src/pdf.js`](../app/src/pdf.js) | Affichage et texte des tickets en PDF ([PDF.js](https://mozilla.github.io/pdf.js/), chargé seulement à l'ouverture d'un PDF). |
 | [`app/src/lecture.js`](../app/src/lecture.js) | Lecture d'une photo de ticket sur le téléphone ([Tesseract.js](https://tesseract.projectnaptha.com), en français ; ses fichiers sont servis par l'appli, dans `ocr/`, chargés à la première lecture). |
 | [`app/src/promos.js`](../app/src/promos.js) | Les promos : recherche pour chaque article et dans toutes les promos, dates, prix, fraîcheur des données. |
+| [`app/src/produits.js`](../app/src/produits.js) | Tous les produits (`produits.json`) : recherche, photo selon la base, prix habituel ; photos et logos des produits déjà vus en promo (`vignettes.json`). |
+| [`app/src/recherche.js`](../app/src/recherche.js) | Pendant qu'on écrit un article : les promos et tous les produits en une seule liste, et les produits qui ressemblent à un mot mal écrit. |
+| [`app/src/ressemblance.js`](../app/src/ressemblance.js) | Les mots connus qui ressemblent à un mot mal écrit (« nutela » → « nutella », « cocacola » → « coca cola »). |
 | [`app/src/robot.js`](../app/src/robot.js) | « Mettre à jour les promos » : lancer et suivre le robot avec l'API de GitHub, puis lire les promos qu'il vient d'écrire. |
 | [`app/src/familles.js`](../app/src/familles.js) | Les familles de produits : « chips » → Pringles, Lay's, Doritos… |
 | [`app/src/installation.js`](../app/src/installation.js) | Quand proposer d'installer l'appli sur l'iPhone. |
@@ -351,7 +360,7 @@ que dans Firebase.
 
 | Tests | Ce qu'ils vérifient | Commande |
 |---|---|---|
-| Logique ([`app/tests`](../app/tests)) | Nettoyage des saisies, doublons, tri, messages d'erreur ; couleur et prénom de chacun, date d'ajout en clair ; tickets de caisse (découpage et recollage du fichier, montant, date, classement par mois, taille des photos, total et date lus sur un ticket même mal lu, faux totaux et dates impossibles écartés) ; recherche des promos (accents, pluriel, mots proches, marques, familles de produits, faux amis, début de mot), article créé depuis une promo, où va la réduction (caisse, lot, carte E.Leclerc), description sans les prix répétés, promos terminées ou à venir, dates, prix, fraîcheur des données ; quand proposer l'installation ; lancement et suivi du robot (clé reconnue, page de GitHub déjà remplie, refus expliqués, passage en cours ou fini, étapes et durées, dernière nouvelle du robot, noms des étapes identiques à ceux du robot sur GitHub, promos fraîches). | `npm test` |
+| Logique ([`app/tests`](../app/tests)) | Nettoyage des saisies, doublons, tri, messages d'erreur ; couleur et prénom de chacun, date d'ajout en clair ; tickets de caisse (découpage et recollage du fichier, montant, date, classement par mois, taille des photos, total et date lus sur un ticket même mal lu, faux totaux et dates impossibles écartés) ; recherche des promos (accents, pluriel, mots proches, marques, familles de produits, faux amis, début de mot) ; tous les produits (photo selon la base, vignettes du catalogue, une seule liste avec les promos, mots mal écrits), article créé depuis une promo ou un produit, où va la réduction (caisse, lot, carte E.Leclerc), description sans les prix répétés, promos terminées ou à venir, dates, prix, fraîcheur des données ; quand proposer l'installation ; lancement et suivi du robot (clé reconnue, page de GitHub déjà remplie, refus expliqués, passage en cours ou fini, étapes et durées, dernière nouvelle du robot, noms des étapes identiques à ceux du robot sur GitHub, promos fraîches). | `npm test` |
 | Scénarios réels ([`app/e2e`](../app/e2e)) | Un navigateur à la taille d'un iPhone utilise l'appli branchée sur l'**émulateur Firebase** (jamais la vraie base), avec deux comptes et un [fichier de promos d'exemple](../app/e2e/promos-exemple.js) aux dates du jour : connexion refusée, ajout, doublon, cochage, modification, suppression, synchronisation en direct entre deux téléphones, mode hors connexion, refus d'un compte étranger, déconnexion, promo choisie avec « + Ajouter » affichée à droite de l'article (rien pour un article écrit à la main, promo retrouvée pour les articles des versions précédentes, « Promo terminée »), promos anciennes ou incomplètes, promos indisponibles puis retrouvées, conseil d'installation dans Safari sur iPhone, glisser pour supprimer avec « Annuler », « Chips » qui trouve Pringles, promos affichées en écrivant (mot entier d'abord, ajout d'une promo ou du texte écrit, affichage par 30), prix expliqué (sur la carte E.Leclerc, ou en caisse avec la carte), prénom et couleur choisis sur un téléphone et vus sur l'autre (pastille, heure d'ajout), photo de chaque promo (ou emplacement neutre sans photo sûre ou introuvable), « Mettre à jour les promos » avec un GitHub simulé ([`github-exemple.js`](../app/e2e/github-exemple.js) : clé demandée une seule fois et retrouvée sur l'autre téléphone, avancée étape par étape avec les nouvelles du robot, bandeau « Voir l'avancée », promos rechargées, clé expirée), tickets de caisse en photo et en PDF ([fichiers d'exemple](../app/e2e/fichiers-exemple.js) : lus tout seuls — date et total — sans changer ce qu'on a choisi, vus en grand sur l'autre téléphone, corrigés, partagés, supprimés, proposés après « Tout retirer », sans réseau, refusés à un compte étranger). Sur GitHub, ils tournent dans Chrome **et Safari** (WebKit). | `npm run e2e` |
 | Accessibilité ([`app/e2e/accessibilite.spec.js`](../app/e2e/accessibilite.spec.js)) | Chaque écran (connexion, liste, recherche, promo, fenêtres, tickets), en mode clair et sombre, vérifié avec [axe](https://github.com/dequelabs/axe-core) selon les règles WCAG 2.2 niveau AA : contrastes, noms lus par VoiceOver, champs… | `npm run e2e` |
 | Rapidité ([Lighthouse](https://developer.chrome.com/docs/lighthouse)) | L'appli construite, mesurée sur un téléphone simulé : rapidité (85 sur 100 au moins), accessibilité (100), bonnes pratiques (95 au moins). Sur GitHub, à chaque modification (rapports gardés 14 jours). | `npm run build && npm run qualite` |

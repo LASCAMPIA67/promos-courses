@@ -1,4 +1,4 @@
-"""Tests de la base des produits (aucun accès à internet : un petit fichier Open Food Facts)."""
+"""Tests de la base des produits (aucun accès à internet : de petits fichiers comme ceux d'Open Food Facts)."""
 
 import gzip
 import json
@@ -6,14 +6,18 @@ import json
 from robot_promos import produits
 from robot_promos.historique import ajouter, lire
 from robot_promos.produits import (
+    BASES,
     COLONNES,
-    PHOTOS,
     autre_enseigne,
     choisir,
     fichier_photo,
     lignes_open_food_facts,
     marque_principale,
+    produits_de_la_base,
+    vendu_en_france,
 )
+
+PHOTOS = BASES["off"].photos
 
 COLONNES_OFF = [
     "code",
@@ -27,8 +31,8 @@ COLONNES_OFF = [
 ]
 
 
-def photo(ean, fichier="front_fr.9"):
-    return f"{PHOTOS}{ean[:3]}/{ean[3:6]}/{ean[6:9]}/{ean[9:]}/{fichier}.200.jpg"
+def photo(ean, fichier="front_fr.9", photos=PHOTOS):
+    return f"{photos}{ean[:3]}/{ean[3:6]}/{ean[6:9]}/{ean[9:]}/{fichier}.200.jpg"
 
 
 LIGNES = [
@@ -67,16 +71,43 @@ LIGNES = [
     ["3245000000000", "Yaourt", "Carrefour Bio, Carrefour", "", "E.Leclerc", "en:france", "50", ""],
     ["3564700000999", "Riz", "Marque Repère", "1 kg", "", "en:morocco", "", ""],
     ["3564700000111", "", "Marque Repère", "", "", "en:france", "", ""],
+    # Sans pays indiqué : gardé avec un code-barres français, écarté sinon.
+    ["3250000000017", "Moutarde forte", "Amora", "", "", "", "5", photo("3250000000017")],
+    ["5410000000017", "Moutarde belge", "Amora", "", "", "", "5", photo("5410000000017")],
+]
+
+# Open Beauty Facts : ses produits avec une photo, même peu scannés.
+OBF = BASES["obf"].photos
+LIGNES_BEAUTE = [
+    [
+        "3600540000004",
+        "Shampooing doux",
+        "Dop",
+        "400 ml",
+        "",
+        "en:france",
+        "0",
+        photo("3600540000004", "front_fr.3", OBF),
+    ],
+    ["3600540000011", "Gel douche", "Dop", "250 ml", "", "en:france", "0", ""],  # sans photo
+    # Aussi dans Open Food Facts : sa fiche d'Open Food Facts l'emporte.
+    ["7613035000000", "Arôme", "Maggi", "", "", "en:france", "0", photo("7613035000000", "front_fr.1", OBF)],
 ]
 
 
-def fichier_open_food_facts(dossier):
-    chemin = dossier / "off.csv.gz"
+def fichier_open_food_facts(dossier, lignes=LIGNES, nom="off.csv.gz"):
+    chemin = dossier / nom
     with gzip.open(chemin, "wt", encoding="utf-8") as f:
         f.write("\t".join(COLONNES_OFF) + "\n")
-        for ligne in LIGNES:
+        for ligne in lignes:
             f.write("\t".join(ligne) + "\n")
     return chemin
+
+
+def retenus(tmp_path, historique):
+    return produits_de_la_base(
+        "off", lignes_open_food_facts(str(fichier_open_food_facts(tmp_path))), historique["produits"]
+    )
 
 
 def historique_avec_nutella():
@@ -110,10 +141,21 @@ def test_fichier_photo():
     assert fichier_photo("3564700000229", photo("3564700000999")) is None  # la photo d'un autre produit
     assert fichier_photo("3564700000229", "https://ailleurs.exemple/p.jpg") is None
     assert fichier_photo("12345678", f"{PHOTOS}12345678/front_fr.3.200.jpg") == "front_fr.3"
+    # Une photo d'une base sœur porte son code ; prise sur un autre site, elle est refusée.
+    assert fichier_photo("3600540000004", photo("3600540000004", "front_fr.3", OBF), "obf") == "obf:front_fr.3"
+    assert fichier_photo("3600540000004", photo("3600540000004", "front_fr.3"), "obf") is None
+
+
+def test_vendu_en_france():
+    assert vendu_en_france("5410000000017", "en:belgium,en:france")
+    assert vendu_en_france("3250000000017", "")  # sans pays : un code-barres français suffit
+    assert not vendu_en_france("5410000000017", "")
+    assert not vendu_en_france("3250000000017", "en:belgium")
 
 
 def test_choisir_ceux_de_leclerc_puis_les_plus_courants(tmp_path):
-    choisis = choisir(lignes_open_food_facts(str(fichier_open_food_facts(tmp_path))), historique_avec_nutella())
+    historique = historique_avec_nutella()
+    choisis = choisir([retenus(tmp_path, historique)], historique)
     par_code = {ligne[0]: dict(zip(COLONNES, ligne, strict=True)) for ligne in choisis}
     # Rangés : Marque Repère, puis les autres sûrs d'être chez Leclerc (les plus scannés d'abord), puis les courants.
     assert [ligne[0] for ligne in choisis] == [
@@ -123,6 +165,7 @@ def test_choisir_ceux_de_leclerc_puis_les_plus_courants(tmp_path):
         "7613035000001",
         "3000000000001",
         "7613035000000",
+        "3250000000017",
     ]
     assert par_code["3564700000229"] == {
         "ean": "3564700000229",
@@ -140,16 +183,66 @@ def test_choisir_ceux_de_leclerc_puis_les_plus_courants(tmp_path):
     assert par_code["7613035000000"]["leclerc"] == 0  # courant en France, pas sûr d'être chez Leclerc
 
 
-def test_la_commande_ecrit_un_produit_par_ligne(tmp_path, monkeypatch):
-    monkeypatch.delenv("GITHUB_STEP_SUMMARY", raising=False)
+def test_les_bases_soeurs_ajoutent_leurs_produits_avec_photo(tmp_path):
+    historique = historique_avec_nutella()
+    beaute = fichier_open_food_facts(tmp_path, LIGNES_BEAUTE, "obf.csv.gz")
+    choisis = choisir(
+        [retenus(tmp_path, historique), produits_de_la_base("obf", lignes_open_food_facts(str(beaute)), {})],
+        historique,
+    )
+    par_code = {ligne[0]: ligne for ligne in choisis}
+    assert par_code["3600540000004"][:6] == ["3600540000004", "Shampooing doux", "Dop", "400 ml", "obf:front_fr.3", 0]
+    assert "3600540000011" not in par_code  # sans photo
+    assert par_code["7613035000000"][1] == "Arôme Maggi"  # la fiche d'Open Food Facts
+
+
+def commande(tmp_path, *options):
     chemin_historique = tmp_path / "historique.json"
     chemin_historique.write_text(json.dumps(historique_avec_nutella()), encoding="utf-8")
     sortie = tmp_path / "produits.json"
-    source = str(fichier_open_food_facts(tmp_path))
-    assert produits.main(["--source", source, "--historique", str(chemin_historique), "--sortie", str(sortie)]) == 0
+    resultat = produits.main(
+        [
+            "--source",
+            f"off={fichier_open_food_facts(tmp_path)}",
+            *options,
+            "--historique",
+            str(chemin_historique),
+            "--sortie",
+            str(sortie),
+        ]
+    )
+    return resultat, sortie
+
+
+def test_la_commande_ecrit_un_produit_par_ligne(tmp_path, monkeypatch):
+    monkeypatch.delenv("GITHUB_STEP_SUMMARY", raising=False)
+    beaute = fichier_open_food_facts(tmp_path, LIGNES_BEAUTE, "obf.csv.gz")
+    resultat, sortie = commande(tmp_path, "--bases", "off,obf", "--source", f"obf={beaute}")
+    assert resultat == 0
     texte = sortie.read_text(encoding="utf-8")
     lu = json.loads(texte)
-    assert (lu["format"], lu["photos"], lu["colonnes"]) == (1, PHOTOS, COLONNES)
-    assert "ODbL" in lu["source"]
-    assert len(lu["produits"]) == 6
-    assert sum(1 for ligne in texte.splitlines() if ligne.startswith('["')) == 6
+    assert (lu["format"], lu["colonnes"]) == (1, COLONNES)
+    assert lu["photos"] == {code: base.photos for code, base in BASES.items()}
+    assert "ODbL" in lu["licence"]
+    assert lu["sources"] == [
+        {"nom": "Open Food Facts", "etat": "ok", "produits": 6},
+        {"nom": "Open Beauty Facts", "etat": "ok", "produits": 2},
+    ]
+    assert len(lu["produits"]) == 8
+    assert sum(1 for ligne in texte.splitlines() if ligne.startswith('["')) == 8
+
+
+def test_une_base_soeur_injoignable_est_notee_sans_open_food_facts_rien_ne_change(tmp_path, monkeypatch):
+    monkeypatch.delenv("GITHUB_STEP_SUMMARY", raising=False)
+    resultat, sortie = commande(tmp_path, "--bases", "off,opf", "--source", f"opf={tmp_path / 'absent.csv.gz'}")
+    assert resultat == 0
+    lu = json.loads(sortie.read_text(encoding="utf-8"))
+    assert lu["sources"][1]["nom"] == "Open Products Facts"
+    assert lu["sources"][1]["etat"] == "erreur"
+    assert "FileNotFoundError" in lu["sources"][1]["message"]
+    assert len(lu["produits"]) == 7
+
+    sortie.unlink()
+    resultat, sortie = commande(tmp_path, "--bases", "off", "--source", f"off={tmp_path / 'absent.csv.gz'}")
+    assert resultat == 1
+    assert not sortie.exists()

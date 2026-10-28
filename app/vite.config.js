@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
-import { URL_PRODUITS } from "./src/produits.js";
+import { URL_PRODUITS, URL_VIGNETTES } from "./src/produits.js";
 import { URL_PROMOS } from "./src/promos.js";
 
 const { version } = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8"));
@@ -99,11 +99,26 @@ export default defineConfig({
             handler: "CacheFirst",
             options: { cacheName: "pdf", expiration: { maxEntries: 4 }, cacheableResponse: { statuses: [200] } },
           },
+          // Quelle photo et quel logo pour chaque produit déjà vu en promo (vignettes.json, changé
+          // chaque matin) : le réseau d'abord, la copie gardée sans réseau. Avant la règle des photos,
+          // qui le garderait sinon deux mois.
+          {
+            urlPattern: new RegExp(`^${URL_VIGNETTES.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")}$`),
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "vignettes",
+              networkTimeoutSeconds: 10,
+              expiration: { maxEntries: 2 },
+              cacheableResponse: { statuses: [200] },
+            },
+          },
           // Les photos des produits (vignettes du robot, branche « photos ») : une photo ne change
           // jamais (son nom vient de la photo d'origine), on la garde donc pour les fois suivantes.
           {
             urlPattern: ({ url }) =>
-              url.origin === "https://raw.githubusercontent.com" && url.pathname.includes("/photos/"),
+              url.origin === "https://raw.githubusercontent.com" &&
+              url.pathname.includes("/photos/") &&
+              /\.(jpg|png)$/.test(url.pathname),
             handler: "CacheFirst",
             options: {
               cacheName: "photos",
@@ -111,9 +126,11 @@ export default defineConfig({
               cacheableResponse: { statuses: [200] },
             },
           },
-          // Les photos des produits sans promo (Open Food Facts) : gardées aussi, pour le mode hors ligne.
+          // Les photos des produits sans promo (Open Food Facts et ses bases sœurs) : gardées aussi,
+          // pour le mode hors ligne.
           {
-            urlPattern: ({ url }) => url.origin === "https://images.openfoodfacts.org",
+            urlPattern: ({ url }) =>
+              /^https:\/\/images\.open(food|beauty|products|petfood)facts\.org$/.test(url.origin),
             handler: "CacheFirst",
             options: {
               cacheName: "photos-produits",

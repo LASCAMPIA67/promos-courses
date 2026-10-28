@@ -236,5 +236,5 @@ test("sans promos, la liste marche quand même", async ({ page, context }) => {
   await page.evaluate(() => window.dispatchEvent(new Event("online")));
   await expect(page.locator("#etat-promos")).toBeHidden();
   await page.getByLabel("Article à ajouter").fill("lait");
-  await expect(page.locator("#etat-recherche")).toHaveText("4 promos");
+  await expect(page.locator("#etat-recherche")).toHaveText("4 produits en promo");
 });
