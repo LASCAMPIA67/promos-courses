@@ -79,7 +79,7 @@ au plus : un document Firestore ne peut pas dépasser 1 Mio.
 
 | Champ | Type | Obligatoire | Signification |
 |---|---|---|---|
-| `magasin` | `leclerc`, `lidl` ou `autre` | oui | Où ont été faites les courses. |
+| `magasin` | `leclerc` ou `autre` | oui | Où ont été faites les courses. |
 | `date_achat` | texte `AAAA-MM-JJ` | oui | Le jour des courses. |
 | `montant` | nombre (0 à 10 000) | non | Le total du ticket, en euros. |
 | `note` | texte (200 caractères max.) | non | « garantie de la cafetière »… |

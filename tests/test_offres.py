@@ -7,9 +7,9 @@ from robot_promos.offres import creer_offre, dedoublonner, verifier
 
 def offre(**champs):
     base = {
-        "id": "lidl-1",
-        "source": "lidl",
-        "magasin": "lidl-lingolsheim",
+        "id": "leclerc-1",
+        "source": "leclerc",
+        "magasin": "leclerc-geispolsheim",
         "catalogue": "c",
         "produit": "Banane",
         "prix": 0.95,
@@ -59,7 +59,7 @@ def document(offres):
 
 
 def test_le_schema_accepte_un_document_valide():
-    verifier(document([offre(), offre(id="lidl-2", lot={"quantite": 2, "prix": 1.5, "prix_unitaire": None})]))
+    verifier(document([offre(), offre(id="leclerc-2", lot={"quantite": 2, "prix": 1.5, "prix_unitaire": None})]))
 
 
 def test_le_schema_refuse_un_document_invalide():

@@ -30,9 +30,9 @@ def test_lit_les_regles_pour_tous_les_robots_et_le_delai():
 
 def test_applique_les_jokers():
     regles, _ = lire_robots(ROBOTS_BONIAL)
-    assert est_autorise(regles, "/Lingolsheim/Lidl/p-r1")
+    assert est_autorise(regles, "/Geispolsheim/Leclerc/p-r1")
     assert not est_autorise(regles, "/Catalogue/123")
-    assert not est_autorise(regles, "/Lingolsheim/Lidl/ajax/offres")
+    assert not est_autorise(regles, "/Geispolsheim/Leclerc/ajax/offres")
 
 
 def test_la_regle_la_plus_precise_gagne():

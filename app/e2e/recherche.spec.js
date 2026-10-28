@@ -24,12 +24,12 @@ test("en écrivant un article, les promos s'affichent ; on en ajoute une, ou ce 
   await champ(page).fill("l");
   await expect(page.locator("#suggestions")).toBeHidden();
 
-  // « lait » : les promos trouvées remplacent la liste, Leclerc d'abord, le mot entier avant « Laitue ».
+  // « lait » : les promos trouvées remplacent la liste, le mot entier (en cours, puis à venir) avant « Laitue ».
   await champ(page).fill("lait");
   await expect(page.locator("#etat-recherche")).toHaveText("4 promos");
   await expect(noms(page)).toHaveText([
+    "Lait demi-écrémé CANDIA",
     "Lait demi-écrémé UHT LACTEL",
-    "Lait demi-écrémé MILSANI",
     "Laitue",
     "Chocolat au lait CÔTE D'OR",
   ]);
@@ -43,7 +43,7 @@ test("en écrivant un article, les promos s'affichent ; on en ajoute une, ou ce 
   await page.getByRole("button", { name: "Effacer" }).click();
   await expect(page.locator("#suggestions")).toBeHidden();
   await expect(aAcheter(page).locator(".nom")).toHaveText(["Lait demi-écrémé"]);
-  await expect(aAcheter(page).locator(".details")).toHaveText(/^\d\d:\d\d · Lidl · 0,89 €$/);
+  await expect(aAcheter(page).locator(".details")).toHaveText(/^\d\d:\d\d · Leclerc · 0,89 €$/);
 
   // Aucune promo : « OK » sur le clavier l'ajoute quand même.
   await champ(page).fill("xyz");

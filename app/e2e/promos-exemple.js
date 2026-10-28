@@ -9,19 +9,12 @@ function jour(decalage) {
   return `${date.getFullYear()}-${deux(date.getMonth() + 1)}-${deux(date.getDate())}`;
 }
 
-const LIDL = {
-  source: "lidl",
-  magasin: "lidl-lingolsheim",
-  catalogue: "promos-de-la-semaine",
-  categorie: null,
-  ean: null,
-};
-const LECLERC = { source: "leclerc", magasin: "leclerc-geispolsheim", catalogue: "26G310G", page: null };
-
-function offre(id, magasin, champs) {
+function offre(id, champs) {
   return {
     id,
-    ...magasin,
+    source: "leclerc",
+    magasin: "leclerc-geispolsheim",
+    catalogue: "26G310G",
     marque: null,
     description: null,
     categorie: null,
@@ -42,9 +35,9 @@ function offre(id, magasin, champs) {
 }
 
 const OFFRES = [
-  offre("lait-lidl", LIDL, {
+  offre("lait", {
     produit: "Lait demi-écrémé",
-    marque: "MILSANI",
+    marque: "CANDIA",
     description: "La bouteille de 1 L",
     prix: 0.89,
     ancien_prix: 1.05,
@@ -52,7 +45,7 @@ const OFFRES = [
     unite: "l",
     reduction: "-15 %",
   }),
-  offre("lait-leclerc", LECLERC, {
+  offre("lait-leclerc", {
     produit: "LAIT DEMI-ÉCRÉMÉ UHT",
     marque: "LACTEL",
     description: "6 x 1 L. Par 2 (12 L) : 9,18 € au lieu de 12,24 €",
@@ -64,7 +57,7 @@ const OFFRES = [
     date_debut: jour(2),
     date_fin: jour(9),
   }),
-  offre("chocolat", LECLERC, {
+  offre("chocolat", {
     produit: "CHOCOLAT AU LAIT",
     marque: "CÔTE D'OR",
     description: "200 g. Le kg : 10,75 €",
@@ -74,7 +67,7 @@ const OFFRES = [
     unite: "kg",
     reduction: "-20 %",
   }),
-  offre("laitue", LIDL, {
+  offre("laitue", {
     produit: "Laitue",
     description: "La pièce",
     prix: 0.79,
@@ -82,32 +75,32 @@ const OFFRES = [
     unite: "pièce",
   }),
   // Pas de « chips » dans le nom : trouvée par la famille « chips ».
-  offre("pringles", LIDL, {
+  offre("pringles", {
     produit: "PRINGLES",
     description: "Le paquet de 165 g",
     prix: 1.99,
     ancien_prix: 2.79,
     reduction: "-28 %",
   }),
-  offre("beurre", LIDL, {
+  offre("beurre", {
     produit: "Beurre doux",
     marque: "PÂTURAGES",
     prix: 1.99,
     date_debut: jour(-8),
     date_fin: jour(-1),
   }),
-  offre("bananes", LIDL, {
+  offre("bananes", {
     produit: "Bananes",
     description: "Le kg. Origine Côte d'Ivoire",
     prix: 1.29,
     ancien_prix: 1.69,
     prix_unitaire: 1.29,
     unite: "kg",
-    reduction: "-23 % avec Lidl Plus",
+    reduction: "-23 %",
     carte_fidelite: true,
     date_fin: jour(1),
   }),
-  offre("pain", LECLERC, {
+  offre("pain", {
     produit: "PAIN DE MIE COMPLET",
     marque: "HARRYS",
     description: "500 g. Le kg : 4,70 €",
@@ -118,7 +111,7 @@ const OFFRES = [
     reduction: "30 % en Ticket E.Leclerc",
     carte_fidelite: true,
   }),
-  offre("cafe", LECLERC, {
+  offre("cafe", {
     produit: "CAFÉ MOULU PUR ARABICA",
     marque: "CARTE NOIRE",
     description: "4 x 250 g (1 kg). Le kg : 9,99 €",
@@ -128,7 +121,7 @@ const OFFRES = [
     unite: "kg",
     reduction: "-25 %",
   }),
-  offre("pates", LECLERC, {
+  offre("pates", {
     produit: "PÂTES SPAGHETTI",
     marque: "PANZANI",
     description: "500 g. Par 3 (1,5 kg) : 1,90 €",
@@ -140,7 +133,7 @@ const OFFRES = [
   }),
   // Une même promo « au choix », que le catalogue donne en deux offres : l'appli n'en montre qu'une.
   ...["SHAMPOOING", "SHAMPOOING PURIFIANT"].map((produit, rang) =>
-    offre(`shampooing-${rang + 1}`, LECLERC, {
+    offre(`shampooing-${rang + 1}`, {
       produit,
       marque: "LE PETIT MARSEILLAIS",
       description: "Au choix : Douceur & Éclat, Nutrition, Purifiant. 2 x 300 ml (600 ml)",
@@ -174,13 +167,9 @@ export function promosExemple({ miseAJour = new Date(), etatLeclerc = "ok", mult
     mise_a_jour: miseAJour.toISOString(),
     version_robot: "0.3.0",
     magasins: {
-      "lidl-lingolsheim": { nom: "Lidl Lingolsheim", enseigne: "Lidl", ville: "Lingolsheim" },
       "leclerc-geispolsheim": { nom: "E.Leclerc Geispolsheim", enseigne: "E.Leclerc", ville: "Geispolsheim" },
     },
-    sources: [
-      source("lidl", "lidl-lingolsheim", "Prospectus Lidl France", "ok"),
-      source("leclerc", "leclerc-geispolsheim", "Catalogues E.Leclerc Geispolsheim", etatLeclerc),
-    ],
+    sources: [source("leclerc", "leclerc-geispolsheim", "Catalogues E.Leclerc Geispolsheim", etatLeclerc)],
     offres,
   };
 }

@@ -1,4 +1,4 @@
-// Les promos de nos magasins (fichier promos.json, écrit chaque matin par le robot) et leur
+// Les promos de notre magasin (fichier promos.json, écrit chaque matin par le robot) et leur
 // comparaison avec la liste de courses. Sans Firebase ni réseau : facile à tester.
 
 import { FAMILLES } from "./familles.js";
@@ -8,9 +8,6 @@ export const URL_PROMOS = "https://raw.githubusercontent.com/LASCAMPIA67/promos-
 
 /** Version du format de promos.json que l'appli sait lire (voir docs/format-promos.md). */
 export const FORMAT = 2;
-
-/** Notre magasin principal : à pertinence égale, ses promos passent avant les autres. */
-export const MAGASIN_PRINCIPAL = "leclerc";
 
 /** Le robot passe chaque matin : au-delà de ce délai, il a manqué au moins un passage. */
 export const HEURES_AVANT_ALERTE = 36;
@@ -134,15 +131,15 @@ export function chercherPromos(index, nom, aujourdhui) {
  * Recherche dans toutes les promos, pendant qu'on tape : chaque mot cherché doit être le début d'un
  * mot du produit ou de sa marque (« fro » trouve « Fromage »), ou un nom de famille complet
  * (« chips » trouve aussi « Pringles »). Sans rien à chercher : toutes les promos, celles en cours
- * d'abord. « magasin » : « lidl », « leclerc » ou vide pour les deux.
- * Même ordre que chercherPromos. Renvoie [{ offre, aVenir }].
+ * d'abord. Même ordre que chercherPromos. Renvoie [{ offre, aVenir }].
  */
-export function rechercherPromos(index, texte, aujourdhui, { magasin = "" } = {}) {
+export function rechercherPromos(index, texte, aujourdhui) {
   const mots = motsCles(texte);
-  const resultats = mots.length
-    ? trouver(index, mots, aujourdhui, (motCherche, mot) => mot.startsWith(motCherche))
-    : toutes(index, aujourdhui);
-  return regrouperVariantes(magasin ? resultats.filter(({ offre }) => offre.source === magasin) : resultats);
+  return regrouperVariantes(
+    mots.length
+      ? trouver(index, mots, aujourdhui, (motCherche, mot) => mot.startsWith(motCherche))
+      : toutes(index, aujourdhui),
+  );
 }
 
 /**
@@ -194,13 +191,10 @@ function toutes(index, aujourdhui) {
   return (index ?? [])
     .filter(({ offre }) => !offre.date_fin || offre.date_fin >= aujourdhui)
     .map(({ offre }) => ({ offre, aVenir: Boolean(offre.date_debut && offre.date_debut > aujourdhui) }))
-    .sort((a, b) => Number(a.aVenir) - Number(b.aVenir) || secondaire(a.offre) - secondaire(b.offre));
+    .sort((a, b) => Number(a.aVenir) - Number(b.aVenir));
 }
 
 const egal = (motCherche, mot) => mot === motCherche;
-
-/** 0 pour le magasin principal (Leclerc), 1 pour les autres. */
-const secondaire = (offre) => Number(offre.source !== MAGASIN_PRINCIPAL);
 
 function trouver(index, motsCherches, aujourdhui, correspond) {
   const groupes = regrouper(motsCherches);
@@ -236,13 +230,10 @@ function trouver(index, motsCherches, aujourdhui, correspond) {
       longueur: motsProduit.length,
     });
   }
-  // Les plus proches d'abord ; à pertinence égale (nom qui commence par l'article, ou pas), Leclerc
-  // avant Lidl.
+  // Les plus proches d'abord.
   trouvees.sort(
     (a, b) =>
       Number(a.parFamille) - Number(b.parFamille) ||
-      Number(a.position > 0) - Number(b.position > 0) ||
-      secondaire(a.offre) - secondaire(b.offre) ||
       a.position - b.position ||
       Number(b.exact) - Number(a.exact) ||
       Number(a.aVenir) - Number(b.aVenir) ||
@@ -276,7 +267,7 @@ export function promoChoisie(article, index, aujourdhui) {
   // Espaces insécables ou non (« 2,25 € ») : la même note.
   const espaces = (texte) => texte?.replace(/[\u00a0\u202f]/g, " ");
   const note = espaces(noteCourte(article.note));
-  const depuisUneNote = /^(Leclerc|Lidl) · /.test(note ?? "");
+  const depuisUneNote = /^Leclerc · /.test(note ?? "");
   if (!index || (!article.promo && !depuisUneNote)) return null;
   const enCours = (o) => !o.date_fin || o.date_fin >= aujourdhui;
   const parIdentifiant = article.promo ? index.find(({ offre }) => offre.id === article.promo)?.offre : null;
@@ -299,9 +290,9 @@ export function promoChoisie(article, index, aujourdhui) {
  */
 export function noteCourte(note) {
   if (!note) return note;
-  const ancienne = /^Promo (Leclerc|Lidl) : (.+?) · (?:Jusqu'|À partir|Dernier jour)/.exec(note);
-  if (ancienne) return `${ancienne[1]} · ${ancienne[2]}`;
-  return note.replace(/^((?:Leclerc|Lidl) · [^·]+?) · (?:jusqu'|dès le ).*$/, "$1");
+  const ancienne = /^Promo Leclerc : (.+?) · (?:Jusqu'|À partir|Dernier jour)/.exec(note);
+  if (ancienne) return `Leclerc · ${ancienne[1]}`;
+  return note.replace(/^(Leclerc · [^·]+?) · (?:jusqu'|dès le ).*$/, "$1");
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -439,25 +430,23 @@ export function joliNom(texte) {
   return minuscules.charAt(0).toLocaleUpperCase("fr-FR") + minuscules.slice(1);
 }
 
-const ENSEIGNES = { lidl: "Lidl", leclerc: "Leclerc" };
+const ENSEIGNES = { leclerc: "Leclerc" };
 
-/** « Lidl », « Leclerc ». */
-export function enseigne(offre) {
-  return ENSEIGNES[offre.source] ?? offre.source;
-}
+/** « Leclerc », au début de la note d'un article ajouté depuis une promo. */
+const enseigne = (offre) => ENSEIGNES[offre.source] ?? offre.source;
 
 /**
  * Comment lire le prix d'une promo. Renvoie { genre, prix, barre, unitaire, detail } :
  * - genre : « caisse » (déjà déduit en caisse), « lot » (en caisse, en prenant plusieurs),
  *   « carte-leclerc » (rendu sur la carte E.Leclerc), « carte-caisse » (en caisse avec la carte
- *   E.Leclerc), « lidl-plus » (avec l'appli Lidl Plus) ou « aucun » (prix du catalogue) ;
+ *   E.Leclerc) ou « aucun » (prix du catalogue) ;
  * - prix : le prix à afficher en gros (celui payé en caisse) ; barre : l'ancien prix à barrer, ou
  *   null ; unitaire : le prix au kilo qui va avec le gros prix ;
- * - detail : ce qu'il faut savoir en plus, en court (« 3,15 € les 2 », « revient à 1,65 € »,
- *   « sans l'appli : 2,49 € »), ou null. Le type de promo lui-même est donné par typePromo.
+ * - detail : ce qu'il faut savoir en plus, en court (« 3,15 € les 2 », « revient à 1,65 € »), ou
+ *   null. Le type de promo lui-même est donné par typePromo.
  */
 export function explicationPrix(offre) {
-  const reduction = (offre.reduction ?? "").replace(/\s*avec Lidl Plus$/i, "");
+  const reduction = offre.reduction ?? "";
   const euros = (montant) => (montant == null ? null : formaterPrix(montant));
   // Prix du lot, sauf s'il est douteux (« -50 % sur le 2e » au même prix qu'un seul : erreur du catalogue).
   const lotFiable =
@@ -481,15 +470,6 @@ export function explicationPrix(offre) {
       detail: offre.ancien_prix != null && offre.prix != null ? `revient à ${prix}${auKilo}` : null,
     };
   }
-  if (offre.source === "lidl" && offre.carte_fidelite) {
-    return {
-      genre: "lidl-plus",
-      prix,
-      barre: null,
-      unitaire: prixUnitaire(offre),
-      detail: offre.lot ? lot : offre.ancien_prix != null ? `sans l'appli : ${euros(offre.ancien_prix)}` : null,
-    };
-  }
   if (offre.lot) {
     const genre = offre.carte_fidelite ? "carte-caisse" : "lot";
     return { genre, prix, barre: null, unitaire: prixUnitaire(offre), detail: lot };
@@ -503,10 +483,10 @@ export function explicationPrix(offre) {
 
 /**
  * Le type de promo, en quelques mots, pour la liste : « -60 % sur le 2e », « -20 % en caisse »,
- * « 30 % sur la carte », « -23 % Lidl Plus »… ; sans réduction particulière, le prix.
+ * « 30 % sur la carte », « -20 % avec la carte »… ; sans réduction particulière, le prix.
  */
 export function typePromo(offre) {
-  const reduction = (offre.reduction ?? "").replace(/\s*avec Lidl Plus$/i, "").trim();
+  const reduction = (offre.reduction ?? "").trim();
   const { genre } = explicationPrix(offre);
   // Sans réduction écrite, le pourcentage d'après l'ancien prix.
   const pourcentage =
@@ -517,8 +497,6 @@ export function typePromo(offre) {
       const detail = reduction.replace(/\s*en Ticket E\.Leclerc/i, "");
       return detail ? `${detail} sur la carte` : "Sur la carte E.Leclerc";
     }
-    case "lidl-plus":
-      return pourcentage ? `${pourcentage} Lidl Plus` : "Prix Lidl Plus";
     case "lot":
       return reduction || "En prenant plusieurs";
     case "carte-caisse":
@@ -539,14 +517,13 @@ export function resumeDescription(texte) {
   const PRIX = String.raw`\d+(?:[.,]\d+)?\s*€`;
   return String(texte ?? "")
     .replace(/\([^()]*€[^()]*\)/g, " · ") // « (1 kg = 7,96 €) »
-    .replace(new RegExp(String.raw`(?:avec Lidl Plus\s+)?au lieu de\s*${PRIX}?`, "gi"), " · ")
+    .replace(new RegExp(String.raw`au lieu de\s*${PRIX}?`, "gi"), " · ")
     .replace(new RegExp(String.raw`\bLes\s+\d+\s+produits?(?:\s+dont\s+\d+\s+offerts?)?\s*:\s*${PRIX}`, "gi"), " · ")
     .replace(new RegExp(String.raw`\bPar\s+\d+\s*(?:\([^)]*\))?\s*:\s*${PRIX}`, "gi"), " · ")
     .replace(new RegExp(String.raw`\bL[ea]\s+(?:kg|L|litre|pièce)\s*:\s*${PRIX}`, "gi"), " · ")
     .replace(/\bLe produit de\s+/gi, "")
     .replace(new RegExp(String.raw`\s*:\s*${PRIX}`, "g"), " · ")
     .replace(/(?:Même promotion disponible|[EÉ]galement disponible)[^.]*\.?/gi, " · ")
-    .replace(/avec Lidl Plus/gi, " · ")
     .replace(/(?<!\d)\.\s*(?=\d)/g, " · ") // « 4 tranches. 140 g » → « 4 tranches · 140 g », mais pas « 1.98 L »
     .replace(/\s*\.?\s*(?:·\s*)+/g, " · ")
     .replace(/\s+/g, " ")

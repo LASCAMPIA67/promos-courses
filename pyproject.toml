@@ -5,13 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "robot-promos"
 dynamic = ["version"]
-description = "Robot qui récupère chaque jour les promos de nos magasins (Lidl Lingolsheim, E.Leclerc Geispolsheim)."
+description = "Robot qui récupère chaque jour les promos de notre magasin (E.Leclerc Geispolsheim)."
 readme = "README.md"
 requires-python = ">=3.12"
 authors = [{ name = "Emilio" }]
 dependencies = [
     "requests>=2.32,<3",
-    "pdfplumber>=0.11.4,<0.12",
     "jsonschema>=4.23,<5",
 ]
 

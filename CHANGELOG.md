@@ -18,13 +18,32 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 - **Lecture automatique des tickets de caisse** : en ajoutant un ticket, l'appli trouve le magasin,
   la date et le total et remplit la fenêtre (« Date et total lus sur le ticket : vérifiez. »). Un
-  PDF des applis E.Leclerc ou Lidl Plus est lu aussitôt (son texte, avec PDF.js) ; une photo ou une
+  PDF de l'appli E.Leclerc est lu aussitôt (son texte, avec PDF.js) ; une photo ou une
   capture d'écran en quelques secondes, avec [Tesseract.js](https://tesseract.projectnaptha.com) en
   français. Tout se passe sur le téléphone : rien n'est envoyé ailleurs, et les fichiers de lecture
   (environ 4 Mo) sont servis par l'appli, téléchargés à la première lecture puis gardés pour marcher
   sans réseau. Ce qu'on a changé à la main n'est jamais remplacé, on peut enregistrer sans attendre,
   et la lecture s'arrête si on ferme la fenêtre. Faux totaux (sous-total, remises, TVA) et dates
   impossibles écartés ; testé sur une photo et un PDF d'exemple, dans Chrome et Safari.
+
+### Modifié
+
+- **Les fiches de promo n'affichent plus le nom du magasin** : il n'y en a plus qu'un. La première
+  ligne dit seulement jusqu'à quand dure la promo.
+- **Tickets de caisse** : le magasin se choisit entre « Leclerc » (d'office) et « Autre ». Les règles
+  d'accès Firebase (`firebase/firestore.rules`) n'acceptent plus que ces deux valeurs.
+- La recherche des promos ne range plus par magasin : les plus proches d'abord, celles en cours avant
+  celles à venir.
+
+### Supprimé
+
+- **Lidl Lingolsheim est retiré du projet** : nous ne faisons nos courses que chez E.Leclerc
+  Geispolsheim. Le robot ne lit plus le prospectus Lidl (modules `lidl.py` et `lidl_pdf.py`, leurs
+  tests, et la bibliothèque `pdfplumber` qui ne servait qu'à eux) ; `promos.json` ne contient plus
+  que les promos Leclerc (le schéma n'accepte plus que `leclerc` et `leclerc-geispolsheim`). Dans
+  l'appli : plus de prix « Lidl Plus », plus de « Leclerc avant Lidl », plus de choix « Lidl » pour
+  un ticket ; les marques propres de Lidl sont retirées des familles de produits. Le format de
+  `promos.json` ne change pas (toujours `2`) : une ancienne appli lit le nouveau fichier sans souci.
 
 ## [0.9.0] - 2026-10-27
 

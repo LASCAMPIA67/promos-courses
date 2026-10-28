@@ -4,7 +4,6 @@ import {
   TAILLE_MAX,
   assembler,
   decouper,
-  devinerMagasin,
   dimensionsReduites,
   formaterTaille,
   libelleTicket,
@@ -46,20 +45,21 @@ describe("lireMontant", () => {
 });
 
 describe("preparerTicket", () => {
-  const saisie = { magasin: "lidl", date: "2026-10-26", montant: "23,45", note: "  avec  la carte " };
+  const saisie = { magasin: "autre", date: "2026-10-26", montant: "23,45", note: "  avec  la carte " };
 
   test("une fiche propre, prête à enregistrer", () => {
     expect(preparerTicket(saisie, AUJOURDHUI)).toEqual({
-      fiche: { magasin: "lidl", date_achat: "2026-10-26", montant: 23.45, note: "avec la carte" },
+      fiche: { magasin: "autre", date_achat: "2026-10-26", montant: 23.45, note: "avec la carte" },
     });
     // Montant et note facultatifs.
     expect(preparerTicket({ ...saisie, montant: "", note: "" }, AUJOURDHUI)).toEqual({
-      fiche: { magasin: "lidl", date_achat: "2026-10-26" },
+      fiche: { magasin: "autre", date_achat: "2026-10-26" },
     });
   });
 
   test("magasin, date et montant vérifiés", () => {
     expect(preparerTicket({ ...saisie, magasin: "carrefour" }, AUJOURDHUI).erreur).toMatch(/magasin/);
+    expect(preparerTicket({ ...saisie, magasin: "lidl" }, AUJOURDHUI).erreur).toMatch(/magasin/);
     expect(preparerTicket({ ...saisie, date: "" }, AUJOURDHUI).erreur).toMatch(/date/);
     expect(preparerTicket({ ...saisie, date: "2026-10-28" }, AUJOURDHUI).erreur).toMatch(/futur/);
     expect(preparerTicket({ ...saisie, montant: "beaucoup" }, AUJOURDHUI).erreur).toMatch(/Montant/);
@@ -67,18 +67,12 @@ describe("preparerTicket", () => {
   });
 });
 
-test("le magasin deviné d'après le nom du fichier, sinon Leclerc", () => {
-  expect(devinerMagasin("Ticket_LIDL_2026-10-27.pdf")).toBe("lidl");
-  expect(devinerMagasin("ticket-leclerc.pdf")).toBe("leclerc");
-  expect(devinerMagasin("IMG_1234.jpg")).toBe("leclerc");
-});
-
 describe("affichage des tickets", () => {
   const ticket = (id, date_achat, champs = {}) => ({ id, magasin: "leclerc", date_achat, ...champs });
 
   test("une ligne courte : magasin, jour, montant", () => {
     expect(simple(libelleTicket(ticket("a", "2026-10-27", { montant: 54.3 })))).toBe("Leclerc · mar. 27/10 · 54,30 €");
-    expect(libelleTicket(ticket("b", "2026-10-05", { magasin: "lidl" }))).toBe("Lidl · lun. 05/10");
+    expect(libelleTicket(ticket("b", "2026-10-05", { magasin: "autre" }))).toBe("Autre magasin · lun. 05/10");
   });
 
   test("le plus récent d'abord, puis par mois", () => {
@@ -118,15 +112,15 @@ CB                            23,45
     expect(lireTicket(texte, "2026-10-27")).toEqual({ magasin: "leclerc", date: "2026-10-27", montant: 23.45 });
   });
 
-  test("ticket Lidl, lu sur une photo (fautes de lecture comprises)", () => {
-    const texte = `LIDL
+  test("ticket d'un autre magasin, lu sur une photo (fautes de lecture comprises)", () => {
+    const texte = `SUPERMARCHE
 Bananes 1,29 B
 Beurre doux 1,99 B
 TOTAI
 12.34
 CB EMV 12,34
 26.10.26 18:05 1234`;
-    expect(lireTicket(texte, "2026-10-27")).toEqual({ magasin: "lidl", date: "2026-10-26", montant: 12.34 });
+    expect(lireTicket(texte, "2026-10-27")).toEqual({ magasin: null, date: "2026-10-26", montant: 12.34 });
   });
 
   test("sans le mot « total » : la ligne de paiement ; rien de lisible : null", () => {

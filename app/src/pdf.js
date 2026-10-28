@@ -1,4 +1,4 @@
-// Affichage des tickets en PDF (ceux des applis E.Leclerc et Lidl Plus) avec PDF.js, de Mozilla :
+// Affichage des tickets en PDF (celui de l'appli E.Leclerc) avec PDF.js, de Mozilla :
 // https://mozilla.github.io/pdf.js/. Chargé seulement à l'ouverture d'un PDF : l'appli reste légère.
 
 import { GlobalWorkerOptions, getDocument } from "pdfjs-dist";

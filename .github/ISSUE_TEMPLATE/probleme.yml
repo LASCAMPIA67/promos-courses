@@ -9,25 +9,25 @@ body:
   - type: dropdown
     id: magasin
     attributes:
-      label: Magasin concerné
+      label: Partie concernée
       options:
-        - Lidl Lingolsheim
-        - E.Leclerc Geispolsheim
-        - Les deux / le robot en général
+        - Les promos E.Leclerc Geispolsheim
+        - L'appli (liste, tickets…)
+        - Le robot en général
     validations:
       required: true
   - type: textarea
     id: probleme
     attributes:
       label: Qu'est-ce qui ne va pas ?
-      placeholder: "Ex. : la promo sur le beurre (page 12 du prospectus) n'apparaît pas."
+      placeholder: "Ex. : la promo sur le beurre (catalogue « Un automne en fête ») n'apparaît pas."
     validations:
       required: true
   - type: textarea
     id: attendu
     attributes:
       label: Qu'est-ce qui était attendu ?
-      placeholder: "Ex. : Beurre doux, 1,99 € au lieu de 2,49 €, avec Lidl Plus."
+      placeholder: "Ex. : Beurre doux, 1,99 € au lieu de 2,49 €, avec la carte E.Leclerc."
   - type: input
     id: lien
     attributes:

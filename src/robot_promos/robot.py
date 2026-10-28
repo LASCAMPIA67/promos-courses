@@ -16,11 +16,10 @@ from robot_promos.config import MAGASINS
 from robot_promos.offres import dedoublonner, verifier
 from robot_promos.outils import aujourdhui, maintenant
 from robot_promos.sources.leclerc import Leclerc
-from robot_promos.sources.lidl import Lidl
 from robot_promos.web import Navigateur
 
 FORMAT = 2  # version du format de promos.json (voir docs/format-promos.md)
-SOURCES = [Lidl(), Leclerc()]
+SOURCES = [Leclerc()]
 
 
 def lire_precedent(fichier):

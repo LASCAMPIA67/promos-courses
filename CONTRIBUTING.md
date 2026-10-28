@@ -108,10 +108,8 @@ Les workflows suivent les [recommandations de sécurité de GitHub](https://docs
 | `src/robot_promos/web.py` | Téléchargement poli (`robots.txt`, pauses, nouvelles tentatives). |
 | `src/robot_promos/offres.py` | Format d'une offre, doublons, vérification du schéma. |
 | `src/robot_promos/promos.schema.json` | Schéma JSON de `promos.json`. |
-| `src/robot_promos/sources/lidl.py` | Source Lidl : prospectus de la semaine. |
-| `src/robot_promos/sources/lidl_pdf.py` | Lecture du PDF Lidl. |
 | `src/robot_promos/sources/leclerc.py` | Source Leclerc : catalogues du magasin. |
-| `src/robot_promos/config.py` | Magasins et réglages. |
+| `src/robot_promos/config.py` | Magasin et réglages. |
 
 Pour ajouter une source : créer un module dans `sources/` avec une classe qui hérite de `Source`
 (méthodes `catalogues` et `offres`), l'ajouter à `SOURCES` dans `robot.py`, au schéma JSON et aux

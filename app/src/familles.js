@@ -5,26 +5,15 @@
 // - « termes » : marques ou mots qui désignent un produit de la famille, dans le nom ou la marque.
 //
 // Seulement des marques qui ne font (presque) qu'une sorte de produit : « Président » fait du beurre
-// ET du fromage, il n'est donc ni dans « beurre » ni dans « fromage ». Les marques propres de Lidl
-// (Crusti Croc, Bellarom…) et de Leclerc (Chabrior…) sont incluses.
+// ET du fromage, il n'est donc ni dans « beurre » ni dans « fromage ». Les marques propres de Leclerc
+// (Chabrior…) sont incluses.
 // Pour ajouter une marque : l'écrire dans « termes », en minuscules, telle qu'elle s'écrit.
 
 export const FAMILLES = [
   // Apéritif et grignotage
   {
     cles: ["chips"],
-    termes: [
-      "pringles",
-      "lay's",
-      "doritos",
-      "vico",
-      "bret's",
-      "monster munch",
-      "crusti croc",
-      "tyrrells",
-      "kettle",
-      "pombär",
-    ],
+    termes: ["pringles", "lay's", "doritos", "vico", "bret's", "monster munch", "tyrrells", "kettle", "pombär"],
   },
   {
     cles: ["apéro", "apéritif", "biscuits apéritif"],
@@ -36,8 +25,6 @@ export const FAMILLES = [
       "vico",
       "bret's",
       "monster munch",
-      "crusti croc",
-      "snack day",
       "curly",
       "tuc",
       "belin",
@@ -61,27 +48,15 @@ export const FAMILLES = [
       "oasis",
       "schweppes",
       "ice tea",
-      "freeway",
       "lipton ice tea",
       "dr pepper",
     ],
   },
-  { cles: ["cola"], termes: ["coca-cola", "pepsi", "freeway cola"] },
-  { cles: ["jus", "jus de fruits"], termes: ["tropicana", "joker", "innocent", "solevita", "pago", "pressade"] },
+  { cles: ["cola"], termes: ["coca-cola", "pepsi"] },
+  { cles: ["jus", "jus de fruits"], termes: ["tropicana", "joker", "innocent", "pago", "pressade"] },
   {
     cles: ["eau", "eau minérale", "eau plate"],
-    termes: [
-      "evian",
-      "cristaline",
-      "vittel",
-      "contrex",
-      "volvic",
-      "hépar",
-      "saskia",
-      "courmayeur",
-      "wattwiller",
-      "mont roucous",
-    ],
+    termes: ["evian", "cristaline", "vittel", "contrex", "volvic", "hépar", "courmayeur", "wattwiller", "mont roucous"],
   },
   {
     cles: ["eau gazeuse", "eau pétillante"],
@@ -97,7 +72,6 @@ export const FAMILLES = [
       "grimbergen",
       "affligem",
       "pelforth",
-      "perlenbacher",
       "carlsberg",
       "corona",
       "hoegaarden",
@@ -137,13 +111,12 @@ export const FAMILLES = [
       "lavazza",
       "jacques vabre",
       "malongo",
-      "bellarom",
       "nescafé",
       "segafredo",
       "illy",
     ],
   },
-  { cles: ["thé", "infusion"], termes: ["twinings", "lord nelson", "éléphant", "kusmi", "lipton", "tetley"] },
+  { cles: ["thé", "infusion"], termes: ["twinings", "éléphant", "kusmi", "lipton", "tetley"] },
 
   // Petit déjeuner et sucré
   {
@@ -157,15 +130,14 @@ export const FAMILLES = [
       "miel pops",
       "corn flakes",
       "cheerios",
-      "crownfield",
       "chabrior",
       "jordans",
       "weetabix",
       "golden grahams",
     ],
   },
-  { cles: ["pâte à tartiner"], termes: ["nutella", "choco nussa", "nocciolata", "pâte à tartiner"] },
-  { cles: ["confiture"], termes: ["st dalfour", "maribel"] },
+  { cles: ["pâte à tartiner"], termes: ["nutella", "nocciolata", "pâte à tartiner"] },
+  { cles: ["confiture"], termes: ["st dalfour"] },
   { cles: ["compote"], termes: ["andros", "materne", "pom'potes"] },
   {
     cles: ["biscuits", "gâteaux"],
@@ -177,7 +149,6 @@ export const FAMILLES = [
       "granola",
       "petit écolier",
       "pépito",
-      "sondey",
       "chabrior",
       "st michel",
       "gerblé",
@@ -189,7 +160,6 @@ export const FAMILLES = [
       "mikado",
       "cookies",
       "madeleines",
-      "tastino",
     ],
   },
   {
@@ -200,8 +170,6 @@ export const FAMILLES = [
       "côte d'or",
       "kinder",
       "ferrero",
-      "fin carré",
-      "mister choc",
       "poulain",
       "suchard",
       "menier",
@@ -229,7 +197,6 @@ export const FAMILLES = [
       "ben & jerry's",
       "cornetto",
       "miko",
-      "gelatelli",
       "esquimau",
       "sorbet",
       "crème glacée",
@@ -251,7 +218,6 @@ export const FAMILLES = [
       "caprice des dieux",
       "saint môret",
       "leerdammer",
-      "chêne d'argent",
       "entremont",
       "camembert",
       "comté",
@@ -284,7 +250,6 @@ export const FAMILLES = [
       "panzani",
       "lustucru",
       "rivoire et carret",
-      "combino",
       "garofalo",
       "la molisana",
       "de cecco",
@@ -299,16 +264,16 @@ export const FAMILLES = [
       "tortellini",
     ],
   },
-  { cles: ["riz"], termes: ["uncle ben's", "taureau ailé", "basmati", "golden sun"] },
-  { cles: ["huile"], termes: ["lesieur", "puget", "isio", "primadonna", "vita d'or"] },
-  { cles: ["thon", "conserve de poisson"], termes: ["petit navire", "saupiquet", "nixe", "connétable"] },
-  { cles: ["farine"], termes: ["francine", "belbake"] },
+  { cles: ["riz"], termes: ["uncle ben's", "taureau ailé", "basmati"] },
+  { cles: ["huile"], termes: ["lesieur", "puget", "isio"] },
+  { cles: ["thon", "conserve de poisson"], termes: ["petit navire", "saupiquet", "connétable"] },
+  { cles: ["farine"], termes: ["francine"] },
   { cles: ["sucre"], termes: ["daddy", "béghin say", "saint louis"] },
-  { cles: ["pizza", "pizzas"], termes: ["buitoni", "sodebo", "ristorante", "wagner", "trattoria alfredo"] },
+  { cles: ["pizza", "pizzas"], termes: ["buitoni", "sodebo", "ristorante", "wagner"] },
   { cles: ["œufs"], termes: ["loué", "matines", "cocorette"] },
 
   // Entretien
-  { cles: ["lessive"], termes: ["ariel", "skip", "omo", "dash", "formil", "maison verte", "l'arbre vert"] },
+  { cles: ["lessive"], termes: ["ariel", "skip", "omo", "dash", "maison verte", "l'arbre vert"] },
   { cles: ["lave-vaisselle", "tablettes lave-vaisselle"], termes: ["finish"] },
   { cles: ["liquide vaisselle"], termes: ["paic", "fairy"] },
   { cles: ["essuie-tout", "sopalin"], termes: ["okay", "sopalin", "essuie-tout"] },
@@ -322,13 +287,13 @@ export const FAMILLES = [
   },
   {
     cles: ["dentifrice"],
-    termes: ["colgate", "signal", "sensodyne", "elmex", "parodontax", "dentalux", "aquafresh", "fluocaril"],
+    termes: ["colgate", "signal", "sensodyne", "elmex", "parodontax", "aquafresh", "fluocaril"],
   },
   { cles: ["shampooing", "shampoing"], termes: ["elseve", "head & shoulders", "dop", "pantene", "schwarzkopf"] },
   { cles: ["gel douche", "douche"], termes: ["le petit marseillais", "dove", "tahiti", "axe"] },
   { cles: ["déodorant", "déo"], termes: ["rexona", "narta", "mennen"] },
 
   // Animaux
-  { cles: ["chat", "chats"], termes: ["whiskas", "felix", "sheba", "friskies", "perfect fit", "coshida"] },
-  { cles: ["chien", "chiens"], termes: ["pedigree", "cesar", "frolic", "canaillou", "orlando"] },
+  { cles: ["chat", "chats"], termes: ["whiskas", "felix", "sheba", "friskies", "perfect fit"] },
+  { cles: ["chien", "chiens"], termes: ["pedigree", "cesar", "frolic", "canaillou"] },
 ];

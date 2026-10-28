@@ -1,9 +1,9 @@
 # 🛒 Promos courses
 
-**Notre liste de courses qui trouve toute seule les promos de nos magasins.**
+**Notre liste de courses qui trouve toute seule les promos de notre magasin.**
 
-Chaque matin, un robot lit les catalogues de **Lidl Lingolsheim** et d'**E.Leclerc Geispolsheim**
-et range toutes les promos dans un fichier. Une appli sur nos deux iPhones garde notre liste de
+Chaque matin, un robot lit les catalogues d'**E.Leclerc Geispolsheim**, le magasin où nous faisons
+nos courses, et range toutes les promos dans un fichier. Une appli sur nos deux iPhones garde notre liste de
 courses commune et la compare à ces promos pour dépenser le moins possible, sans rien faire au
 quotidien.
 
@@ -26,7 +26,7 @@ quotidien.
 
 - [Où en est le projet](#où-en-est-le-projet)
 - [Comment ça marche](#comment-ça-marche)
-- [Les magasins et les sources](#les-magasins-et-les-sources)
+- [Le magasin et sa source](#le-magasin-et-sa-source)
 - [L'appli](#lappli)
 - [Au quotidien](#au-quotidien)
 - [Le fichier promos.json](#le-fichier-promosjson)
@@ -43,7 +43,7 @@ quotidien.
 
 | Étape | Description | État |
 |---|---|---|
-| 1 | Choisir les magasins | ✅ Fait |
+| 1 | Choisir le magasin | ✅ Fait |
 | 2 | Tester les sources de promos | ✅ Fait |
 | 3 | Créer le robot qui récupère les promos | ✅ Fait et validé (version 0.2.0) |
 | 4 | Créer l'appli (liste de courses commune + comparaison aux promos) | ✅ Fait et validé (version 0.4.0) |
@@ -56,7 +56,6 @@ Dernière mise à jour de ce tableau : 27/10/2026. Le détail des évolutions es
 
 ```mermaid
 flowchart LR
-    L["🟡 Lidl Lingolsheim<br/>prospectus PDF de la semaine"] --> R
     E["🔵 E.Leclerc Geispolsheim<br/>catalogues du magasin"] --> R
     subgraph G["GitHub — gratuit"]
         H["⏰ Chaque matin, 5 h 47"] --> R["🤖 Robot<br/>(GitHub Actions)"]
@@ -69,7 +68,7 @@ flowchart LR
 1. **Chaque matin à 5 h 47** (heure de Paris), GitHub lance le robot tout seul. Si GitHub l'oublie
    (cela arrive quand ses serveurs sont surchargés), des rattrapages sont prévus à 8 h 17 et 12 h 37 :
    ils ne font rien si le robot est déjà passé dans la journée.
-2. Le robot regarde la liste des catalogues de chaque magasin. Il ne relit un catalogue que **s'il a
+2. Le robot regarde la liste des catalogues du magasin. Il ne relit un catalogue que **s'il a
    changé** depuis la veille.
 3. Il en extrait chaque promo : produit, marque, prix, ancien prix, réduction, prix au kilo,
    conditions (carte de fidélité, « 2e à -60 % »…), dates.
@@ -79,11 +78,10 @@ flowchart LR
    elle, n'est **pas** stockée ici (ce dépôt est public) mais dans une base **Firebase** privée et gratuite, réservée à nos deux comptes :
    voir [docs/liste-commune.md](docs/liste-commune.md).
 
-## Les magasins et les sources
+## Le magasin et sa source
 
 | Magasin | Source | Ce qu'on obtient |
 |---|---|---|
-| **Lidl Lingolsheim** | Prospectus PDF officiel de Lidl France (semaine en cours et suivante) | Tous les produits du prospectus : prix, ancien prix, réduction, Lidl Plus, prix au kilo, lots, dates de chaque page. Environ 500 promos par jour. |
 | **E.Leclerc Geispolsheim** | Catalogues officiels du magasin (n° 1067) | Tous les catalogues en cours et à venir : prix, prix barré, « 2e à -X % », « 2 + 1 offert », Ticket E.Leclerc, prix au kilo, code-barres, photo. Environ 1 400 promos par jour. |
 
 Le détail (adresses consultées, choix faits, sources écartées) est dans
@@ -96,7 +94,7 @@ Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
 
 | Liste | Promos d'un article | En écrivant un article | Mode sombre |
 |---|---|---|---|
-| ![Liste de courses : une pastille de couleur par personne et l'heure d'ajout](docs/captures/liste.png) | ![Les promos du lait chez Lidl et Leclerc](docs/captures/promos.png) | ![Recherche « lait » dans toutes les promos](docs/captures/recherche.png) | ![Mode sombre](docs/captures/liste-sombre.png) |
+| ![Liste de courses : une pastille de couleur par personne et l'heure d'ajout](docs/captures/liste.png) | ![Les promos du lait chez Leclerc](docs/captures/promos.png) | ![Recherche « lait » dans toutes les promos](docs/captures/recherche.png) | ![Mode sombre](docs/captures/liste-sombre.png) |
 
 - **Liste commune** : ce que l'un ajoute, coche ou supprime apparaît aussitôt sur l'autre téléphone.
 - **Qui et quand** : une petite pastille de couleur sous le rond à cocher dit qui a ajouté l'article
@@ -104,24 +102,23 @@ Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
   d'ajout.
 - **Promos** : un article ajouté depuis une promo porte une étiquette « Promo », avec dessous le
   type de promo (« -60 % sur le 2e », « 30 % sur la carte »…) ; un article écrit à la main n'en
-  affiche pas. En touchant l'étiquette, on voit la promo : magasin, prix, prix au kilo, jusqu'à quand
-  (ou à partir de quand) et, en clair, **où va la réduction** : déjà déduite en caisse, en prenant
-  plusieurs, rendue sur la carte E.Leclerc (Ticket E.Leclerc) ou avec l'appli Lidl Plus.
-  **Leclerc d'abord**, notre magasin principal.
+  affiche pas. En touchant l'étiquette, on voit la promo : prix, prix au kilo, jusqu'à quand (ou à
+  partir de quand) et, en clair, **où va la réduction** : déjà déduite en caisse, en prenant
+  plusieurs, en caisse avec la carte E.Leclerc, ou rendue sur la carte (Ticket E.Leclerc).
 - **Familles de produits** : « Chips » trouve aussi Pringles, Lay's, Doritos… ; « Soda » trouve
   Coca-Cola, Fanta… ; « Couches » trouve Pampers… (environ 50 familles).
 - **Les promos en écrivant** : en écrivant un article, les promos qui correspondent s'affichent
   aussitôt ; « + » ajoute ce qu'on a écrit (même sans promo), ou on ajoute une promo d'un geste (avec
-  une note courte : « Lidl · 0,89 € »).
-- **Promos à jour** : l'appli prévient si le robot n'est pas passé ou si un magasin manque.
+  une note courte : « Leclerc · 0,89 € »).
+- **Promos à jour** : l'appli prévient si le robot n'est pas passé ou si les promos sont incomplètes.
 - **Rangée par rayon**, dans l'ordre du magasin (le surgelé en dernier) ; un rayon mal deviné se
   corrige une fois pour toutes.
 - **Ajout rapide** avec quantité facultative ; un article déjà dans la liste est signalé.
 - **Caddie** : un article coché passe dans « Dans le caddie » ; « Tout retirer » vide le caddie.
 - **Supprimer d'un geste** : glisser un article vers la gauche, comme dans Mail sur l'iPhone
   (avec « Annuler » en cas d'erreur).
-- **Tickets de caisse** : en photo, en capture d'écran ou en PDF (celui de l'appli E.Leclerc ou
-  Lidl Plus), gardés en bas de la liste avec le magasin, la date et le montant, **lus tout seuls**
+- **Tickets de caisse** : en photo, en capture d'écran ou en PDF (celui de l'appli E.Leclerc),
+  gardés en bas de la liste avec le magasin, la date et le montant, **lus tout seuls**
   sur le téléphone ; on les ouvre en grand, on les partage. Privés, comme la liste, et jamais dans
   ce dépôt.
 - **Marche sans réseau** (au fond du magasin) : les changements partent au retour du réseau.
@@ -140,7 +137,7 @@ pas à pas : [docs/installation-iphone.md](docs/installation-iphone.md).
 
 1. Ouvrir l'onglet [**Actions**](https://github.com/lascampia67/promos-courses/actions) du dépôt.
 2. Cliquer sur le dernier lancement de **Robot des promos**.
-3. En bas de la page, le tableau **Résultat du robot** indique, pour chaque magasin, le nombre de
+3. En bas de la page, le tableau **Résultat du robot** indique, pour le magasin, le nombre de
    promos et chaque catalogue lu.
 
 ### Lancer le robot à la main
@@ -162,21 +159,21 @@ Exemple d'une promo (extrait) :
 
 ```json
 {
-  "magasin": "lidl-lingolsheim",
-  "produit": "Cervelas",
-  "marque": "SAINT ALBY",
-  "prix": 2.65,
-  "prix_unitaire": 6.63,
+  "magasin": "leclerc-geispolsheim",
+  "produit": "BISCUITS HALLOWEEN",
+  "marque": "MINI BN",
+  "prix": 5.65,
+  "prix_unitaire": 16.14,
   "unite": "kg",
-  "reduction": "-40 % sur le 2e avec Lidl Plus",
-  "lot": { "quantite": 2, "prix": 4.24, "prix_unitaire": 5.3 },
-  "carte_fidelite": true,
-  "date_debut": "2026-10-22",
-  "date_fin": "2026-10-28"
+  "reduction": "-68 % sur le 2e",
+  "lot": { "quantite": 2, "prix": 7.46, "prix_unitaire": 10.66 },
+  "carte_fidelite": false,
+  "date_debut": "2026-10-20",
+  "date_fin": "2026-10-31"
 }
 ```
 
-Ici, un cervelas coûte 2,65 € (6,63 €/kg) ; en en prenant 2 avec Lidl Plus, on paie 4,24 € (5,30 €/kg).
+Ici, un paquet coûte 5,65 € (16,14 €/kg) ; en en prenant 2, on paie 7,46 € (10,66 €/kg).
 L'appli affiche ces deux prix au kilo côte à côte pour juger si le lot vaut vraiment le coup.
 
 Tous les champs sont expliqués dans [docs/format-promos.md](docs/format-promos.md). Le format exact
@@ -184,9 +181,9 @@ est décrit par un schéma JSON : [`promos.schema.json`](src/robot_promos/promos
 
 ## Fiabilité
 
-- **Une source en panne n'arrête pas les autres.** Elle est marquée `erreur` ou `partiel` et ses
-  promos de la veille encore valables sont conservées.
-- **Si toutes les sources sont en panne**, `promos.json` n'est pas modifié (on garde le précédent).
+- **Une source en panne** est marquée `erreur` ou `partiel` et ses promos de la veille encore
+  valables sont conservées.
+- **Si rien n'a pu être lu**, `promos.json` n'est pas modifié (on garde le précédent).
 - **Pannes passagères** : le robot réessaie automatiquement deux fois en attendant un peu.
 - **Lancement oublié par GitHub** : rattrapages à 8 h 17 et 12 h 37, sans jamais faire plus d'un
   passage par jour sur les sites.
@@ -278,10 +275,8 @@ promos-courses/
 │   ├── web.py                      ← téléchargement poli (robots.txt, pauses)
 │   ├── offres.py                   ← format d'une offre, doublons, vérification
 │   ├── promos.schema.json          ← schéma JSON de promos.json
-│   ├── config.py                   ← magasins et réglages
+│   ├── config.py                   ← magasin et réglages
 │   └── sources/
-│       ├── lidl.py                 ← Lidl : prospectus de la semaine
-│       ├── lidl_pdf.py             ← Lidl : lecture du PDF
 │       └── leclerc.py              ← Leclerc : catalogues du magasin
 ├── tests/                          ← tests automatiques du robot
 ├── app/
@@ -319,9 +314,6 @@ Détails dans [CONTRIBUTING.md](CONTRIBUTING.md#publier-une-nouvelle-version).
 
 ## Limites connues
 
-- **Lidl** : les promos sont lues dans le PDF du prospectus. La lecture est très fiable, mais une mise
-  en page inhabituelle peut faire manquer un produit ou associer un mauvais prix. Les produits
-  « Uniquement en ligne » sont volontairement ignorés.
 - **Leclerc** : certaines promos portent sur toute une marque (« sur les produits présents en magasin
   de… ») : elles n'ont pas de prix unique (`prix` vaut `null`).
 - Les prix sont ceux des catalogues : une promo peut être épuisée en magasin.

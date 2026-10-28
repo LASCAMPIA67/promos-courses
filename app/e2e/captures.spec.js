@@ -136,7 +136,7 @@ for (const theme of ["light", "dark"]) {
       await page.screenshot({ path: `${DOSSIER}ajout-ticket.png` });
       await nouveau.getByRole("button", { name: "Enregistrer" }).click();
       await choisirFichier(page, ajouterTicket, {
-        name: "ticket-lidl.pdf",
+        name: "e-ticket.pdf",
         mimeType: "application/pdf",
         buffer: pdfExemple(),
       });
@@ -147,7 +147,7 @@ for (const theme of ["light", "dark"]) {
       await page.locator("#liste-tickets").scrollIntoViewIfNeeded();
       await page.screenshot({ path: `${DOSSIER}tickets.png` });
 
-      await page.getByRole("button", { name: /^Ouvrir le ticket Leclerc · / }).click();
+      await page.getByRole("button", { name: /^Ouvrir le ticket Leclerc · .*23,45/ }).click();
       await expect(page.getByRole("img", { name: "Photo du ticket de caisse" })).toBeVisible();
       await page.screenshot({ path: `${DOSSIER}ticket.png` });
     }

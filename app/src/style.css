@@ -898,7 +898,7 @@ dialog h2 {
   padding: 0;
 }
 
-/* Une promo se lit de haut en bas : magasin et dates, produit, taille, prix, type de promo. */
+/* Une promo se lit de haut en bas : dates, produit, taille, prix, type de promo. */
 .promo {
   display: grid;
   gap: 3px;
@@ -913,36 +913,9 @@ dialog h2 {
   margin: 0;
 }
 
-.promo-haut {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 1px;
-}
-
-.enseigne {
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 750;
-}
-
-/* Couleurs des enseignes : jaune et bleu pour Lidl, bleu pour Leclerc. */
-.enseigne[data-source="lidl"] {
-  background: #ffe500;
-  color: #0050aa;
-}
-
-.enseigne[data-source="leclerc"] {
-  background: #0066b3;
-  color: #ffffff;
-}
-
 .periode {
   color: var(--discret);
   font-size: 0.82rem;
-  text-align: right;
 }
 
 .promo[data-a-venir] .periode {
@@ -1000,7 +973,7 @@ dialog h2 {
 }
 
 /* Le type de promo, d'une couleur selon l'endroit où va la réduction : en caisse (vert), sur la
-   carte E.Leclerc (bleu), avec l'appli Lidl Plus (jaune). */
+   carte E.Leclerc (bleu). */
 .promo-bas {
   display: flex;
   flex-wrap: wrap;
@@ -1023,11 +996,6 @@ dialog h2 {
 .type[data-genre="carte-caisse"] {
   background: var(--info-doux);
   color: var(--info);
-}
-
-.type[data-genre="lidl-plus"] {
-  background: var(--attention-doux);
-  color: var(--attention);
 }
 
 .detail {
@@ -1164,15 +1132,10 @@ dialog h2 {
   height: 19px;
 }
 
-/* Bleu pour Leclerc, jaune pour Lidl, comme les étiquettes des promos. */
+/* Bleu Leclerc. */
 .icone-ticket[data-magasin="leclerc"] {
   background: #0066b3;
   color: #ffffff;
-}
-
-.icone-ticket[data-magasin="lidl"] {
-  background: #ffe500;
-  color: #0050aa;
 }
 
 .texte-ticket {

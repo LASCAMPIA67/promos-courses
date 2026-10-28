@@ -66,8 +66,8 @@
       "additionalProperties": false,
       "properties": {
         "id": {"type": "string", "minLength": 1},
-        "source": {"enum": ["lidl", "leclerc"]},
-        "magasin": {"enum": ["lidl-lingolsheim", "leclerc-geispolsheim"]},
+        "source": {"enum": ["leclerc"]},
+        "magasin": {"enum": ["leclerc-geispolsheim"]},
         "catalogue": {"type": "string"},
         "produit": {"type": "string", "minLength": 1},
         "marque": {"type": ["string", "null"]},

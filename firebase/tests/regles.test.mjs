@@ -113,7 +113,7 @@ describe("ajouter un article", () => {
   });
 
   test("la promo d'où vient l'article (son identifiant) est facultative mais limitée", async () => {
-    const depuisUnePromo = nouvelArticle(COMPTE_1, { promo: "lidl-2026-10-22-80000" });
+    const depuisUnePromo = nouvelArticle(COMPTE_1, { promo: "leclerc-26g009p-6650c0333e63" });
     await assertSucceeds(setDoc(doc(base(COMPTE_1), "articles/a"), depuisUnePromo));
     await assertFails(setDoc(doc(base(COMPTE_1), "articles/b"), nouvelArticle(COMPTE_1, { promo: "x".repeat(101) })));
     await assertFails(setDoc(doc(base(COMPTE_1), "articles/c"), nouvelArticle(COMPTE_1, { promo: 42 })));
@@ -247,7 +247,8 @@ describe("tickets de caisse", () => {
   test("on corrige le magasin, la date, le montant ou la note, jamais le fichier", async () => {
     await assertSucceeds(ajouterTicket(base(COMPTE_1), nouveauTicket(COMPTE_1)));
     const ref = doc(base(COMPTE_2), "tickets/t1");
-    await assertSucceeds(updateDoc(ref, { magasin: "lidl", date_achat: "2026-10-26", montant: 12, note: "ok" }));
+    await assertSucceeds(updateDoc(ref, { magasin: "autre", date_achat: "2026-10-26", montant: 12, note: "ok" }));
+    await assertFails(updateDoc(ref, { magasin: "lidl" }));
     await assertFails(updateDoc(ref, { taille: 10 }));
     await assertFails(updateDoc(ref, { ajoute_par: COMPTE_2 }));
     await assertFails(setDoc(doc(base(COMPTE_2), "tickets/t1/morceaux/0"), { donnees: fichier(10) }));
@@ -267,7 +268,7 @@ describe("tickets de caisse", () => {
 
 describe("réglages", () => {
   test("le foyer peut lire et écrire ses réglages, pas les autres", async () => {
-    await assertSucceeds(setDoc(doc(base(COMPTE_1), "reglages/foyer"), { lidl_plus: true }));
+    await assertSucceeds(setDoc(doc(base(COMPTE_1), "reglages/foyer"), { carte_leclerc: true }));
     await assertSucceeds(getDoc(doc(base(COMPTE_2), "reglages/foyer")));
     await assertFails(getDoc(doc(base(INCONNU), "reglages/foyer")));
   });

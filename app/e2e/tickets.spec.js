@@ -28,7 +28,7 @@ test("un ticket en photo : vu en grand sur les deux téléphones, corrigé, puis
   const fenetre = telephone1.getByRole("dialog", { name: "Nouveau ticket" });
   await expect(fenetre.getByRole("img", { name: "Aperçu du ticket" })).toBeVisible();
   await expect(fenetre.getByRole("radio", { name: "Leclerc" })).toBeChecked();
-  await fenetre.getByRole("radio", { name: "Lidl" }).check();
+  await fenetre.getByRole("radio", { name: "Autre" }).check();
   await fenetre.getByLabel("Montant").fill("beaucoup");
   await fenetre.getByRole("button", { name: "Enregistrer" }).click();
   await expect(fenetre.getByRole("alert")).toHaveText("Montant incompréhensible (exemple : 54,30).");
@@ -39,13 +39,13 @@ test("un ticket en photo : vu en grand sur les deux téléphones, corrigé, puis
 
   // Sur l'autre téléphone, directement sous la liste.
   await expect(tickets(telephone2)).toHaveCount(1);
-  await expect(tickets(telephone2)).toContainText("Lidl");
+  await expect(tickets(telephone2)).toContainText("Autre magasin");
   await expect(tickets(telephone2)).toContainText("23,45 €");
   await expect(tickets(telephone2)).toContainText("garantie de la bouilloire");
 
   // En grand : la photo, allégée mais à sa taille (300 pixels de large : rien à réduire).
-  await telephone2.getByRole("button", { name: /^Ouvrir le ticket Lidl · / }).click();
-  const ticket = telephone2.getByRole("dialog", { name: /^Lidl, / });
+  await telephone2.getByRole("button", { name: /^Ouvrir le ticket Autre magasin · / }).click();
+  const ticket = telephone2.getByRole("dialog", { name: /^Autre magasin, / });
   const image = ticket.getByRole("img", { name: "Photo du ticket de caisse" });
   await expect(image).toBeVisible();
   await expect.poll(() => image.evaluate((img) => img.naturalWidth)).toBe(300);
@@ -81,20 +81,20 @@ test("un ticket en PDF (appli du magasin) : chaque page affichée, et partagé",
   await seConnecter(page, COMPTES.un);
   const pdf = pdfExemple();
   await choisirFichier(page, boutonAjouter(page), {
-    name: "ticket-lidl.pdf",
+    name: "e-ticket.pdf",
     mimeType: "application/pdf",
     buffer: pdf,
   });
   const fenetre = page.getByRole("dialog", { name: "Nouveau ticket" });
   await expect(fenetre.locator(".apercu-pdf")).toHaveText("PDF · 1 Ko");
-  await expect(fenetre.getByRole("radio", { name: "Lidl" })).toBeChecked(); // deviné d'après le nom
+  await expect(fenetre.getByRole("radio", { name: "Leclerc" })).toBeChecked();
   // Le total, lu dans le PDF.
   await expect(fenetre.getByRole("status")).toHaveText("Total lu sur le ticket : vérifiez.");
   await expect(fenetre.getByLabel("Montant")).toHaveValue("2,54");
   await fenetre.getByRole("button", { name: "Enregistrer" }).click();
 
-  await page.getByRole("button", { name: /^Ouvrir le ticket Lidl · / }).click();
-  const ticket = page.getByRole("dialog", { name: /^Lidl, / });
+  await page.getByRole("button", { name: /^Ouvrir le ticket Leclerc · / }).click();
+  const ticket = page.getByRole("dialog", { name: /^Leclerc, / });
   const pagePdf = ticket.getByRole("img", { name: "Page 1 du ticket" });
   await expect(pagePdf).toBeVisible({ timeout: 20_000 });
   // La page est vraiment dessinée : il y a du texte (des pixels foncés) sur le fond blanc.
@@ -114,7 +114,7 @@ test("un ticket en PDF (appli du magasin) : chaque page affichée, et partagé",
   const jour = await page.evaluate(() => new Date().toLocaleDateString("sv-SE"));
   await expect
     .poll(() => page.evaluate(() => window.partage))
-    .toEqual([`ticket-lidl-${jour}.pdf application/pdf ${pdf.length}`]);
+    .toEqual([`ticket-leclerc-${jour}.pdf application/pdf ${pdf.length}`]);
 });
 
 test("la photo du ticket est lue : date et total remplis, sans changer ce qu'on a choisi", async ({ page }) => {
@@ -122,7 +122,7 @@ test("la photo du ticket est lue : date et total remplis, sans changer ce qu'on 
   await seConnecter(page, COMPTES.un);
   // Un ticket d'il y a trois jours (la date du jour est déjà proposée d'office).
   const jour = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
-  const image = await page.evaluate(dessinerTicket, { enTete: "LIDL", date: jour.toLocaleDateString("fr-FR") });
+  const image = await page.evaluate(dessinerTicket, { enTete: "E.LECLERC", date: jour.toLocaleDateString("fr-FR") });
   await choisirFichier(page, boutonAjouter(page), {
     name: "IMG_0043.png",
     mimeType: "image/png",

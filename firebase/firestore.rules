@@ -65,7 +65,7 @@ service cloud.firestore {
     function ticketValide(t) {
       return t.keys().hasAll(['magasin', 'date_achat', 'type', 'taille', 'morceaux', 'ajoute_par', 'cree_le'])
         && t.keys().hasOnly(['magasin', 'date_achat', 'montant', 'note', 'type', 'taille', 'morceaux', 'ajoute_par', 'cree_le'])
-        && t.magasin in ['leclerc', 'lidl', 'autre']
+        && t.magasin in ['leclerc', 'autre']
         && t.date_achat is string && t.date_achat.matches('[0-9]{4}-[0-9]{2}-[0-9]{2}')
         && (!('montant' in t) || (t.montant is number && t.montant >= 0 && t.montant <= 10000))
         && texteOuAbsent(t, 'note', 200)

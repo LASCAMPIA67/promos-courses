@@ -6,7 +6,6 @@
 
 export const MAGASINS_TICKET = {
   leclerc: "Leclerc",
-  lidl: "Lidl",
   autre: "Autre magasin",
 };
 
@@ -48,15 +47,6 @@ export function lireMontant(texte) {
   if (!propre) return null;
   if (!/^\d+(\.\d{1,2})?$/.test(propre)) return Number.NaN;
   return Number(propre);
-}
-
-/** Le magasin le plus probable d'après le nom du fichier (« ticket-lidl.pdf »…), sinon Leclerc, notre magasin principal. */
-export function devinerMagasin(nomFichier) {
-  return String(nomFichier ?? "")
-    .toLowerCase()
-    .includes("lidl")
-    ? "lidl"
-    : "leclerc";
 }
 
 /** Vérifie ce qui a été saisi : { fiche } (prête pour Firestore, sans le fichier) ou { erreur }. */
@@ -167,7 +157,7 @@ export function lireTicket(texte, aujourdhui) {
     .filter(Boolean);
   const tout = lignes.join("\n");
 
-  const magasin = /lidl/i.test(tout) ? "lidl" : /leclerc/i.test(tout) ? "leclerc" : null;
+  const magasin = /leclerc/i.test(tout) ? "leclerc" : null;
 
   let montant = null;
   for (const motif of LIGNES_TOTAL) {

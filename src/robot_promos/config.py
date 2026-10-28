@@ -10,9 +10,8 @@ USER_AGENT = "Mozilla/5.0 (compatible; promos-courses/1.0; +https://github.com/l
 # Pause minimale entre deux requêtes, en secondes (plus si le site le demande dans robots.txt).
 PAUSE = 3
 
-# Nos magasins. On ne garde que l'enseigne et la ville : pas besoin de plus.
+# Notre magasin. On ne garde que l'enseigne et la ville : pas besoin de plus.
 MAGASINS = {
-    "lidl-lingolsheim": {"nom": "Lidl Lingolsheim", "enseigne": "Lidl", "ville": "Lingolsheim"},
     "leclerc-geispolsheim": {"nom": "E.Leclerc Geispolsheim", "enseigne": "E.Leclerc", "ville": "Geispolsheim"},
 }
 

@@ -2,11 +2,9 @@
 
 import html
 import re
-from datetime import date, datetime, timedelta
+from datetime import datetime
 
 from robot_promos.config import FUSEAU
-
-JOURS = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"]
 
 
 def maintenant():
@@ -39,35 +37,3 @@ def nombre(texte):
     except ValueError:
         return None
     return round(valeur, 2) if valeur > 0 else None
-
-
-def date_iso(annee, jour, mois):
-    try:
-        return date(annee, int(mois), int(jour)).isoformat()
-    except ValueError:
-        return None
-
-
-def date_jj_mm(texte, reference):
-    """« 22/10 » -> « 2026-10-22 », en choisissant l'année la plus proche de la date de référence."""
-    m = re.search(r"(\d{1,2})/(\d{1,2})", texte or "")
-    if not m:
-        return None
-    ref = date.fromisoformat(reference)
-    candidates = [date_iso(ref.year + d, m.group(1), m.group(2)) for d in (-1, 0, 1)]
-    candidates = [c for c in candidates if c]
-    return min(candidates, key=lambda c: abs((date.fromisoformat(c) - ref).days)) if candidates else None
-
-
-def prochain_jour(depuis, nom_du_jour):
-    """Date du prochain « dimanche » (par exemple) à partir de « depuis » (inclus)."""
-    d = date.fromisoformat(depuis)
-    ecart = (JOURS.index(nom_du_jour.lower()) - d.weekday()) % 7
-    return (d + timedelta(days=ecart)).isoformat()
-
-
-def identifiant(*morceaux):
-    """Fabrique un identifiant lisible et stable : « Pain de mie » -> « pain-de-mie »."""
-    texte = "-".join(str(m) for m in morceaux if m not in (None, ""))
-    texte = re.sub(r"[^a-z0-9]+", "-", texte.lower().translate(str.maketrans("àâäéèêëîïôöùûüç", "aaaeeeeiioouuuc")))
-    return texte.strip("-")[:80]

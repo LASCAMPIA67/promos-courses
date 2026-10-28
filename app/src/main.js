@@ -1,5 +1,5 @@
 // L'appli : connexion, puis liste de courses commune synchronisée entre nos deux iPhones,
-// comparée aux promos de nos magasins.
+// comparée aux promos de notre magasin.
 
 import { onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { registerSW } from "virtual:pwa-register";
@@ -31,7 +31,6 @@ import {
   alerteFraicheur,
   articleDepuisPromo,
   dateDuJour,
-  enseigne,
   explicationPrix,
   indexerPromos,
   joliNom,
@@ -49,7 +48,6 @@ import { AUTRES, RAYONS, cleRayon, rangerParRayon, rayonDe } from "./rayons.js";
 import {
   MAGASINS_TICKET,
   TICKETS_SOUS_LA_LISTE,
-  devinerMagasin,
   formaterMontant,
   formaterTaille,
   jourEnLettres,
@@ -439,17 +437,14 @@ function element(balise, classe, texte) {
 }
 
 /**
- * Une promo, rangée pour se lire d'un coup d'œil : le magasin et jusqu'à quand ; le produit ; sa
- * taille ; le prix ; le type de promo (couleur selon l'endroit où va la réduction) et le détail utile.
+ * Une promo, rangée pour se lire d'un coup d'œil : jusqu'à quand ; le produit ; sa taille ; le prix ;
+ * le type de promo (couleur selon l'endroit où va la réduction) et le détail utile.
  */
 function cartePromo(offre, aVenir, aujourdhui, { avecAjout = false } = {}) {
   const carte = element("li", "promo");
   carte.toggleAttribute("data-a-venir", aVenir);
 
-  const haut = element("div", "promo-haut");
-  const magasin = element("span", "enseigne", enseigne(offre));
-  magasin.dataset.source = offre.source;
-  haut.append(magasin, element("span", "periode", periode(offre, aujourdhui)));
+  const haut = element("p", "periode", periode(offre, aujourdhui));
 
   // Le nom, avec la marque si elle n'y est pas déjà.
   const nom = element("p", "promo-nom", joliNom(offre.produit));
@@ -961,7 +956,7 @@ $("voir-tickets").addEventListener("click", () => {
 });
 
 // Ajouter un ticket : l'iPhone propose de prendre une photo, la photothèque (captures d'écran) ou
-// Fichiers (le PDF de l'appli E.Leclerc ou Lidl Plus).
+// Fichiers (le PDF de l'appli E.Leclerc).
 function choisirFichierTicket() {
   $("fichier-ticket").click();
 }
@@ -988,7 +983,7 @@ async function ouvrirFormulaireTicket({ fichier = null, ticket = null }) {
   };
   etat.ticketEnCours = enCours;
   $("titre-ajout-ticket").textContent = ticket ? "Modifier le ticket" : "Nouveau ticket";
-  const magasin = ticket?.magasin ?? devinerMagasin(fichier?.name);
+  const magasin = ticket?.magasin ?? "leclerc";
   for (const choix of document.querySelectorAll('input[name="magasin"]')) choix.checked = choix.value === magasin;
   $("date-ticket").value = ticket?.date_achat ?? dateDuJour();
   $("date-ticket").max = dateDuJour();
@@ -1147,7 +1142,7 @@ async function ouvrirTicket(ticket) {
 }
 
 function dessinerEnteteTicket(ticket) {
-  $("titre-ticket").textContent = `${MAGASINS_TICKET[ticket.magasin]}, ${jourEnLettres(ticket.date_achat)}`;
+  $("titre-ticket").textContent = `${MAGASINS_TICKET[ticket.magasin] ?? "Ticket"}, ${jourEnLettres(ticket.date_achat)}`;
   $("infos-ticket").textContent = [
     ticket.montant != null ? formaterMontant(ticket.montant) : null,
     ticket.note,

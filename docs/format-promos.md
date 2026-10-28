@@ -18,9 +18,9 @@ Son format est décrit précisément (et vérifié à chaque passage) par le sch
   "format": 2,
   "mise_a_jour": "2026-10-27T05:48:12+01:00",
   "version_robot": "0.2.0",
-  "magasins": { "lidl-lingolsheim": { "nom": "Lidl Lingolsheim", "enseigne": "Lidl", "ville": "Lingolsheim" } },
-  "sources": [ { "id": "lidl", "etat": "ok", "nb_offres": 499, "catalogues": [ … ] } ],
-  "offres": [ { "produit": "Banane", "prix": 0.95, … } ]
+  "magasins": { "leclerc-geispolsheim": { "nom": "E.Leclerc Geispolsheim", "enseigne": "E.Leclerc", "ville": "Geispolsheim" } },
+  "sources": [ { "id": "leclerc", "etat": "ok", "nb_offres": 1394, "catalogues": [ … ] } ],
+  "offres": [ { "produit": "MOZZARELLA RÂPÉE", "prix": 1.11, … } ]
 }
 ```
 
@@ -29,7 +29,7 @@ Son format est décrit précisément (et vérifié à chaque passage) par le sch
 | `format` | Version du format du fichier (actuellement `2`). |
 | `mise_a_jour` | Date et heure du passage du robot, heure de Paris. |
 | `version_robot` | Version du robot qui a écrit le fichier. |
-| `magasins` | Nos magasins, rangés par identifiant (`lidl-lingolsheim`, `leclerc-geispolsheim`). |
+| `magasins` | Notre magasin, rangé par identifiant (`leclerc-geispolsheim`). |
 | `sources` | L'état de chaque source (voir ci-dessous). |
 | `offres` | La liste des promos (voir ci-dessous). Les promos terminées sont retirées. |
 
@@ -61,25 +61,25 @@ Son format est décrit précisément (et vérifié à chaque passage) par le sch
 
 | Champ | Exemple | Signification |
 |---|---|---|
-| `id` | `lidl-2026-10-22-80000` | Identifiant unique de l'offre. |
-| `source` | `lidl` | Source de l'offre (`lidl` ou `leclerc`). |
-| `magasin` | `lidl-lingolsheim` | Magasin. |
-| `catalogue` | `du-22-10-au-28-10-les-promos-de-la-semaine` | Catalogue d'où vient l'offre. |
-| `produit` | `Banane` | Nom du produit. |
-| `marque` | `MILBONA` | Marque, si connue. |
-| `description` | `Le kilo Catégorie 1` | Quantité, variétés, conditions… |
-| `categorie` | `L'ÉPICERIE À PRIX E.LECLERC` | Rayon ou thème, si connu (Leclerc). |
-| `ean` | `8000500242612` | Code-barres, si connu (Leclerc). |
-| `prix` | `0.95` | **Prix d'UN article**, en euros. Si `carte_fidelite` vaut `true`, c'est le prix avec la carte. `null` pour une offre valable sur toute une marque. |
-| `ancien_prix` | `1.45` | Prix habituel, quand le catalogue l'indique. |
-| `prix_unitaire`, `unite` | `0.95`, `kg` | Prix au `kg`, au `l` ou à la `pièce` pour UN article. |
-| `reduction` | `-34 % avec Lidl Plus` | La réduction, écrite en clair. |
-| `lot` | `{"quantite": 2, "prix": 4.24, "prix_unitaire": 5.3}` | Quand l'avantage demande d'en acheter plusieurs (« 2e à -40 % », « 2 + 1 offert ») : quantité à acheter, prix total et prix au kilo du lot. |
-| `carte_fidelite` | `true` | Il faut la carte (Lidl Plus, carte E.Leclerc / Ticket E.Leclerc). |
-| `date_debut`, `date_fin` | `2026-10-22`, `2026-10-25` | Validité, dates incluses. Une promo dont `date_debut` est dans le futur est « à venir ». |
+| `id` | `leclerc-26g124e-33f09dcc3d51` | Identifiant unique de l'offre. |
+| `source` | `leclerc` | Source de l'offre (`leclerc`). |
+| `magasin` | `leclerc-geispolsheim` | Magasin. |
+| `catalogue` | `26G124E` | Catalogue d'où vient l'offre. |
+| `produit` | `MOZZARELLA RÂPÉE 22% MAT. GR` | Nom du produit. |
+| `marque` | `LES CROISÉS` | Marque, si connue. |
+| `description` | `Au lait de vache pasteurisé. 150 g.Le kg : 9,27 €` | Quantité, variétés, conditions… |
+| `categorie` | `LE FRAIS À PRIX E.LECLERC` | Rayon ou thème, si connu. |
+| `ean` | `3564706590298` | Code-barres, si connu. |
+| `prix` | `1.11` | **Prix d'UN article**, en euros. Si `carte_fidelite` vaut `true`, c'est le prix avec la carte (une fois le Ticket E.Leclerc déduit). `null` pour une offre valable sur toute une marque. |
+| `ancien_prix` | `1.39` | Prix habituel, quand le catalogue l'indique (pour un Ticket E.Leclerc : le prix payé en caisse). |
+| `prix_unitaire`, `unite` | `7.4`, `kg` | Prix au `kg`, au `l` ou à la `pièce` pour UN article. |
+| `reduction` | `20 % en Ticket E.Leclerc` | La réduction, écrite en clair. |
+| `lot` | `{"quantite": 2, "prix": 7.46, "prix_unitaire": 10.66}` | Quand l'avantage demande d'en acheter plusieurs (« 2e à -68 % », « 2 + 1 offert ») : quantité à acheter, prix total et prix au kilo du lot. |
+| `carte_fidelite` | `true` | Il faut la carte E.Leclerc (réduction en caisse ou Ticket E.Leclerc). |
+| `date_debut`, `date_fin` | `2026-10-20`, `2026-10-31` | Validité, dates incluses. Une promo dont `date_debut` est dans le futur est « à venir ». |
 | `lien` | | Page du catalogue sur le site de l'enseigne. |
-| `image` | | Photo du produit (Leclerc) ou de la page du prospectus (Lidl). |
-| `page` | `3` | Numéro de page dans le prospectus (Lidl). |
+| `image` | | Photo du produit. |
+| `page` | `null` | Numéro de page dans le catalogue, si connu. |
 
 ## Comment l'appli s'en sert
 
@@ -96,5 +96,5 @@ Le code est dans [`app/src/promos.js`](../app/src/promos.js) ; le détail côté
 - **Fraîcheur des données** : si `mise_a_jour` date de plus de 36 heures (le robot a manqué au moins un
   passage), un bandeau jaune prévient que les promos ont pu changer (voir le README, section
   « Dépannage »).
-- **Sources en difficulté** : pour chaque source dont l'`etat` n'est pas `ok`, l'appli signale que les
-  promos de ce magasin sont incomplètes (`partiel`) ou indisponibles (`erreur`).
+- **Source en difficulté** : si l'`etat` n'est pas `ok`, l'appli signale que les promos du magasin
+  sont incomplètes (`partiel`) ou pas à jour (`erreur`).

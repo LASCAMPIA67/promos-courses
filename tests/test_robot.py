@@ -8,8 +8,8 @@ from robot_promos.sources import Catalogue, Source
 
 
 class FausseSource(Source):
-    id = "lidl"
-    magasin = "lidl-lingolsheim"
+    id = "leclerc"
+    magasin = "leclerc-geispolsheim"
     nom = "Fausse source"
 
     def __init__(self, version="v1", panne_catalogues=False, panne_offres=False):
@@ -29,9 +29,9 @@ class FausseSource(Source):
             raise ValueError("PDF illisible")
         return [
             creer_offre(
-                id="lidl-1",
-                source="lidl",
-                magasin="lidl-lingolsheim",
+                id="leclerc-1",
+                source="leclerc",
+                magasin="leclerc-geispolsheim",
                 catalogue="semaine",
                 produit=f"Banane {self.version}",
                 prix=0.95,

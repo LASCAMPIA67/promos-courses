@@ -46,7 +46,6 @@ test("un article ajouté depuis une promo l'affiche à droite ; écrit à la mai
   const fenetre = page.getByRole("dialog", { name: "Promo pour « Lait demi-écrémé UHT »" });
   const promo = fenetre.locator(".promo");
   await expect(promo).toHaveCount(1);
-  await expect(promo.locator(".enseigne")).toHaveText("Leclerc");
   await expect(promo.locator(".periode")).toContainText("Dès");
   await expect(promo.locator(".promo-nom")).toHaveText("Lait demi-écrémé UHT LACTEL");
   await expect(promo.locator(".promo-description")).toHaveText("6 x 1 L");
@@ -59,18 +58,17 @@ test("un article ajouté depuis une promo l'affiche à droite ; écrit à la mai
   await fenetre.getByRole("button", { name: "Fermer" }).click();
   await expect(fenetre).toBeHidden();
 
-  // Lidl, réduction immédiate : ancien prix barré.
+  // Réduction immédiate : ancien prix barré.
   await ajouterDepuisPromo(page, "lait", "Lait demi-écrémé");
   await expect(ligne(page, "Lait demi-écrémé").locator(".type-promo")).toHaveText("-15 % en caisse");
   await ligne(page, "Lait demi-écrémé")
     .getByRole("button", { name: /^Voir la promo/i })
     .click();
-  const lidl = page.getByRole("dialog", { name: "Promo pour « Lait demi-écrémé »" }).locator(".promo");
-  await expect(lidl.locator(".enseigne")).toHaveText("Lidl");
-  await expect(lidl.locator(".prix")).toHaveText("0,89 €");
-  await expect(lidl.locator(".ancien-prix")).toHaveText("1,05 €");
-  await expect(lidl.locator(".type")).toHaveText("-15 % en caisse");
-  await expect(lidl.locator(".periode")).toContainText("Jusqu'au");
+  const lait = page.getByRole("dialog", { name: "Promo pour « Lait demi-écrémé »" }).locator(".promo");
+  await expect(lait.locator(".prix")).toHaveText("0,89 €");
+  await expect(lait.locator(".ancien-prix")).toHaveText("1,05 €");
+  await expect(lait.locator(".type")).toHaveText("-15 % en caisse");
+  await expect(lait.locator(".periode")).toContainText("Jusqu'au");
   await page.getByRole("button", { name: "Fermer" }).click();
 
   // Dans le caddie, plus besoin de l'étiquette.
@@ -79,13 +77,16 @@ test("un article ajouté depuis une promo l'affiche à droite ; écrit à la mai
   await expect(caddie(page).locator(".bouton-promos")).toHaveCount(0);
 });
 
-test("le prix dit clairement où va la réduction : carte E.Leclerc ou Lidl Plus", async ({ page, context }) => {
+test("le prix dit clairement où va la réduction : sur la carte E.Leclerc, ou en caisse avec la carte", async ({
+  page,
+  context,
+}) => {
   await servirPromos(context);
   await seConnecter(page, COMPTES.un);
   await ajouterDepuisPromo(page, "pain", "Pain de mie complet");
   await ajouterDepuisPromo(page, "bananes", "Bananes");
   await expect(ligne(page, "Pain de mie complet").locator(".type-promo")).toHaveText("30 % sur la carte");
-  await expect(ligne(page, "Bananes").locator(".type-promo")).toHaveText("-23 % Lidl Plus");
+  await expect(ligne(page, "Bananes").locator(".type-promo")).toHaveText("-23 % avec la carte");
 
   await ligne(page, "Pain de mie complet")
     .getByRole("button", { name: /^Voir la promo/i })
@@ -100,9 +101,9 @@ test("le prix dit clairement où va la réduction : carte E.Leclerc ou Lidl Plus
     .getByRole("button", { name: /^Voir la promo/i })
     .click();
   const bananes = page.getByRole("dialog", { name: "Promo pour « Bananes »" }).locator(".promo");
-  await expect(bananes.locator(".promo-prix")).toHaveText("1,29 €");
-  await expect(bananes.locator(".type")).toHaveText("-23 % Lidl Plus");
-  await expect(bananes.locator(".detail")).toHaveText("sans l'appli : 1,69 €");
+  await expect(bananes.locator(".prix")).toHaveText("1,29 €");
+  await expect(bananes.locator(".ancien-prix")).toHaveText("1,69 €");
+  await expect(bananes.locator(".type")).toHaveText("-23 % avec la carte");
 });
 
 test("une même promo « au choix » (plusieurs parfums) n'est montrée qu'une fois", async ({ page, context }) => {
@@ -133,16 +134,16 @@ test("articles des versions précédentes : promo retrouvée d'après la note, o
   request,
 }) => {
   await servirPromos(context);
-  // Ajoutés depuis une promo par une ancienne version : pas d'identifiant, une note « Promo Lidl : … ».
+  // Ajoutés depuis une promo par une ancienne version : pas d'identifiant, une note « Promo Leclerc : … ».
   await ecrireArticle(request, "ancien-lait", {
     nom: "Lait demi-écrémé",
-    note: "Promo Lidl : 0,89 € · Jusqu'au samedi 31 octobre",
+    note: "Promo Leclerc : 0,89 € · Jusqu'au samedi 31 octobre",
   });
   // Une promo choisie qui n'est plus dans les catalogues.
-  await ecrireArticle(request, "ancien-beurre", { nom: "Beurre doux", note: "Lidl · 1,99 €", promo: "beurre" });
+  await ecrireArticle(request, "ancien-beurre", { nom: "Beurre doux", note: "Leclerc · 1,99 €", promo: "beurre" });
   await seConnecter(page, COMPTES.un);
   await expect(ligne(page, "Lait demi-écrémé").locator(".type-promo")).toHaveText("-15 % en caisse");
-  await expect(ligne(page, "Lait demi-écrémé").locator(".details")).toHaveText(/ · Lidl · 0,89 €$/);
+  await expect(ligne(page, "Lait demi-écrémé").locator(".details")).toHaveText(/ · Leclerc · 0,89 €$/);
   await expect(ligne(page, "Beurre doux").locator(".promo-terminee")).toHaveText("Promo terminée");
   await expect(ligne(page, "Beurre doux").locator(".bouton-promos")).toHaveCount(0);
 });
