@@ -4,6 +4,7 @@
 import { expect, test } from "@playwright/test";
 
 import { choisirFichier, dessinerTicket, pdfExemple } from "./fichiers-exemple.js";
+import { CLE, simulerGitHub } from "./github-exemple.js";
 import { COMPTES, creerComptes, seConnecter, viderLaBase } from "./outils.js";
 import { servirPromos } from "./promos-exemple.js";
 
@@ -151,6 +152,22 @@ for (const theme of ["light", "dark"]) {
       await page.getByRole("button", { name: /^Ouvrir le ticket Leclerc · .*23,45/ }).click();
       await expect(page.getByRole("img", { name: "Photo du ticket de caisse" })).toBeVisible();
       await page.screenshot({ path: `${DOSSIER}ticket.png` });
+      await page.getByRole("button", { name: "Fermer" }).click();
+
+      // « Mettre à jour les promos » : la fenêtre d'avancée, pendant les photos (GitHub simulé).
+      const github = await simulerGitHub(context);
+      await page.getByRole("button", { name: "Mon compte" }).click();
+      await page.getByRole("button", { name: "Mettre à jour les promos" }).click();
+      await page.getByLabel("Clé GitHub").fill(CLE);
+      await page.getByRole("button", { name: "Enregistrer et lancer" }).click();
+      const avancee = page.getByRole("dialog", { name: "Mise à jour des promos" });
+      await expect(avancee.locator(".detail-etape")).toHaveText("En attente d'une machine GitHub…");
+      github.avancer();
+      github.avancer();
+      await expect(avancee.locator(".detail-etape")).toHaveText("Photos : 312 sur 1 450 (12 nouvelles)");
+      await page.screenshot({ path: `${DOSSIER}robot.png` });
+      github.avancer();
+      await expect(avancee.getByRole("status")).toHaveText(/^Terminé/);
     }
   });
 }

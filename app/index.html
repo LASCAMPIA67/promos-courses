@@ -314,6 +314,24 @@
       <ul id="liste-promos" class="promos"></ul>
     </dialog>
 
+    <!-- Où en est le robot lancé avec « Mettre à jour les promos » -->
+    <dialog id="fenetre-robot" class="fenetre-robot" aria-labelledby="titre-fenetre-robot">
+      <div class="entete-fenetre">
+        <div>
+          <h2 id="titre-fenetre-robot">Mise à jour des promos</h2>
+          <p id="resume-robot" class="discret" role="status"></p>
+        </div>
+        <button type="button" class="bouton-icone" data-fermer aria-label="Fermer">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+        </button>
+      </div>
+      <ol id="etapes-robot" class="etapes-robot"></ol>
+      <p class="discret note-robot">
+        Vous pouvez fermer cette fenêtre : les promos se mettront à jour toutes seules.
+        <a id="lien-passage" class="lien" target="_blank" rel="noopener noreferrer" hidden>Détail sur GitHub</a>
+      </p>
+    </dialog>
+
     <!-- Mon compte -->
     <dialog id="fenetre-compte" aria-labelledby="titre-fenetre-compte">
       <form id="form-compte" method="dialog" novalidate>

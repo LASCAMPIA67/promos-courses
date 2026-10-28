@@ -53,9 +53,11 @@ import {
   ErreurRobot,
   adressePromosFraiches,
   cleValide,
+  avanceeDuPassage,
   dernierPassage,
+  detailsDuPassage,
+  formaterDuree,
   lancerRobot,
-  phrasePassage,
 } from "./robot.js";
 import {
   MAGASINS_TICKET,
@@ -77,7 +79,7 @@ const ADRESSE_PROMOS = import.meta.env.MODE === "emulateurs" ? "promos-test.json
 const RELIRE_LES_PROMOS_APRES = 60 * 60 * 1000; // 1 heure
 const PROMOS_PAR_PAGE = 30;
 /** Entre deux nouvelles du robot lancé depuis l'appli : il met de 2 minutes à une heure (photos). */
-const ATTENTE_ROBOT = import.meta.env.MODE === "emulateurs" ? 300 : 20_000;
+const ATTENTE_ROBOT = import.meta.env.MODE === "emulateurs" ? 300 : 10_000;
 
 const etat = {
   utilisateur: null,
@@ -100,7 +102,7 @@ const etat = {
 };
 
 // Le robot lancé depuis l'appli : sa clé GitHub (lue dans Firebase), son suivi, ce qu'il fait.
-const robot = { cle: undefined, suivi: null, message: "", genre: "info" };
+const robot = { cle: undefined, suivi: null, horloge: null, message: "", genre: "info", passage: null };
 
 auth.languageCode = "fr";
 $("version").textContent = __VERSION__;
@@ -438,6 +440,10 @@ function dessinerEtatPromos() {
   // Pendant que le robot travaille (« Mettre à jour les promos »), on suit son avancée ici.
   if (robot.message) {
     afficherMessage($("etat-promos"), robot.message, robot.genre);
+    const voir = element("button", "lien lien-avancee", "Voir l'avancée");
+    voir.type = "button";
+    voir.addEventListener("click", ouvrirAvancee);
+    $("etat-promos").append(" ", voir);
     return;
   }
   const alertes = [];
@@ -1293,25 +1299,28 @@ async function cleDuRobot() {
   return robot.cle;
 }
 
-/** Ce que fait le robot : dans « Mon compte » et, en haut de la liste, à la place de l'état des promos. */
-function nouvelleDuRobot(message, genre = "info") {
-  robot.message = message;
-  robot.genre = genre;
-  $("etat-robot").textContent = message || dateDesPromos();
-  dessinerEtatPromos();
-}
-
 const dateDesPromos = () =>
   etat.promos ? `Promos mises à jour ${formaterMoment(new Date(etat.promos.donnees.mise_a_jour))}.` : "";
 
 $("lancer-robot").addEventListener("click", async () => {
   afficherMessage($("message-robot"), "");
+  if (robot.suivi) {
+    // Il travaille déjà : on montre où il en est.
+    $("fenetre-compte").close();
+    ouvrirAvancee();
+    return;
+  }
   const cle = await cleDuRobot();
-  if (cle) demarrerRobot(cle);
-  else demanderCle();
+  if (!cle) {
+    demanderCle();
+    return;
+  }
+  $("fenetre-compte").close();
+  demarrerRobot(cle);
 });
 
 function demanderCle(message) {
+  if (!$("fenetre-compte").open) $("bouton-compte").click();
   $("creer-cle").href = ADRESSE_NOUVELLE_CLE;
   $("cle-robot").hidden = false;
   if (message) afficherMessage($("message-robot"), message, "erreur");
@@ -1329,6 +1338,7 @@ async function enregistrerCle() {
   $("cle-robot").hidden = true;
   afficherMessage($("message-robot"), "");
   enregistrerCleRobot(db, cle).catch(signalerErreur); // gardée pour les deux téléphones
+  $("fenetre-compte").close();
   demarrerRobot(cle);
 }
 
@@ -1340,9 +1350,10 @@ $("champ-cle").addEventListener("keydown", (evenement) => {
   enregistrerCle();
 });
 
-/** Lance le robot (sauf s'il travaille déjà), puis suit son passage jusqu'au bout. */
+/** Lance le robot (sauf s'il travaille déjà), puis suit son passage jusqu'au bout, étape par étape. */
 async function demarrerRobot(cle) {
-  $("lancer-robot").disabled = true;
+  Object.assign(robot, { passage: null, details: null, chargement: "a_venir", lance: new Date() });
+  ouvrirAvancee();
   try {
     const avant = await dernierPassage(cle);
     if (avant?.etat === "en_cours") {
@@ -1352,52 +1363,136 @@ async function demarrerRobot(cle) {
       suivreRobot(cle, null, avant?.id);
     }
   } catch (erreur) {
-    $("lancer-robot").disabled = false;
+    $("fenetre-robot").close();
+    nouvelleDuRobot("");
     if (erreur instanceof ErreurRobot && erreur.raison === "cle") demanderCle(erreur.message);
-    else afficherMessage($("message-robot"), erreur.message || "Le robot n'a pas pu être lancé.", "erreur");
+    else afficherMessage($("bandeau"), erreur.message || "Le robot n'a pas pu être lancé.", "erreur");
   }
 }
 
 /**
  * Suit le passage `id` (déjà en cours), ou celui qui vient d'être demandé : le premier qui n'est pas
- * `precedent`. GitHub met quelques secondes à le créer.
+ * `precedent` (GitHub met quelques secondes à le créer). Toutes les 10 secondes : ses étapes, et la
+ * dernière nouvelle du robot (« Photos : 312 sur 1 450 »).
  */
 function suivreRobot(cle, id, precedent) {
   clearTimeout(robot.suivi);
   const etape = async () => {
     try {
       const passage = await dernierPassage(cle);
-      const leBon = passage && (id ? passage.id === id : passage.id !== precedent);
-      if (leBon && passage.etat !== "en_cours") {
-        await finDuRobot(cle, passage);
-        return;
+      if (passage && (id ? passage.id === id : passage.id !== precedent)) {
+        robot.passage = passage;
+        robot.details = await detailsDuPassage(cle, passage).catch(() => robot.details);
+        if (passage.etat !== "en_cours") {
+          await finDuRobot(cle, passage);
+          return;
+        }
       }
-      nouvelleDuRobot(leBon ? phrasePassage(passage) : "Le robot démarre…");
     } catch (erreur) {
       console.warn("Robot : pas de nouvelles pour l'instant.", erreur); // on réessaie
     }
+    dessinerAvancee();
     robot.suivi = setTimeout(etape, ATTENTE_ROBOT);
   };
-  nouvelleDuRobot("Le robot démarre…");
-  etape();
+  robot.suivi = setTimeout(etape, 0);
+  dessinerAvancee();
 }
 
 async function finDuRobot(cle, passage) {
   robot.suivi = null;
-  $("lancer-robot").disabled = false;
-  if (passage.etat !== "reussi") {
-    nouvelleDuRobot(phrasePassage(passage), "erreur");
-    return;
+  if (passage.etat === "reussi") {
+    // Les promos que le robot vient d'écrire, sans attendre la copie de GitHub (5 minutes).
+    robot.chargement = "en_cours";
+    dessinerAvancee();
+    const adresse =
+      import.meta.env.MODE === "emulateurs" ? ADRESSE_PROMOS : await adressePromosFraiches(cle).catch(() => undefined);
+    await chargerPromos(adresse);
+    robot.chargement = "fait";
   }
-  // Les promos que le robot vient d'écrire, sans attendre la copie de GitHub (5 minutes).
-  const adresse =
-    import.meta.env.MODE === "emulateurs" ? ADRESSE_PROMOS : await adressePromosFraiches(cle).catch(() => undefined);
-  await chargerPromos(adresse);
-  nouvelleDuRobot("Promos mises à jour.", "succes");
+  dessinerAvancee();
+  const message = robot.message;
   setTimeout(() => {
-    if (robot.message === "Promos mises à jour.") nouvelleDuRobot("");
-  }, 8_000);
+    if (!robot.suivi && robot.message === message) nouvelleDuRobot("");
+  }, 10_000);
 }
+
+/** Les étapes à montrer : celles du robot sur GitHub, puis l'arrivée des promos dans l'appli. */
+function etapesDuRobot() {
+  const passage = robot.passage ?? { etat: "en_cours", debut: robot.lance };
+  const phases = avanceeDuPassage(passage, robot.details ?? {});
+  if (!robot.passage) phases[0].detail = "Demande envoyée à GitHub…";
+  phases.push({
+    titre: "Nouvelles promos dans l'appli",
+    etat: passage.etat === "echoue" ? "a_venir" : robot.chargement,
+    duree: null,
+    detail: null,
+  });
+  return { passage, phases };
+}
+
+const ETATS_ETAPE = { fait: "terminé", en_cours: "en cours", a_venir: "à venir", echoue: "en panne" };
+const ICONES_ETAPE = {
+  fait: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12.5l4 4L18 8" /></svg>',
+  echoue: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17" /></svg>',
+  en_cours: "",
+  a_venir: "",
+};
+
+/** La fenêtre « Mise à jour des promos », le bandeau en haut de la liste et la ligne de « Mon compte ». */
+function dessinerAvancee() {
+  const { passage, phases } = etapesDuRobot();
+  const maintenant = new Date();
+  const enCours = phases.find((phase) => phase.etat === "en_cours");
+  const enPanne = phases.some((phase) => phase.etat === "echoue") || passage.etat === "echoue";
+  const fini = robot.chargement === "fait";
+
+  $("etapes-robot").replaceChildren(
+    ...phases.map(({ titre, etat, duree, detail }) => {
+      const ligne = element("li", "etape-robot");
+      ligne.dataset.etat = etat;
+      const icone = element("span", "icone-etape");
+      icone.innerHTML = ICONES_ETAPE[etat];
+      const textes = element("div", "textes-etape");
+      textes.append(element("span", "titre-etape", titre), element("span", "cache", ` : ${ETATS_ETAPE[etat]}`));
+      if (detail) textes.append(element("span", "detail-etape", detail));
+      ligne.append(icone, textes);
+      if (duree != null && etat !== "a_venir") ligne.append(element("span", "duree-etape", formaterDuree(duree)));
+      return ligne;
+    }),
+  );
+  const depuis = passage.debut ?? robot.lance;
+  $("resume-robot").textContent = enPanne
+    ? "Le robot s'est arrêté : les promos d'avant restent affichées."
+    : fini
+      ? `Terminé en ${formaterDuree(Math.max(0, passage.fin - passage.debut))} : les promos sont à jour.`
+      : `Commencé il y a ${formaterDuree(Math.max(0, maintenant - depuis))}.`;
+  $("lien-passage").hidden = !passage.adresse;
+  if (passage.adresse) $("lien-passage").href = passage.adresse;
+
+  if (enPanne) nouvelleDuRobot("Le robot n'a pas réussi à mettre les promos à jour.", "erreur");
+  else if (fini) nouvelleDuRobot("Promos mises à jour.", "succes");
+  else nouvelleDuRobot(`Mise à jour des promos — ${enCours?.detail ?? enCours?.titre ?? "…"}`);
+}
+
+/** Ce que fait le robot, en une ligne : dans « Mon compte » et en haut de la liste. */
+function nouvelleDuRobot(message, genre = "info") {
+  robot.message = message;
+  robot.genre = genre;
+  $("etat-robot").textContent = message || dateDesPromos();
+  dessinerEtatPromos();
+}
+
+function ouvrirAvancee() {
+  dessinerAvancee();
+  if (!$("fenetre-robot").open) $("fenetre-robot").showModal();
+  // Les durées avancent chaque seconde pendant qu'on regarde.
+  clearInterval(robot.horloge);
+  robot.horloge = setInterval(() => {
+    if (robot.suivi) dessinerAvancee();
+  }, 1000);
+}
+
+$("fenetre-robot").addEventListener("close", () => clearInterval(robot.horloge));
 
 $("deconnexion").addEventListener("click", async () => {
   $("fenetre-compte").close();

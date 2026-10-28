@@ -24,6 +24,17 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
   « fine-grained » limitée à ce dépôt et au droit « Actions » (un an) : l'appli ouvre la page de
   GitHub déjà remplie, puis garde la clé dans Firebase (`reglages/robot`) pour les deux téléphones,
   jamais dans ce dépôt. Clé refusée ou expirée : l'appli le dit et en demande une nouvelle.
+- **L'avancée du robot, étape par étape** : la fenêtre « Mise à jour des promos » s'ouvre au
+  lancement et montre Démarrage, Lecture des catalogues Leclerc, Photos des produits,
+  Enregistrement et Nouvelles promos dans l'appli : cochées quand elles sont finies (avec leur
+  durée), en cours, à venir ou en panne, avec la dernière nouvelle du robot (« Catalogue 3 sur 9 :
+  Un automne en fête », « Photos : 312 sur 1 450 (12 nouvelles) ») et un lien vers le passage sur
+  GitHub. Fenêtre fermée, une ligne en haut de la liste suit le robot (« Voir l'avancée »). Le
+  robot écrit ces nouvelles dans un statut GitHub (`robot-promos/avancee`, au plus toutes les 10
+  secondes) ; ses étapes sont séparées dans le workflow (« Lire les catalogues », « Fabriquer les
+  photos » lancé à part avec `python -m robot_promos.photos`, « Enregistrer les promos »…), et un
+  test vérifie que l'appli connaît leurs noms exacts. Une panne pendant les photos n'empêche plus
+  d'enregistrer les promos.
 - Règles d'accès : `reglages/robot` n'accepte qu'une clé `github_pat_…`, sans autre champ.
 
 ### Modifié

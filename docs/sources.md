@@ -50,6 +50,16 @@ Ko). Au plus une heure de photos par passage : les premiers jours, elles arriven
 > la visionneuse officielle : une zone grise pour le droit d'auteur, comme l'accès au catalogue.
 > Emilio a choisi de l'accepter. Pour tout retirer d'un coup : supprimer la branche `photos`.
 
+## L'avancée d'un passage
+
+Pendant un passage, le robot écrit où il en est (« Catalogue 3 sur 9 : … », « Photos : 312 sur
+1 450 ») dans un « statut » GitHub de l'enregistrement qu'il traite (nom : `robot-promos/avancee`,
+voir [`avancee.py`](../src/robot_promos/avancee.py)), au plus toutes les 10 secondes. L'appli le lit
+pour sa fenêtre « Mise à jour des promos » ([appli.md](appli.md#mettre-à-jour-les-promos-sans-attendre)).
+Les étapes du passage (« Lire les catalogues », « Fabriquer les photos »…) sont celles du workflow
+[`robot.yml`](../.github/workflows/robot.yml) : l'appli reprend leurs noms exacts, et un test vérifie
+qu'ils restent identiques.
+
 ## Sources abandonnées
 
 | Source | Magasin | Raison |

@@ -35,6 +35,7 @@ jobs:
     permissions:
       contents: write # pour pouvoir enregistrer promos.json et les photos dans le dépôt
       actions: read # pour savoir si le robot a déjà été lancé aujourd'hui
+      statuses: write # pour dire à l'appli où en est le robot (src/robot_promos/avancee.py)
     steps:
       # Un lancement programmé ne fait rien si le robot a déjà été lancé aujourd'hui (heure de
       # Paris), à la main ou par un autre horaire. Un lancement à la main passe toujours.
@@ -83,16 +84,27 @@ jobs:
             git rev-parse "FETCH_HEAD^{tree}" > "$RUNNER_TEMP/arbre-photos"
           fi
 
-      - name: Lancer le robot
+      # Les noms des étapes ci-dessous sont repris par l'appli pour montrer l'avancée du robot
+      # (app/src/robot.js, PHASES) : les changer là aussi.
+      - name: Lire les catalogues
         if: steps.aujourdhui.outputs.deja_passe != 'oui'
         env:
           SANS_CACHE: ${{ inputs.sans_cache }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          options=(--photos "$RUNNER_TEMP/photos" --minutes-photos 60)
           if [ "$SANS_CACHE" = "true" ]; then
-            options+=(--sans-cache)
+            python -m robot_promos --sans-cache
+          else
+            python -m robot_promos
           fi
-          python -m robot_promos "${options[@]}"
+
+      # Au plus une heure de téléchargement ; une panne ici n'empêche pas d'enregistrer les promos.
+      - name: Fabriquer les photos
+        if: steps.aujourdhui.outputs.deja_passe != 'oui'
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python -m robot_promos.photos "$RUNNER_TEMP/photos" --minutes 60
 
       # La branche « photos » est réécrite à chaque fois, en un seul enregistrement : elle ne garde que
       # les photos des promos en cours, sans historique (le dépôt ne grossit pas). Elle est publiée
@@ -118,7 +130,7 @@ jobs:
             git push --force origin "$enregistrement:refs/heads/photos"
           fi
 
-      - name: Enregistrer promos.json
+      - name: Enregistrer les promos
         if: steps.aujourdhui.outputs.deja_passe != 'oui'
         run: |
           git config user.name "github-actions[bot]"
@@ -131,3 +143,14 @@ jobs:
             git pull --rebase origin "${GITHUB_REF_NAME}"
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
+
+      # Le dernier mot pour l'appli : le passage est fini (réussi ou non).
+      - name: Signaler la fin à l'appli
+        if: always() && steps.aujourdhui.outputs.deja_passe != 'oui'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ETAT: ${{ job.status == 'success' && 'success' || 'failure' }}
+        run: |
+          if [ "$ETAT" = "success" ]; then description="Promos enregistrées"; else description="Passage interrompu"; fi
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -f state="$ETAT" \
+            -f context="robot-promos/avancee" -f description="$description" > /dev/null

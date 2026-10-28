@@ -114,8 +114,8 @@ Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
   aussitôt ; « + » ajoute ce qu'on a écrit (même sans promo), ou on ajoute une promo d'un geste (avec
   une note courte : « Leclerc · 0,89 € »).
 - **Promos à jour** : l'appli prévient si le robot n'est pas passé ou si les promos sont incomplètes ;
-  **« Mettre à jour les promos »** (dans Mon compte) lance le robot sans attendre et recharge les
-  promos dès qu'il a fini.
+  **« Mettre à jour les promos »** (dans Mon compte) lance le robot sans attendre, montre où il en
+  est étape par étape (« Photos : 312 sur 1 450 ») et recharge les promos dès qu'il a fini.
 - **Rangée par rayon**, dans l'ordre du magasin (le surgelé en dernier) ; un rayon mal deviné se
   corrige une fois pour toutes.
 - **Ajout rapide** avec quantité facultative ; un article déjà dans la liste est signalé.
@@ -281,6 +281,7 @@ promos-courses/
 │   ├── web.py                      ← téléchargement poli (robots.txt, pauses)
 │   ├── offres.py                   ← format d'une offre, doublons, vérification
 │   ├── photos.py                   ← vignettes des photos des produits (branche « photos »)
+│   ├── avancee.py                  ← où en est le robot, pour l'appli
 │   ├── promos.schema.json          ← schéma JSON de promos.json
 │   ├── config.py                   ← magasin et réglages
 │   └── sources/

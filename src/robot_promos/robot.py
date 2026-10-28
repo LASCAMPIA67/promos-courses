@@ -12,10 +12,10 @@ from collections import Counter
 from pathlib import Path
 
 from robot_promos import __version__
+from robot_promos.avancee import Avancee, sans_nouvelles
 from robot_promos.config import MAGASINS
 from robot_promos.offres import dedoublonner, verifier
 from robot_promos.outils import aujourdhui, maintenant
-from robot_promos.photos import preparer_photos
 from robot_promos.sources.leclerc import Leclerc
 from robot_promos.web import Navigateur
 
@@ -39,7 +39,7 @@ def offres_precedentes(precedent, source, catalogue=None):
     ]
 
 
-def traiter_source(nav, source, precedent, utiliser_cache=True):
+def traiter_source(nav, source, precedent, utiliser_cache=True, avancee=sans_nouvelles):
     """Renvoie (état de la source, offres trouvées). Ne lève jamais d'erreur."""
     anciens = {
         c["id"]: c for s in precedent.get("sources", []) if s.get("id") == source.id for c in s.get("catalogues", [])
@@ -68,7 +68,8 @@ def traiter_source(nav, source, precedent, utiliser_cache=True):
         return etat, offres
 
     offres, erreurs, reutilises, en_ligne = [], [], 0, 0
-    for catalogue in catalogues:
+    for rang, catalogue in enumerate(catalogues, start=1):
+        avancee(f"Catalogue {rang} sur {len(catalogues)} : {catalogue.nom}", forcer=True)
         ancien = anciens.get(catalogue.id)
         if utiliser_cache and ancien and ancien.get("version") == catalogue.version:
             trouvees = offres_precedentes(precedent, source.id, catalogue.id)
@@ -103,19 +104,16 @@ def main(argv=None):
     parser = argparse.ArgumentParser(prog="python -m robot_promos", description=__doc__.splitlines()[0])
     parser.add_argument("--sortie", default="promos.json", help="fichier à écrire (par défaut : promos.json)")
     parser.add_argument("--sans-cache", action="store_true", help="relire tous les catalogues, même inchangés")
-    parser.add_argument("--photos", metavar="DOSSIER", help="dossier des vignettes des photos (branche « photos »)")
-    parser.add_argument(
-        "--minutes-photos", type=float, default=60, help="temps maximal pour télécharger les photos (par défaut : 60)"
-    )
     parser.add_argument("--version", action="version", version=f"robot_promos {__version__}")
     args = parser.parse_args(argv)
 
     precedent = lire_precedent(args.sortie)
     nav = Navigateur()
+    avancee = Avancee()
     etats, offres = [], []
     for source in SOURCES:
         print(f"→ {source.nom}…", flush=True)
-        etat, trouvees = traiter_source(nav, source, precedent, utiliser_cache=not args.sans_cache)
+        etat, trouvees = traiter_source(nav, source, precedent, utiliser_cache=not args.sans_cache, avancee=avancee)
         print(f"   {etat['etat']} : {etat['nb_offres']} offres. {etat['remarque']}", flush=True)
         if etat["etat"] != "ok" and os.environ.get("GITHUB_ACTIONS"):
             print(f"::warning title={source.nom}::{etat['remarque']}")
@@ -135,16 +133,7 @@ def main(argv=None):
         for catalogue in etat["catalogues"]:
             catalogue["nb_offres"] = compte[(etat["id"], catalogue["id"])]
         etat["nb_offres"] = sum(c["nb_offres"] for c in etat["catalogues"])
-    bilan_photos = None
-    if args.photos:
-        print("→ Photos des produits…", flush=True)
-        bilan_photos = preparer_photos(nav, offres, args.photos, budget=args.minutes_photos * 60)
-        print(
-            f"   {bilan_photos['avec_photo']} offres avec photo ; {bilan_photos['nouvelles']} nouvelles, "
-            f"{bilan_photos['retirees']} retirées, {bilan_photos['erreurs']} illisibles, "
-            f"{bilan_photos['en_attente']} pour le prochain passage.",
-            flush=True,
-        )
+    # Les photos de ces offres sont faites à part, juste après (python -m robot_promos.photos).
     document = {
         "format": FORMAT,
         "mise_a_jour": maintenant(),
@@ -156,11 +145,12 @@ def main(argv=None):
     verifier(document)
     Path(args.sortie).write_text(json.dumps(document, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(f"{args.sortie} écrit : {len(offres)} offres ({nav.nb_requetes} requêtes).")
-    ecrire_resume(etats, len(offres), bilan_photos)
+    avancee(f"Catalogues lus : {len(offres)} promos", forcer=True)
+    ecrire_resume(etats, len(offres))
     return 0
 
 
-def ecrire_resume(etats, total, bilan_photos=None):
+def ecrire_resume(etats, total):
     """Tableau affiché sur la page du lancement dans GitHub Actions."""
     chemin = os.environ.get("GITHUB_STEP_SUMMARY")
     if not chemin:
@@ -188,14 +178,6 @@ def ecrire_resume(etats, total, bilan_photos=None):
                 f"| {MAGASINS[e['magasin']]['nom']} | {c['nom']} | {c['debut']} | {c['fin']} | "
                 f"{c['nb_offres']} | {'non (inchangé)' if c['reutilise'] else 'oui'} |"
             )
-    if bilan_photos:
-        lignes += [
-            "",
-            f"### Photos : {bilan_photos['avec_photo']} offres sur {total}",
-            "",
-            f"{bilan_photos['nouvelles']} nouvelles, {bilan_photos['retirees']} retirées, "
-            f"{bilan_photos['erreurs']} illisibles, {bilan_photos['en_attente']} pour le prochain passage.",
-        ]
     with Path(chemin).open("a", encoding="utf-8") as f:
         f.write("\n".join(lignes) + "\n")
 

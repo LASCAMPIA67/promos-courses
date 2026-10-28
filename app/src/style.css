@@ -915,8 +915,117 @@ dialog h2 {
 /* ------------------------------------------------------------------------------------------ */
 /* Les promos d'un article */
 
-.fenetre-promos {
+.fenetre-promos,
+.fenetre-robot {
   padding: 0;
+}
+
+.entete-fenetre p {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+}
+
+/* La mise à jour des promos, étape par étape : fait (vert), en cours (bleu, qui tourne), à venir, en panne. */
+.etapes-robot {
+  list-style: none;
+  margin: 0;
+  padding: 6px 20px;
+}
+
+.etape-robot {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  padding: 11px 0;
+}
+
+.etape-robot + .etape-robot {
+  border-top: 1px solid var(--bordure);
+}
+
+.icone-etape {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--bordure);
+  border-radius: 50%;
+}
+
+.icone-etape svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 3;
+}
+
+.etape-robot[data-etat="fait"] .icone-etape {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--sur-accent);
+}
+
+.etape-robot[data-etat="echoue"] .icone-etape {
+  border-color: var(--danger);
+  background: var(--danger);
+  color: #ffffff;
+}
+
+.etape-robot[data-etat="en_cours"] .icone-etape {
+  border-color: var(--info);
+  border-top-color: transparent;
+  background: var(--info-doux);
+  animation: tourner 0.9s linear infinite;
+}
+
+@keyframes tourner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.textes-etape {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.titre-etape {
+  font-weight: 600;
+}
+
+.etape-robot[data-etat="a_venir"] .titre-etape {
+  color: var(--discret);
+  font-weight: 500;
+}
+
+.detail-etape {
+  color: var(--info);
+  font-size: 0.88rem;
+  overflow-wrap: anywhere;
+}
+
+.duree-etape {
+  color: var(--discret);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.note-robot {
+  margin: 0;
+  padding: 6px 20px 20px;
+  font-size: 0.88rem;
+}
+
+.note-robot .lien {
+  padding: 0;
+}
+
+.lien-avancee {
+  padding: 0;
+  color: inherit;
+  text-decoration: underline;
 }
 
 .entete-fenetre {

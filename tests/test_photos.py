@@ -1,10 +1,13 @@
 """Tests des vignettes des photos (aucun accès à internet : les photos sont fabriquées ici)."""
 
 import io
+import json
 
 from PIL import Image
 
-from robot_promos.config import ADRESSE_PHOTOS
+from robot_promos import photos
+from robot_promos.config import ADRESSE_PHOTOS, MAGASINS
+from robot_promos.offres import creer_offre
 from robot_promos.photos import TAILLE, nom_photo, preparer_photos, reduire
 
 MEDIA = "https://nos-catalogues-promos-v2.e.leclerc/media/"
@@ -92,3 +95,35 @@ def test_preparer_photos_s_arrete_au_bout_du_temps_prevu(tmp_path):
     assert bilan["nouvelles"] == 2  # commencées à 40 et 80 secondes ; à 120, le temps prévu est passé
     assert bilan["en_attente"] == 3  # faites au prochain passage
     assert [o["photo"] is not None for o in offres] == [True, True, False, False, False]
+
+
+def test_la_commande_photos_complete_promos_json(tmp_path, monkeypatch):
+    def offre_complete(id, image):
+        return creer_offre(
+            id=id,
+            source="leclerc",
+            magasin="leclerc-geispolsheim",
+            catalogue="c",
+            produit="Sirop",
+            prix=2.75,
+            image=image,
+        )
+
+    promos = tmp_path / "promos.json"
+    document = {
+        "format": 2,
+        "mise_a_jour": "2026-10-28T06:00:00+01:00",
+        "version_robot": "0.12.0",
+        "magasins": MAGASINS,
+        "sources": [],
+        "offres": [offre_complete("a", f"{MEDIA}{'a' * 32}"), offre_complete("b", None)],
+    }
+    promos.write_text(json.dumps(document), encoding="utf-8")
+    monkeypatch.setattr(photos, "Navigateur", FauxNavigateur)
+    monkeypatch.setattr(photos, "Avancee", lambda: photos.sans_nouvelles)
+    monkeypatch.delenv("GITHUB_STEP_SUMMARY", raising=False)
+
+    assert photos.main([str(tmp_path / "vignettes"), "--promos", str(promos)]) == 0
+    ecrites = json.loads(promos.read_text(encoding="utf-8"))["offres"]
+    assert [o["photo"] for o in ecrites] == [f"{ADRESSE_PHOTOS}{'a' * 32}.jpg", None]
+    assert (tmp_path / "vignettes" / f"{'a' * 32}.jpg").exists()

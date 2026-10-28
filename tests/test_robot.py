@@ -42,6 +42,7 @@ class FausseSource(Source):
 
 def lancer(tmp_path, monkeypatch, source):
     monkeypatch.setattr(robot, "SOURCES", [source])
+    monkeypatch.setattr(robot, "Avancee", lambda: robot.sans_nouvelles)
     monkeypatch.setattr(robot, "Navigateur", lambda: type("Nav", (), {"nb_requetes": 0})())
     sortie = tmp_path / "promos.json"
     code = robot.main(["--sortie", str(sortie)])

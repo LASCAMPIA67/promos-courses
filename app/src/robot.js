@@ -68,6 +68,7 @@ export function lirePassage(passage) {
     debut: new Date(passage.run_started_at ?? passage.created_at),
     fin: new Date(passage.updated_at),
     adresse: passage.html_url,
+    sha: passage.head_sha,
   };
 }
 
@@ -89,11 +90,101 @@ export async function adressePromosFraiches(cle, appel = fetch) {
   return `https://raw.githubusercontent.com/${DEPOT}/${enregistrement}/promos.json`;
 }
 
-/** « Le robot travaille depuis 4 min… », pour suivre un passage. */
-export function phrasePassage(passage, maintenant = new Date()) {
-  if (passage.etat === "en_cours") {
-    const minutes = Math.floor((maintenant - passage.debut) / 60_000);
-    return minutes < 1 ? "Le robot démarre…" : `Le robot travaille depuis ${minutes} min…`;
+/**
+ * Les grandes étapes d'un passage, comme l'appli les montre, et les étapes du robot sur GitHub qui
+ * les composent : leurs noms exacts dans .github/workflows/robot.yml (un test vérifie qu'ils y sont).
+ * GitHub ajoute « Set up job » au début, puis « Post … » et « Complete job » à la fin.
+ */
+export const PHASES = [
+  {
+    titre: "Démarrage",
+    etapes: [
+      "Set up job",
+      "Vérifier si le robot est déjà passé aujourd'hui",
+      "Récupérer le dépôt",
+      "Installer Python",
+      "Installer le robot",
+      "Reprendre les photos déjà faites",
+    ],
+  },
+  { titre: "Lecture des catalogues Leclerc", etapes: ["Lire les catalogues"] },
+  { titre: "Photos des produits", etapes: ["Fabriquer les photos"] },
+  {
+    titre: "Enregistrement",
+    etapes: ["Enregistrer les photos", "Enregistrer les promos", "Signaler la fin à l'appli"],
+  },
+];
+
+/** Le nom du statut où le robot écrit où il en est (src/robot_promos/avancee.py). */
+const CONTEXTE_AVANCEE = "robot-promos/avancee";
+
+/**
+ * Le détail d'un passage : les étapes de GitHub et la dernière nouvelle du robot (« Photos : 312
+ * sur 1 450 »), ou null. Renvoie { etapes, nouvelle }.
+ */
+export async function detailsDuPassage(cle, passage, appel = fetch) {
+  const [travaux, statuts] = await Promise.all([
+    appeler(cle, `${API}/actions/runs/${passage.id}/jobs`, {}, appel).then((reponse) => reponse.json()),
+    passage.sha
+      ? appeler(cle, `${API}/commits/${passage.sha}/statuses?per_page=30`, {}, appel)
+          .then((reponse) => reponse.json())
+          .catch(() => [])
+      : [],
+  ]);
+  // Les nouvelles de ce passage seulement (un passage précédent a pu écrire sur le même enregistrement).
+  const nouvelle = (Array.isArray(statuts) ? statuts : []).find(
+    (statut) => statut.context === CONTEXTE_AVANCEE && new Date(statut.created_at) >= passage.debut - 60_000,
+  );
+  return { etapes: travaux.jobs?.[0]?.steps ?? [], nouvelle: nouvelle?.description ?? null };
+}
+
+/**
+ * Où en est un passage, étape par étape : [{ titre, etat (« fait », « en_cours », « a_venir » ou
+ * « echoue »), duree (en millisecondes, ou null), detail (ou null) }].
+ */
+export function avanceeDuPassage(passage, { etapes = [], nouvelle = null } = {}, maintenant = new Date()) {
+  const groupes = PHASES.map(() => []);
+  let rang = 0;
+  for (const etape of etapes) {
+    const trouve = PHASES.findIndex((phase) => phase.etapes.includes(etape.name));
+    if (trouve !== -1) rang = trouve;
+    else if (/^(Post |Complete job)/.test(etape.name)) rang = PHASES.length - 1;
+    groupes[rang].push(etape);
   }
-  return passage.etat === "reussi" ? "Promos à jour." : "Le robot n'a pas réussi à mettre les promos à jour.";
+  const finie = (etape) => etape.status === "completed";
+  const phases = PHASES.map(({ titre }, n) => {
+    const groupe = groupes[n];
+    let etat = "a_venir";
+    if (groupe.some((etape) => etape.conclusion === "failure")) etat = "echoue";
+    else if (passage.etat === "reussi" || (groupe.length && groupe.every(finie))) etat = "fait";
+    else if (groupe.some((etape) => etape.status === "in_progress" || finie(etape))) etat = "en_cours";
+    const debuts = groupe.map((etape) => etape.started_at).filter(Boolean);
+    const fins = groupe.map((etape) => etape.completed_at).filter(Boolean);
+    const debut = debuts.length ? new Date(debuts.sort()[0]) : null;
+    const fin = etat === "fait" && fins.length ? new Date(fins.sort().at(-1)) : maintenant;
+    return { titre, etat, duree: debut ? Math.max(0, fin - debut) : null, detail: null };
+  });
+  if (passage.etat === "en_cours") {
+    // Entre deux étapes, ou avant que GitHub ait trouvé une machine : la prochaine étape est « en cours ».
+    if (!phases.some((phase) => phase.etat === "en_cours" || phase.etat === "echoue")) {
+      const prochaine = phases.find((phase) => phase.etat === "a_venir");
+      if (prochaine) prochaine.etat = "en_cours";
+    }
+    const enCours = phases.find((phase) => phase.etat === "en_cours");
+    if (enCours) enCours.detail = etapes.length ? nouvelle : "En attente d'une machine GitHub…";
+  }
+  if (passage.etat === "echoue" && !phases.some((phase) => phase.etat === "echoue")) {
+    const coupee = phases.find((phase) => phase.etat !== "fait");
+    if (coupee) coupee.etat = "echoue";
+  }
+  return phases;
+}
+
+/** « 45 s », « 4 min », « 1 h 05 ». */
+export function formaterDuree(millisecondes) {
+  const secondes = Math.round(millisecondes / 1000);
+  if (secondes < 60) return `${secondes} s`;
+  const minutes = Math.floor(secondes / 60);
+  if (minutes < 60) return `${minutes} min`;
+  return `${Math.floor(minutes / 60)} h ${String(minutes % 60).padStart(2, "0")}`;
 }
