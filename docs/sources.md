@@ -65,10 +65,46 @@ Le robot en fait une petite image PNG (96 pixels de haut au plus, 1 à 12 Ko), r
 la branche `photos`, avec la même règle que les photos (téléchargée une seule fois, retirée quand
 plus aucune promo n'en a besoin).
 
-> Wikidata (la base de Wikipédia) donne aussi le logo officiel de 139 de ces marques, mais la
-> recherche par nom s'y trompe trop souvent (« SVR » → une compagnie aérienne, « WELL » → un club
-> de football, « ARIEL » → des motos) : écartée le 28/10/2026, faute de pouvoir la vérifier
-> automatiquement.
+### Le logo Marque Repère
+
+Les produits **Marque Repère** (la marque des centres E.Leclerc) ont tous le logo Marque Repère,
+même quand le catalogue joint celui de leur gamme (Bio Village, Délisse…) : demande d'Emilio du
+28/10/2026. Le robot les reconnaît à leur **code-barres** : ceux de Scamark, qui fabrique les
+produits de la marque pour Leclerc, commencent par `356470`. Quelques gammes ont d'autres
+codes-barres (la charcuterie Tradilège : `3661112…`) : elles sont reconnues à leur nom, tel qu'il
+figure dans le [dossier de presse des 25 ans de Marque Repère](https://www.mouvement.leclerc/sites/default/files/2022-03/DP_25%20ans_Marque%20Repe%C4%9Are_vdef_1.pdf)
+(2022) : Bio Village, Copains Copines, Délisse, Mots d'Enfants, Œufs de nos Régions, Pom'lisse,
+Récoltons l'Avenir, Smicy, Soutenons nos Agriculteurs, Tradilège, Volandrie. Eco+ et Nos Régions
+ont du Talent sont d'autres marques de Leclerc : elles gardent leur logo. Le détail est dans
+[`marques.py`](../src/robot_promos/marques.py). Dans l'appli, VoiceOver lit « Marque Repère
+(DÉLISSE) » : le nom de la gamme n'est pas perdu.
+
+### Les logos pris sur Wikipédia
+
+Pour les marques dont le catalogue ne donne pas de logo, le robot prend leur **logo officiel publié
+sur Wikipédia**, d'après une liste **vérifiée à la main** :
+[`logos.json`](../src/robot_promos/logos.json) (la marque, l'adresse de l'image, la page du fichier
+avec sa source et sa licence). Le logo Marque Repère en fait partie. Le logo du catalogue passe
+toujours en premier.
+
+Pourquoi une liste, et pas une recherche automatique ? Parce que la recherche par nom se trompe trop
+souvent : « SVR » donne une compagnie aérienne, « BERETTA » des armes (c'est ici de la charcuterie
+italienne), « CATTIER » un champagne (ici des cosmétiques), « SCHNEIDER » une chaîne de pharmacies
+(ici des gnocchis). Chaque logo de la liste a été regardé à l'œil, à côté des produits de la marque
+dans les promos. À chaque passage, le résumé du robot sur GitHub liste les **marques encore sans
+logo** : de quoi compléter la liste quand une nouvelle marque arrive.
+
+Les images viennent de `upload.wikimedia.org` (son `robots.txt` l'autorise) : une miniature de
+taille standard (500 pixels de large au plus), comme le demandent les
+[règles de Wikimedia](https://w.wiki/GHai), téléchargée **une seule fois** par logo, avec la pause
+habituelle et l'adresse du projet dans la présentation du robot (« User-Agent »).
+
+> **Licences.** Les logos de Wikimedia Commons sont presque tous dans le domaine public (de simples
+> textes, trop simples pour le droit d'auteur), mais restent des marques déposées ; ceux de
+> Wikipédia en français ou en anglais (comme celui de Marque Repère) n'y sont publiés que pour
+> illustrer l'article de la marque. Une petite copie dans l'appli, pour reconnaître la marque d'un
+> produit en promo : la même zone grise que les logos du catalogue, acceptée par Emilio le
+> 28/10/2026. La page de chaque fichier est notée dans `logos.json`.
 
 ## L'avancée d'un passage
 

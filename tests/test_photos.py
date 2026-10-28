@@ -8,7 +8,7 @@ from PIL import Image
 from robot_promos import photos
 from robot_promos.config import ADRESSE_PHOTOS, MAGASINS
 from robot_promos.offres import creer_offre
-from robot_promos.photos import TAILLE, nom_photo, preparer_logos, preparer_photos, reduire, reduire_logo
+from robot_promos.photos import TAILLE, nom_logo, nom_photo, preparer_logos, preparer_photos, reduire, reduire_logo
 
 MEDIA = "https://nos-catalogues-promos-v2.e.leclerc/media/"
 
@@ -158,12 +158,57 @@ def test_preparer_logos_un_logo_par_marque_pour_toutes_ses_promos(tmp_path):
         {"marque": None, "logo_catalogue": f"{MEDIA}{'c' * 32}"},  # pas de marque : pas de logo
     ]
     nav = FauxNavigateur(logo_png())
-    bilan = preparer_logos(nav, offres, tmp_path)
+    bilan = preparer_logos(nav, offres, tmp_path, officiels={})
 
     assert nav.demandes == [f"{MEDIA}{'a' * 32}"]
     attendu = f"{ADRESSE_PHOTOS}logos/{'a' * 32}.png"
     assert [o["logo"] for o in offres] == [attendu, attendu, attendu, attendu, None, None]
+    assert [o["logo_marque"] for o in offres] == [None] * 6
     assert sorted(f.name for f in (tmp_path / "logos").iterdir()) == [f"{'a' * 32}.png"]
     assert bilan["marques"] == 1
     assert bilan["avec_logo"] == 4
     assert bilan["retirees"] == 1
+    assert bilan["sans_logo"] == ["INCONNUE"]
+
+
+WIKI = "https://upload.wikimedia.org/wikipedia/commons/"
+
+
+def test_nom_logo():
+    assert nom_logo(f"{MEDIA}{'a' * 32}") == f"{'a' * 32}.png"  # du catalogue : son identifiant
+    assert (
+        nom_logo(f"{WIKI}c/cb/Haribo.svg/500px-Haribo.svg.png") == "0dc4ba27ee07b1da9ede3b7d8e5a4b6a.png"
+    )  # de Wikipédia : une empreinte
+    assert nom_logo(None) is None
+
+
+def test_preparer_logos_marque_repere_et_logos_de_wikipedia(tmp_path):
+    officiels = {
+        "MARQUE REPÈRE": f"{WIKI}mr.png",
+        "HARIBO": f"{WIKI}haribo.png",
+        "LACTEL": f"{WIKI}lactel.png",  # le catalogue en donne un : il passe avant
+    }
+    offres = [
+        {"marque": "DÉLISSE", "ean": "3564700012345", "logo_catalogue": None},
+        {"marque": "BIO VILLAGE", "ean": "3564709000000", "logo_catalogue": f"{MEDIA}{'b' * 32}"},
+        {"marque": "TRADILÈGE", "ean": "3661112057565", "logo_catalogue": None},  # une gamme Marque Repère
+        {"marque": "Haribo", "ean": "4001686000000", "logo_catalogue": None},
+        {"marque": "LACTEL", "ean": "3428270000000", "logo_catalogue": f"{MEDIA}{'a' * 32}"},
+        {"marque": "ECO+", "ean": "3564700099999", "logo_catalogue": None},  # une autre marque de Leclerc
+    ]
+    nav = FauxNavigateur(logo_png())
+    bilan = preparer_logos(nav, offres, tmp_path, officiels=officiels)
+
+    assert sorted(nav.demandes) == sorted([f"{WIKI}mr.png", f"{WIKI}haribo.png", f"{MEDIA}{'a' * 32}"])
+    repere = f"{ADRESSE_PHOTOS}logos/{nom_logo(f'{WIKI}mr.png')}"
+    assert [o["logo"] for o in offres] == [
+        repere,
+        repere,
+        repere,
+        f"{ADRESSE_PHOTOS}logos/{nom_logo(f'{WIKI}haribo.png')}",
+        f"{ADRESSE_PHOTOS}logos/{'a' * 32}.png",
+        None,
+    ]
+    assert [o["logo_marque"] for o in offres] == ["Marque Repère"] * 3 + [None] * 3
+    assert bilan["marque_repere"] == 3
+    assert bilan["sans_logo"] == ["ECO+"]

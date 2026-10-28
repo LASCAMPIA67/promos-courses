@@ -81,7 +81,8 @@ Son format est décrit précisément (et vérifié à chaque passage) par le sch
 | `image` | | Photo du produit (l'originale, dans le catalogue), **seulement si elle est sûre** : la photo du produit seul, qui porte son code-barres ou son nom exact. `null` sinon (produits frais, promos sur toute une marque). |
 | `photo` | | Vignette de cette photo pour l'appli (256 pixels, JPEG), dans la branche `photos` du dépôt. `null` tant qu'elle n'est pas faite. Facultatif : un fichier sans ce champ reste valable. |
 | `logo_catalogue` | | Logo de la marque joint par le catalogue à ce produit (l'original), **seulement si son nom est exactement la marque** ; `null` sinon. Facultatif. |
-| `logo` | | Vignette du logo de la marque pour l'appli (PNG, 96 pixels de haut au plus), dans `logos/` de la branche `photos` : la même pour toutes les promos de la marque, même celles dont le produit n'a pas de logo dans le catalogue. `null` sans logo sûr. Facultatif. |
+| `logo` | | Vignette du logo de la marque pour l'appli (PNG, 96 pixels de haut au plus), dans `logos/` de la branche `photos` : la même pour toutes les promos de la marque, même celles dont le produit n'a pas de logo dans le catalogue. Sinon le logo officiel pris sur Wikipédia (liste vérifiée à la main) ; le logo Marque Repère pour tous les produits Marque Repère. `null` sans logo sûr. Facultatif. |
+| `logo_marque` | | La marque que montre le logo quand ce n'est pas celle du produit : `"Marque Repère"` (pour une gamme comme Délisse) ; `null` sinon. Facultatif. |
 | `page` | `null` | Numéro de page dans le catalogue, si connu. |
 
 ## Comment l'appli s'en sert

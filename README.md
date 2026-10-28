@@ -108,7 +108,8 @@ Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
 - **Une photo pour chaque promo** : la photo du produit lui-même, prise dans le catalogue
   officiel, seulement quand on est sûr que c'est la bonne (elle porte le code-barres ou le nom exact
   du produit) ; sinon un emplacement neutre, jamais une photo trompeuse. En haut à droite, le
-  **logo de la marque** donné par le catalogue (une marque sur deux), sinon son nom en petit.
+  **logo de la marque** (celui du catalogue, sinon le logo officiel pris sur Wikipédia ; le logo
+  Marque Repère pour tous les produits Marque Repère), sinon son nom en petit.
 - **Familles de produits** : « Chips » trouve aussi Pringles, Lay's, Doritos… ; « Soda » trouve
   Coca-Cola, Fanta… ; « Couches » trouve Pampers… (environ 50 familles).
 - **Les promos en écrivant** : en écrivant un article, les promos qui correspondent s'affichent
@@ -282,6 +283,8 @@ promos-courses/
 │   ├── web.py                      ← téléchargement poli (robots.txt, pauses)
 │   ├── offres.py                   ← format d'une offre, doublons, vérification
 │   ├── photos.py                   ← vignettes des photos et des logos (branche « photos »)
+│   ├── marques.py                  ← produits Marque Repère, logos pris sur Wikipédia
+│   ├── logos.json                  ← liste des logos de Wikipédia, vérifiés un par un
 │   ├── avancee.py                  ← où en est le robot, pour l'appli
 │   ├── promos.schema.json          ← schéma JSON de promos.json
 │   ├── config.py                   ← magasin et réglages

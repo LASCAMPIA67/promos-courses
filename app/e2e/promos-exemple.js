@@ -14,6 +14,7 @@ const COULEURS = {
   "cafe.jpg": [45, 45, 45],
   "pates.jpg": [235, 190, 40],
   "shampooing.jpg": [46, 158, 91],
+  "jambon.jpg": [232, 150, 160],
 };
 
 /** Les logos d'exemple : nom → couleur du cartouche. « absent.png » n'existe pas. */
@@ -23,6 +24,7 @@ const COULEURS_LOGOS = {
   "lactel.png": [20, 70, 160],
   "panzani.png": [0, 110, 60],
   "harrys.png": [200, 30, 40],
+  "marque-repere.png": [226, 30, 36],
 };
 
 /** Date à « décalage » jours d'aujourd'hui, au format du fichier : « 2026-10-27 ». */
@@ -56,6 +58,7 @@ function offre(id, champs) {
     photo: null,
     logo_catalogue: null,
     logo: null,
+    logo_marque: null,
     page: 3,
     ...champs,
   };
@@ -169,6 +172,21 @@ const OFFRES = [
     unite: "kg",
     reduction: "2 + 1 offert",
     lot: { quantite: 3, prix: 1.9, prix_unitaire: 1.27 },
+  }),
+  // Un produit Marque Repère (une gamme de la marque) : le logo Marque Repère.
+  offre("jambon", {
+    photo: `${PHOTOS}jambon.jpg`,
+    logo: `${LOGOS}marque-repere.png`,
+    logo_marque: "Marque Repère",
+    produit: "JAMBON CUIT SUPÉRIEUR",
+    marque: "TRADILÈGE",
+    ean: "3661112000000",
+    description: "4 tranches (160 g). Le kg : 14,69 €",
+    prix: 2.35,
+    ancien_prix: 2.95,
+    prix_unitaire: 14.69,
+    unite: "kg",
+    reduction: "-20 %",
   }),
   // Une même promo « au choix », que le catalogue donne en deux offres : l'appli n'en montre qu'une.
   ...["SHAMPOOING", "SHAMPOOING PURIFIANT"].map((produit, rang) =>

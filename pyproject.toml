@@ -29,7 +29,7 @@ dev = [
 version = { attr = "robot_promos.__version__" }
 
 [tool.setuptools.package-data]
-robot_promos = ["promos.schema.json"]
+robot_promos = ["promos.schema.json", "logos.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,0 +1,9 @@
+{
+ "description": "Logos officiels pris sur Wikipédia, pour les marques dont le catalogue Leclerc ne donne pas de logo. Chaque logo a été vérifié à l'œil avant d'être ajouté ; « page » mène à la page du fichier (source, licence). Voir docs/sources.md.",
+ "marques": {
+  "MARQUE REPÈRE": {
+   "image": "https://upload.wikimedia.org/wikipedia/fr/thumb/c/c9/Logo_Marque_Rep%C3%A8re_2018.png/500px-Logo_Marque_Rep%C3%A8re_2018.png",
+   "page": "https://fr.wikipedia.org/wiki/Fichier:Logo_Marque_Rep%C3%A8re_2018.png"
+  }
+ }
+}

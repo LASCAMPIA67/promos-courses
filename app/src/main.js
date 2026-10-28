@@ -587,17 +587,18 @@ $("plus-de-resultats").addEventListener("click", () => {
   dessinerSuggestions();
 });
 
-/** « Ajouter à la liste », ou « Dans la liste » si l'article y est déjà. */
 /**
- * La marque, en haut à droite : son logo (une vignette faite par le robot, seulement quand le
- * catalogue le donne pour cette marque), sinon son nom en petit. Rien pour un produit sans marque.
+ * La marque, en haut à droite : son logo (une vignette faite par le robot, d'après le catalogue ou
+ * Wikipédia ; le logo Marque Repère pour tous ses produits), sinon son nom en petit. Rien pour un
+ * produit sans marque.
  */
 function marquePromo(offre) {
   if (!offre.marque) return null;
   const nom = () => element("span", "marque-promo", offre.marque);
   if (!adresseSure(offre.logo)) return nom();
   // Le texte de remplacement est lu par VoiceOver : le nom de la marque n'est écrit nulle part ailleurs.
-  return imageDuRobot(offre.logo, "logo-marque", offre.marque, (logo) => logo.replaceWith(nom()));
+  const texte = offre.logo_marque ? `${offre.logo_marque} (${offre.marque})` : offre.marque;
+  return imageDuRobot(offre.logo, "logo-marque", texte, (logo) => logo.replaceWith(nom()));
 }
 
 const adresseSure = (adresse) => /^https:\/\//.test(adresse ?? "");
@@ -635,6 +636,7 @@ function photoPromo(offre) {
   return imageDuRobot(offre.photo, "photo-promo", "", (image) => image.replaceWith(sansPhoto()));
 }
 
+/** « Ajouter à la liste », ou « Dans la liste » si l'article y est déjà. */
 function boutonAjouter(offre) {
   const bouton = element("button", "bouton-ajouter");
   bouton.type = "button";

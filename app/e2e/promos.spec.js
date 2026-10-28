@@ -171,6 +171,14 @@ test("chaque promo montre la photo de son produit et, dans le coin, le logo de s
   await expect(promos.nth(2).locator(".photo-promo")).toHaveClass(/sans-photo/);
   await expect(promos.nth(2).locator("img")).toHaveCount(0);
 
+  // Un produit Marque Repère : le logo Marque Repère ; VoiceOver lit aussi le nom de la gamme.
+  await page.getByLabel("Article à ajouter").fill("jambon");
+  await expect(promos.locator(".promo-nom")).toHaveText(["Jambon cuit supérieur"]);
+  await expect(promos.getByRole("img", { name: "Marque Repère (TRADILÈGE)" })).toHaveAttribute(
+    "src",
+    "https://exemple.test/logos/marque-repere.png",
+  );
+
   // Une photo introuvable : l'emplacement neutre aussi, pas d'image cassée.
   await page.getByLabel("Article à ajouter").fill("bananes");
   await expect(promos.locator(".promo-nom")).toHaveText(["Bananes"]);

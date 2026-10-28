@@ -3,8 +3,9 @@
 Les photos du catalogue Leclerc pèsent souvent 2 à 6 Mo : bien trop pour un téléphone. Le robot
 télécharge une seule fois chaque photo fiable (voir sources/leclerc.py, photo_fiable) et en fait une
 vignette JPEG carrée de 256 pixels (une quinzaine de Ko), sur fond blanc, le produit centré. De même
-pour le logo de chaque marque (sources/leclerc.py, logo_de_la_marque) : une petite image PNG, dans
-« logos/ », qui sert à toutes les promos de la marque.
+pour le logo de chaque marque (sources/leclerc.py, logo_de_la_marque ; sinon le logo officiel pris
+sur Wikipédia, voir marques.py) : une petite image PNG, dans « logos/ », qui sert à toutes les promos
+de la marque. Les produits Marque Repère ont tous le logo Marque Repère.
 
 Les vignettes sont rangées dans la branche « photos » du dépôt, réécrite à chaque passage : elle ne
 garde que les photos des promos en cours, sans historique (le dépôt ne grossit pas). L'appli les lit
@@ -14,6 +15,7 @@ Lancement, après le robot : python -m robot_promos.photos DOSSIER   (options : 
 """
 
 import argparse
+import hashlib
 import io
 import json
 import os
@@ -27,6 +29,7 @@ from PIL import Image, ImageChops, ImageOps
 
 from robot_promos.avancee import Avancee, sans_nouvelles
 from robot_promos.config import ADRESSE_PHOTOS
+from robot_promos.marques import MARQUE_REPERE, cle_marque, est_marque_repere, logos_officiels
 from robot_promos.offres import verifier
 from robot_promos.web import Navigateur
 
@@ -43,6 +46,14 @@ def nom_photo(adresse, extension="jpg"):
     """« …/media/a36742fdec095062bc70d90a1edd4f3c » -> « a36742fdec095062bc70d90a1edd4f3c.jpg » (ou None)."""
     identifiant = (adresse or "").rstrip("/").rsplit("/", 1)[-1]
     return f"{identifiant}.{extension}" if re.fullmatch(r"[0-9a-f]{16,64}", identifiant) else None
+
+
+def nom_logo(adresse):
+    """Le fichier d'un logo : celui du catalogue garde son identifiant ; un logo de Wikipédia prend une
+    empreinte de son adresse (« 3f9a…e1.png »)."""
+    if not adresse:
+        return None
+    return nom_photo(adresse, "png") or f"{hashlib.sha256(adresse.encode()).hexdigest()[:32]}.png"
 
 
 def sur_fond_blanc(octets):
@@ -142,30 +153,41 @@ def preparer_photos(nav, offres, dossier, budget=None, horloge=time.monotonic, a
     return bilan
 
 
-def cle_marque(marque):
-    """La même marque, écrite « Foxter » ou « FOXTER »."""
-    return " ".join((marque or "").upper().split())
-
-
-def preparer_logos(nav, offres, dossier, budget=None, horloge=time.monotonic, avancee=sans_nouvelles):
+def preparer_logos(nav, offres, dossier, budget=None, horloge=time.monotonic, avancee=sans_nouvelles, officiels=None):
     """Fait les vignettes des logos (dans `dossier`/logos) et indique dans chaque offre celui de sa
     marque (« logo »), ou None. Une marque n'a qu'un logo : celui que le catalogue joint le plus
-    souvent à ses produits, repris pour tous, même ceux qui n'en ont pas. Renvoie un petit bilan.
+    souvent à ses produits, repris pour tous, même ceux qui n'en ont pas ; sinon son logo officiel
+    pris sur Wikipédia (`officiels`, par défaut ceux de logos.json). Les produits Marque Repère ont
+    tous le logo Marque Repère, et « logo_marque » le dit. Renvoie un petit bilan.
     """
+    officiels = logos_officiels() if officiels is None else officiels
     par_marque = defaultdict(Counter)
     for offre in offres:
         if offre.get("marque") and nom_photo(offre.get("logo_catalogue"), "png"):
             par_marque[cle_marque(offre["marque"])][offre["logo_catalogue"]] += 1
-    choisis = {marque: logos.most_common(1)[0][0] for marque, logos in par_marque.items()}
-    a_faire = {nom_photo(adresse, "png"): adresse for adresse in choisis.values()}
+    choisis = officiels | {marque: logos.most_common(1)[0][0] for marque, logos in par_marque.items()}
+    marque_repere = officiels.get(cle_marque(MARQUE_REPERE))
+
+    def logo_de(offre):
+        """(adresse du logo, marque qu'il montre quand ce n'est pas celle du produit)."""
+        if not offre.get("marque"):
+            return None, None
+        if marque_repere and est_marque_repere(offre):
+            return marque_repere, MARQUE_REPERE
+        return choisis.get(cle_marque(offre["marque"])), None
+
+    logos = [logo_de(offre) for offre in offres]
+    a_faire = {nom_logo(adresse): adresse for adresse, _ in logos if adresse}
     limite = None if budget is None else horloge() + budget
     dossier = Path(dossier) / "logos"
     presentes, bilan = faire_vignettes(nav, a_faire, dossier, "png", reduire_logo, "Logos", limite, horloge, avancee)
-    for offre in offres:
-        nom = nom_photo(choisis.get(cle_marque(offre.get("marque"))), "png")
-        offre["logo"] = f"{ADRESSE_PHOTOS}logos/{nom}" if nom in presentes else None
+    for offre, (adresse, montre) in zip(offres, logos, strict=True):
+        offre["logo"] = f"{ADRESSE_PHOTOS}logos/{nom_logo(adresse)}" if nom_logo(adresse) in presentes else None
+        offre["logo_marque"] = montre if offre["logo"] else None
     bilan["avec_logo"] = sum(1 for offre in offres if offre["logo"])
-    bilan["marques"] = len({nom for nom in a_faire if nom in presentes})
+    bilan["marque_repere"] = sum(1 for offre in offres if offre["logo_marque"] == MARQUE_REPERE)
+    bilan["marques"] = len(presentes & a_faire.keys())
+    bilan["sans_logo"] = sorted({cle_marque(o["marque"]) for o in offres if o.get("marque") and not o["logo"]})
     return bilan
 
 
@@ -195,15 +217,17 @@ def main(argv=None):
         f"{bilan['en_attente']} pour le prochain passage."
     )
     phrase_logos = (
-        f"{nombre(logos['avec_logo'])} promos avec le logo de leur marque ({logos['marques']} marques) ; "
+        f"{nombre(logos['avec_logo'])} promos avec le logo de leur marque ({logos['marques']} logos, "
+        f"dont {nombre(logos['marque_repere'])} promos Marque Repère) ; "
         f"{logos['nouvelles']} nouveaux, {logos['retirees']} retirés, {logos['erreurs']} illisibles, "
         f"{logos['en_attente']} pour le prochain passage."
     )
+    sans_logo = f"Marques sans logo ({len(logos['sans_logo'])}) : {', '.join(logos['sans_logo']) or 'aucune'}."
     print(f"   {phrase_logos}\n   {phrase}", flush=True)
     avancee(f"Photos : {nombre(bilan['avec_photo'])} promos avec photo", forcer=True)
     if resume := os.environ.get("GITHUB_STEP_SUMMARY"):
         with Path(resume).open("a", encoding="utf-8") as f:
-            f.write(f"\n### Photos et logos\n\n{phrase}\n\n{phrase_logos}\n")
+            f.write(f"\n### Photos et logos\n\n{phrase}\n\n{phrase_logos}\n\n{sans_logo}\n")
     return 0
 
 

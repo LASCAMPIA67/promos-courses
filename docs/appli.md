@@ -147,10 +147,12 @@ Les photos du catalogue pèsent 2 à 6 Mo chacune : le robot en fait une fois po
 vignette (256 pixels, une quinzaine de Ko). L'appli les garde sur le téléphone : elles s'affichent
 aussi sans réseau, une fois vues. Détails : [sources.md](sources.md#photos-des-produits).
 
-En haut à droite de chaque promo, le **logo de sa marque**, celui que le catalogue Leclerc donne pour
-cette marque (une marque sur deux environ) ; sinon, le nom de la marque écrit en petit au même
-endroit. Le nom du produit, lui, est écrit seul (sans la marque à la suite). Les logos aussi restent
-sur le téléphone. Détails : [sources.md](sources.md#logos-des-marques).
+En haut à droite de chaque promo, le **logo de sa marque** : celui que le catalogue Leclerc donne
+pour cette marque, sinon son logo officiel pris sur Wikipédia (une liste vérifiée à la main) ; les
+produits **Marque Repère** (Délisse, Bio Village, Tradilège…) ont tous le logo Marque Repère. Sans
+logo sûr, le nom de la marque est écrit en petit au même endroit. Le nom du produit, lui, est écrit
+seul (sans la marque à la suite). Les logos aussi restent sur le téléphone. Détails :
+[sources.md](sources.md#logos-des-marques).
 
 ### Comprendre le prix : où va la réduction
 
