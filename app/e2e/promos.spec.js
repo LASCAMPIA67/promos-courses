@@ -128,6 +128,35 @@ test("« Chips » trouve aussi les marques de chips, comme Pringles", async ({ p
   await expect(page.locator("#resultats .promo-nom")).toHaveText(["Pringles"]);
 });
 
+test("chaque promo montre la photo de son produit, ou un emplacement neutre sans photo sûre", async ({
+  page,
+  context,
+}) => {
+  await servirPromos(context);
+  await seConnecter(page, COMPTES.un);
+  await page.getByLabel("Article à ajouter").fill("lait");
+  const promos = page.locator("#resultats .promo");
+  await expect(promos.locator(".promo-nom")).toHaveText([
+    "Lait demi-écrémé CANDIA",
+    "Lait demi-écrémé UHT LACTEL",
+    "Laitue",
+    "Chocolat au lait CÔTE D'OR",
+  ]);
+  // La vignette du robot, bien chargée.
+  const photo = promos.first().locator("img.photo-promo");
+  await expect(photo).toHaveAttribute("src", "https://exemple.test/photos/lait.jpg");
+  await expect.poll(() => photo.evaluate((image) => image.complete && image.naturalWidth)).toBe(256);
+  // Pas de photo sûre (produit frais) : un emplacement neutre, jamais une photo au hasard.
+  await expect(promos.nth(2).locator(".photo-promo")).toHaveClass(/sans-photo/);
+  await expect(promos.nth(2).locator("img")).toHaveCount(0);
+
+  // Une photo introuvable : l'emplacement neutre aussi, pas d'image cassée.
+  await page.getByLabel("Article à ajouter").fill("bananes");
+  await expect(promos.locator(".promo-nom")).toHaveText(["Bananes"]);
+  await expect(promos.locator(".photo-promo")).toHaveClass(/sans-photo/);
+  await expect(promos.locator("img")).toHaveCount(0);
+});
+
 test("articles des versions précédentes : promo retrouvée d'après la note, ou dite terminée", async ({
   page,
   context,

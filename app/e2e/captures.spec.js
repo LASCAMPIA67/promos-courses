@@ -12,7 +12,8 @@ const AUTRE = COMPTES.deux;
 const DOSSIER = new URL("../../docs/captures/", import.meta.url).pathname;
 
 test.skip(!process.env.CAPTURES, "captures seulement à la demande (CAPTURES=1)");
-test.use({ deviceScaleFactor: 2 });
+// Sans animations : chaque capture montre l'écran une fois en place (pas une fenêtre en train de s'ouvrir).
+test.use({ deviceScaleFactor: 2, reducedMotion: "reduce" });
 
 test.beforeAll(async ({ request }) => {
   await creerComptes(request, [COMPTE, AUTRE]);

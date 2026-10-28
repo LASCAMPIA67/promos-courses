@@ -1,6 +1,21 @@
 // Un petit promos.json d'exemple, aux dates du jour, pour les scénarios réels et les captures.
 // Mêmes champs que le vrai fichier (voir docs/format-promos.md).
 
+import { photoProduitExemple } from "./fichiers-exemple.js";
+
+/** Les photos d'exemple : nom → couleur de l'emballage dessiné. « absente.jpg » n'existe pas. */
+const PHOTOS = "https://exemple.test/photos/";
+const COULEURS = {
+  "lait.jpg": [47, 125, 225],
+  "lait-uht.jpg": [31, 95, 191],
+  "chocolat.jpg": [110, 60, 30],
+  "pringles.jpg": [200, 40, 40],
+  "pain.jpg": [196, 140, 70],
+  "cafe.jpg": [45, 45, 45],
+  "pates.jpg": [235, 190, 40],
+  "shampooing.jpg": [46, 158, 91],
+};
+
 /** Date à « décalage » jours d'aujourd'hui, au format du fichier : « 2026-10-27 ». */
 function jour(decalage) {
   const date = new Date();
@@ -29,6 +44,7 @@ function offre(id, champs) {
     date_fin: jour(4),
     lien: `https://exemple.test/catalogue/${id}`,
     image: null,
+    photo: null,
     page: 3,
     ...champs,
   };
@@ -36,6 +52,7 @@ function offre(id, champs) {
 
 const OFFRES = [
   offre("lait", {
+    photo: `${PHOTOS}lait.jpg`,
     produit: "Lait demi-écrémé",
     marque: "CANDIA",
     description: "La bouteille de 1 L",
@@ -46,6 +63,7 @@ const OFFRES = [
     reduction: "-15 %",
   }),
   offre("lait-leclerc", {
+    photo: `${PHOTOS}lait-uht.jpg`,
     produit: "LAIT DEMI-ÉCRÉMÉ UHT",
     marque: "LACTEL",
     description: "6 x 1 L. Par 2 (12 L) : 9,18 € au lieu de 12,24 €",
@@ -58,6 +76,7 @@ const OFFRES = [
     date_fin: jour(9),
   }),
   offre("chocolat", {
+    photo: `${PHOTOS}chocolat.jpg`,
     produit: "CHOCOLAT AU LAIT",
     marque: "CÔTE D'OR",
     description: "200 g. Le kg : 10,75 €",
@@ -76,6 +95,7 @@ const OFFRES = [
   }),
   // Pas de « chips » dans le nom : trouvée par la famille « chips ».
   offre("pringles", {
+    photo: `${PHOTOS}pringles.jpg`,
     produit: "PRINGLES",
     description: "Le paquet de 165 g",
     prix: 1.99,
@@ -90,6 +110,7 @@ const OFFRES = [
     date_fin: jour(-1),
   }),
   offre("bananes", {
+    photo: `${PHOTOS}absente.jpg`,
     produit: "Bananes",
     description: "Le kg. Origine Côte d'Ivoire",
     prix: 1.29,
@@ -101,6 +122,7 @@ const OFFRES = [
     date_fin: jour(1),
   }),
   offre("pain", {
+    photo: `${PHOTOS}pain.jpg`,
     produit: "PAIN DE MIE COMPLET",
     marque: "HARRYS",
     description: "500 g. Le kg : 4,70 €",
@@ -112,6 +134,7 @@ const OFFRES = [
     carte_fidelite: true,
   }),
   offre("cafe", {
+    photo: `${PHOTOS}cafe.jpg`,
     produit: "CAFÉ MOULU PUR ARABICA",
     marque: "CARTE NOIRE",
     description: "4 x 250 g (1 kg). Le kg : 9,99 €",
@@ -122,6 +145,7 @@ const OFFRES = [
     reduction: "-25 %",
   }),
   offre("pates", {
+    photo: `${PHOTOS}pates.jpg`,
     produit: "PÂTES SPAGHETTI",
     marque: "PANZANI",
     description: "500 g. Par 3 (1,5 kg) : 1,90 €",
@@ -134,6 +158,7 @@ const OFFRES = [
   // Une même promo « au choix », que le catalogue donne en deux offres : l'appli n'en montre qu'une.
   ...["SHAMPOOING", "SHAMPOOING PURIFIANT"].map((produit, rang) =>
     offre(`shampooing-${rang + 1}`, {
+      photo: `${PHOTOS}shampooing.jpg`,
       produit,
       marque: "LE PETIT MARSEILLAIS",
       description: "Au choix : Douceur & Éclat, Nutrition, Purifiant. 2 x 300 ml (600 ml)",
@@ -174,7 +199,19 @@ export function promosExemple({ miseAJour = new Date(), etatLeclerc = "ok", mult
   };
 }
 
-/** Sert ce fichier à la place de promos-test.json pour tous les onglets d'un navigateur de test. */
+/**
+ * Sert ce fichier à la place de promos-test.json pour tous les onglets d'un navigateur de test, avec
+ * ses photos (comme raw.githubusercontent.com : lisibles depuis l'appli, « absente.jpg » introuvable).
+ */
 export async function servirPromos(contexte, options) {
   await contexte.route("**/promos-test.json", (requete) => requete.fulfill({ json: promosExemple(options) }));
+  await contexte.route(`${PHOTOS}**`, (requete) => {
+    const couleur = COULEURS[new URL(requete.request().url()).pathname.split("/").at(-1)];
+    if (!couleur) return requete.fulfill({ status: 404, body: "introuvable" });
+    return requete.fulfill({
+      contentType: "image/png",
+      headers: { "Access-Control-Allow-Origin": "*" },
+      body: photoProduitExemple(couleur),
+    });
+  });
 }

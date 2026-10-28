@@ -98,6 +98,18 @@ export default defineConfig({
             handler: "CacheFirst",
             options: { cacheName: "pdf", expiration: { maxEntries: 4 }, cacheableResponse: { statuses: [200] } },
           },
+          // Les photos des produits (vignettes du robot, branche « photos ») : une photo ne change
+          // jamais (son nom vient de la photo d'origine), on la garde donc pour les fois suivantes.
+          {
+            urlPattern: ({ url }) =>
+              url.origin === "https://raw.githubusercontent.com" && url.pathname.includes("/photos/"),
+            handler: "CacheFirst",
+            options: {
+              cacheName: "photos",
+              expiration: { maxEntries: 600, maxAgeSeconds: 60 * 24 * 3600, purgeOnQuotaError: true },
+              cacheableResponse: { statuses: [200] },
+            },
+          },
           {
             urlPattern: ({ url }) => url.pathname.includes("/ocr/"),
             handler: "CacheFirst",

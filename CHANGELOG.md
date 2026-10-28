@@ -14,6 +14,24 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+### Ajouté
+
+- **Une photo pour chaque promo** : à gauche de chaque fiche (résultats quand on écrit un article,
+  fenêtre « Promo pour… »), la photo du produit. Elle vient du catalogue officiel Leclerc et n'est
+  gardée que si elle est sûre : la photo du produit seul (jamais une photo d'ambiance), qui porte
+  le code-barres du produit ou exactement son nom. Sinon, un emplacement neutre : produits frais,
+  promos sur toute une marque, photo introuvable. Le robot fait une fois pour toutes une petite
+  vignette (256 pixels, une quinzaine de Ko au lieu de 2 à 6 Mo), rangée dans la branche `photos`
+  du dépôt, réécrite à chaque passage (pas d'historique). L'appli les garde pour les voir sans
+  réseau. Nouveau champ facultatif `photo` dans `promos.json` (format inchangé, toujours `2`).
+
+### Corrigé
+
+- Le robot prenait la première image du catalogue, parfois une photo d'ambiance (un plat) au lieu
+  du produit : 32 promos concernées. Chaque catalogue est relu une fois pour corriger.
+- Les captures d'écran de la documentation sont prises sans animation (une fenêtre n'est plus
+  capturée en train de s'ouvrir).
+
 ## [0.10.0] - 2026-10-28
 
 ### Ajouté

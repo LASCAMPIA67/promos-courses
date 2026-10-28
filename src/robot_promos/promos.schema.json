@@ -93,7 +93,8 @@
         "date_debut": {"$ref": "#/$defs/date"},
         "date_fin": {"$ref": "#/$defs/date"},
         "lien": {"type": ["string", "null"]},
-        "image": {"type": ["string", "null"]},
+        "image": {"type": ["string", "null"], "description": "Photo du produit (originale), seulement si elle est fiable."},
+        "photo": {"type": ["string", "null"], "description": "Vignette de la photo pour l'appli (facultatif)."},
         "page": {"type": ["integer", "null"], "minimum": 1}
       }
     }

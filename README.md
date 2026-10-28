@@ -105,6 +105,9 @@ Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
   affiche pas. En touchant l'étiquette, on voit la promo : prix, prix au kilo, jusqu'à quand (ou à
   partir de quand) et, en clair, **où va la réduction** : déjà déduite en caisse, en prenant
   plusieurs, en caisse avec la carte E.Leclerc, ou rendue sur la carte (Ticket E.Leclerc).
+- **Une photo pour chaque promo** : la photo du produit lui-même, prise dans le catalogue
+  officiel, seulement quand on est sûr que c'est la bonne (elle porte le code-barres ou le nom exact
+  du produit) ; sinon un emplacement neutre, jamais une photo trompeuse.
 - **Familles de produits** : « Chips » trouve aussi Pringles, Lay's, Doritos… ; « Soda » trouve
   Coca-Cola, Fanta… ; « Couches » trouve Pampers… (environ 50 familles).
 - **Les promos en écrivant** : en écrivant un article, les promos qui correspondent s'affichent
@@ -274,6 +277,7 @@ promos-courses/
 │   ├── robot.py                    ← chef d'orchestre
 │   ├── web.py                      ← téléchargement poli (robots.txt, pauses)
 │   ├── offres.py                   ← format d'une offre, doublons, vérification
+│   ├── photos.py                   ← vignettes des photos des produits (branche « photos »)
 │   ├── promos.schema.json          ← schéma JSON de promos.json
 │   ├── config.py                   ← magasin et réglages
 │   └── sources/
@@ -314,6 +318,9 @@ Détails dans [CONTRIBUTING.md](CONTRIBUTING.md#publier-une-nouvelle-version).
 
 ## Limites connues
 
+- **Photos** : les produits frais (boucherie, fromage à la coupe, poisson) n'ont dans le catalogue
+  qu'une photo d'ambiance : ils restent sans photo. Les premiers jours, les photos arrivent par
+  vagues (au plus une heure de téléchargement par passage du robot).
 - **Leclerc** : certaines promos portent sur toute une marque (« sur les produits présents en magasin
   de… ») : elles n'ont pas de prix unique (`prix` vaut `null`).
 - Les prix sont ceux des catalogues : une promo peut être épuisée en magasin.

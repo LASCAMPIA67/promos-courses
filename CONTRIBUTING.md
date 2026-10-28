@@ -107,6 +107,7 @@ Les workflows suivent les [recommandations de sécurité de GitHub](https://docs
 | `src/robot_promos/robot.py` | Chef d'orchestre : interroge les sources, écrit `promos.json`. |
 | `src/robot_promos/web.py` | Téléchargement poli (`robots.txt`, pauses, nouvelles tentatives). |
 | `src/robot_promos/offres.py` | Format d'une offre, doublons, vérification du schéma. |
+| `src/robot_promos/photos.py` | Vignettes des photos des produits (branche `photos`). |
 | `src/robot_promos/promos.schema.json` | Schéma JSON de `promos.json`. |
 | `src/robot_promos/sources/leclerc.py` | Source Leclerc : catalogues du magasin. |
 | `src/robot_promos/config.py` | Magasin et réglages. |

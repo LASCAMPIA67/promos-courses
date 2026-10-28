@@ -30,6 +30,26 @@ Pourquoi pas autre chose ?
 - **Tiendeo** interdit aux robots ses pages de catalogues.
 - **Bonial** ne montre qu'une partie des offres.
 
+## Photos des produits
+
+Le catalogue donne, pour chaque produit, des photos « packshot » (le produit seul) et parfois des
+photos d'« ambiance » (un plat, une mise en scène). Pour qu'une photo ne trompe jamais, le robot ne
+garde que la photo **du produit seul** dont le nom de fichier porte le **code-barres** du produit
+(presque toutes) ou exactement **son nom** ; sinon, pas de photo. Mesure du 28/10/2026 : 1 406
+produits sur 1 538 ont une photo au code-barres, une quarantaine une photo à leur nom, et 83
+produits frais n'ont qu'une photo d'ambiance (donc pas de photo dans l'appli).
+
+Les photos du catalogue (`https://nos-catalogues-promos-v2.e.leclerc/media/…`, pas de `robots.txt` :
+autorisé) pèsent 2 à 6 Mo. Le robot télécharge **une seule fois** chaque photo, avec la même pause
+de 3 secondes entre deux demandes, et en fait une vignette JPEG de 256 pixels (une quinzaine de
+Ko). Au plus une heure de photos par passage : les premiers jours, elles arrivent par vagues.
+
+> **Décision du 28/10/2026.** Les vignettes sont rangées dans la branche `photos` de ce dépôt
+> (public), réécrite à chaque passage : elle ne garde que les photos des promos en cours, sans
+> historique. Ce sont des copies réduites des photos du catalogue Leclerc, que n'importe qui voit sur
+> la visionneuse officielle : une zone grise pour le droit d'auteur, comme l'accès au catalogue.
+> Emilio a choisi de l'accepter. Pour tout retirer d'un coup : supprimer la branche `photos`.
+
 ## Sources abandonnées
 
 | Source | Magasin | Raison |

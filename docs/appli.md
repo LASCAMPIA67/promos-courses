@@ -15,7 +15,7 @@ Seuls nos deux comptes peuvent s'y connecter et voir la liste (voir
 
 Les captures sont faites avec des promos d'exemple et des prénoms fictifs (Camille en vert, Alex en orange).
 
-## Ce qu'elle sait faire (version 0.9)
+## Ce qu'elle sait faire (version 0.11)
 
 - **Se connecter** avec son e-mail et son mot de passe (une seule fois : la connexion reste active).
   Lien « Mot de passe oublié ? » pour recevoir un e-mail de changement de mot de passe.
@@ -118,7 +118,8 @@ Geispolsheim. L'appli lit ce fichier :
   leur note (« Leclerc · 2,25 € ») ;
 - en touchant l'étiquette, on voit **cette promo**, rangée pour se lire d'un coup d'œil (comme dans
   les résultats quand on écrit un article) :
-  1. **jusqu'à quand** elle dure (« Jusqu'au sam. 31 oct. », « Dernier jour ») ; une promo **à venir** (catalogue de la semaine suivante) est en
+  1. à gauche, la **photo du produit** (voir « Les photos des produits » ci-dessous) ; à côté,
+     **jusqu'à quand** elle dure (« Jusqu'au sam. 31 oct. », « Dernier jour ») ; une promo **à venir** (catalogue de la semaine suivante) est en
      bleu (« Dès jeu. 29 oct. ») ;
   2. le produit et sa marque ;
   3. sa taille, sur une ligne (« 2 x 300 ml », sans les prix répétés) ;
@@ -129,6 +130,19 @@ Geispolsheim. L'appli lit ce fichier :
   le catalogue donne en plusieurs offres, n'est montrée **qu'une fois** ;
 - en écrivant un article, les promos les plus proches viennent d'abord : pour « Lait », « Lait
   demi-écrémé » passe avant « Chocolat au lait ».
+
+### Les photos des produits
+
+Chaque promo montre la photo de son produit, prise dans le catalogue officiel Leclerc, à condition
+d'être **sûr que c'est la bonne** : la photo du produit seul (pas une photo d'ambiance, un plat ou
+une mise en scène), qui porte dans son nom le **code-barres** du produit ou exactement son nom.
+Sinon, un petit emplacement neutre (un sac) : mieux vaut pas de photo qu'une photo trompeuse. C'est
+le cas des produits frais (boucherie, fromage à la coupe, poisson) et des promos sur toute une
+marque.
+
+Les photos du catalogue pèsent 2 à 6 Mo chacune : le robot en fait une fois pour toutes une petite
+vignette (256 pixels, une quinzaine de Ko). L'appli les garde sur le téléphone : elles s'affichent
+aussi sans réseau, une fois vues. Détails : [sources.md](sources.md#photos-des-produits).
 
 ### Comprendre le prix : où va la réduction
 
@@ -243,7 +257,7 @@ que dans Firebase.
 | Tests | Ce qu'ils vérifient | Commande |
 |---|---|---|
 | Logique ([`app/tests`](../app/tests)) | Nettoyage des saisies, doublons, tri, messages d'erreur ; couleur et prénom de chacun, date d'ajout en clair ; tickets de caisse (découpage et recollage du fichier, montant, date, classement par mois, taille des photos, total et date lus sur un ticket même mal lu, faux totaux et dates impossibles écartés) ; recherche des promos (accents, pluriel, mots proches, marques, familles de produits, faux amis, début de mot), article créé depuis une promo, où va la réduction (caisse, lot, carte E.Leclerc), description sans les prix répétés, promos terminées ou à venir, dates, prix, fraîcheur des données ; quand proposer l'installation. | `npm test` |
-| Scénarios réels ([`app/e2e`](../app/e2e)) | Un navigateur à la taille d'un iPhone utilise l'appli branchée sur l'**émulateur Firebase** (jamais la vraie base), avec deux comptes et un [fichier de promos d'exemple](../app/e2e/promos-exemple.js) aux dates du jour : connexion refusée, ajout, doublon, cochage, modification, suppression, synchronisation en direct entre deux téléphones, mode hors connexion, refus d'un compte étranger, déconnexion, promo choisie avec « + Ajouter » affichée à droite de l'article (rien pour un article écrit à la main, promo retrouvée pour les articles des versions précédentes, « Promo terminée »), promos anciennes ou incomplètes, promos indisponibles puis retrouvées, conseil d'installation dans Safari sur iPhone, glisser pour supprimer avec « Annuler », « Chips » qui trouve Pringles, promos affichées en écrivant (mot entier d'abord, ajout d'une promo ou du texte écrit, affichage par 30), prix expliqué (sur la carte E.Leclerc, ou en caisse avec la carte), prénom et couleur choisis sur un téléphone et vus sur l'autre (pastille, heure d'ajout), tickets de caisse en photo et en PDF ([fichiers d'exemple](../app/e2e/fichiers-exemple.js) : lus tout seuls — date et total — sans changer ce qu'on a choisi, vus en grand sur l'autre téléphone, corrigés, partagés, supprimés, proposés après « Tout retirer », sans réseau, refusés à un compte étranger). Sur GitHub, ils tournent dans Chrome **et Safari** (WebKit). | `npm run e2e` |
+| Scénarios réels ([`app/e2e`](../app/e2e)) | Un navigateur à la taille d'un iPhone utilise l'appli branchée sur l'**émulateur Firebase** (jamais la vraie base), avec deux comptes et un [fichier de promos d'exemple](../app/e2e/promos-exemple.js) aux dates du jour : connexion refusée, ajout, doublon, cochage, modification, suppression, synchronisation en direct entre deux téléphones, mode hors connexion, refus d'un compte étranger, déconnexion, promo choisie avec « + Ajouter » affichée à droite de l'article (rien pour un article écrit à la main, promo retrouvée pour les articles des versions précédentes, « Promo terminée »), promos anciennes ou incomplètes, promos indisponibles puis retrouvées, conseil d'installation dans Safari sur iPhone, glisser pour supprimer avec « Annuler », « Chips » qui trouve Pringles, promos affichées en écrivant (mot entier d'abord, ajout d'une promo ou du texte écrit, affichage par 30), prix expliqué (sur la carte E.Leclerc, ou en caisse avec la carte), prénom et couleur choisis sur un téléphone et vus sur l'autre (pastille, heure d'ajout), photo de chaque promo (ou emplacement neutre sans photo sûre ou introuvable), tickets de caisse en photo et en PDF ([fichiers d'exemple](../app/e2e/fichiers-exemple.js) : lus tout seuls — date et total — sans changer ce qu'on a choisi, vus en grand sur l'autre téléphone, corrigés, partagés, supprimés, proposés après « Tout retirer », sans réseau, refusés à un compte étranger). Sur GitHub, ils tournent dans Chrome **et Safari** (WebKit). | `npm run e2e` |
 | Accessibilité ([`app/e2e/accessibilite.spec.js`](../app/e2e/accessibilite.spec.js)) | Chaque écran (connexion, liste, recherche, promo, fenêtres, tickets), en mode clair et sombre, vérifié avec [axe](https://github.com/dequelabs/axe-core) selon les règles WCAG 2.2 niveau AA : contrastes, noms lus par VoiceOver, champs… | `npm run e2e` |
 | Rapidité ([Lighthouse](https://developer.chrome.com/docs/lighthouse)) | L'appli construite, mesurée sur un téléphone simulé : rapidité (85 sur 100 au moins), accessibilité (100), bonnes pratiques (95 au moins). Sur GitHub, à chaque modification (rapports gardés 14 jours). | `npm run build && npm run qualite` |
 | Captures d'écran | Régénère les images de cette page dans `docs/captures/`. | `npm run captures` |

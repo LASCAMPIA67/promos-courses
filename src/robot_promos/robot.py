@@ -15,6 +15,7 @@ from robot_promos import __version__
 from robot_promos.config import MAGASINS
 from robot_promos.offres import dedoublonner, verifier
 from robot_promos.outils import aujourdhui, maintenant
+from robot_promos.photos import preparer_photos
 from robot_promos.sources.leclerc import Leclerc
 from robot_promos.web import Navigateur
 
@@ -102,6 +103,10 @@ def main(argv=None):
     parser = argparse.ArgumentParser(prog="python -m robot_promos", description=__doc__.splitlines()[0])
     parser.add_argument("--sortie", default="promos.json", help="fichier à écrire (par défaut : promos.json)")
     parser.add_argument("--sans-cache", action="store_true", help="relire tous les catalogues, même inchangés")
+    parser.add_argument("--photos", metavar="DOSSIER", help="dossier des vignettes des photos (branche « photos »)")
+    parser.add_argument(
+        "--minutes-photos", type=float, default=60, help="temps maximal pour télécharger les photos (par défaut : 60)"
+    )
     parser.add_argument("--version", action="version", version=f"robot_promos {__version__}")
     args = parser.parse_args(argv)
 
@@ -130,6 +135,16 @@ def main(argv=None):
         for catalogue in etat["catalogues"]:
             catalogue["nb_offres"] = compte[(etat["id"], catalogue["id"])]
         etat["nb_offres"] = sum(c["nb_offres"] for c in etat["catalogues"])
+    bilan_photos = None
+    if args.photos:
+        print("→ Photos des produits…", flush=True)
+        bilan_photos = preparer_photos(nav, offres, args.photos, budget=args.minutes_photos * 60)
+        print(
+            f"   {bilan_photos['avec_photo']} offres avec photo ; {bilan_photos['nouvelles']} nouvelles, "
+            f"{bilan_photos['retirees']} retirées, {bilan_photos['erreurs']} illisibles, "
+            f"{bilan_photos['en_attente']} pour le prochain passage.",
+            flush=True,
+        )
     document = {
         "format": FORMAT,
         "mise_a_jour": maintenant(),
@@ -141,11 +156,11 @@ def main(argv=None):
     verifier(document)
     Path(args.sortie).write_text(json.dumps(document, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(f"{args.sortie} écrit : {len(offres)} offres ({nav.nb_requetes} requêtes).")
-    ecrire_resume(etats, len(offres))
+    ecrire_resume(etats, len(offres), bilan_photos)
     return 0
 
 
-def ecrire_resume(etats, total):
+def ecrire_resume(etats, total, bilan_photos=None):
     """Tableau affiché sur la page du lancement dans GitHub Actions."""
     chemin = os.environ.get("GITHUB_STEP_SUMMARY")
     if not chemin:
@@ -173,6 +188,14 @@ def ecrire_resume(etats, total):
                 f"| {MAGASINS[e['magasin']]['nom']} | {c['nom']} | {c['debut']} | {c['fin']} | "
                 f"{c['nb_offres']} | {'non (inchangé)' if c['reutilise'] else 'oui'} |"
             )
+    if bilan_photos:
+        lignes += [
+            "",
+            f"### Photos : {bilan_photos['avec_photo']} offres sur {total}",
+            "",
+            f"{bilan_photos['nouvelles']} nouvelles, {bilan_photos['retirees']} retirées, "
+            f"{bilan_photos['erreurs']} illisibles, {bilan_photos['en_attente']} pour le prochain passage.",
+        ]
     with Path(chemin).open("a", encoding="utf-8") as f:
         f.write("\n".join(lignes) + "\n")
 

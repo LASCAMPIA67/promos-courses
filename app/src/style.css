@@ -913,6 +913,48 @@ dialog h2 {
   margin: 0;
 }
 
+/* En haut : la photo du produit, et à côté jusqu'à quand, le nom et la taille. */
+.promo-tete {
+  --taille-photo: 64px;
+  display: grid;
+  grid-template-columns: var(--taille-photo) minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+
+.fenetre-promos .promo-tete {
+  --taille-photo: 88px;
+}
+
+.promo-textes {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+/* Les photos des produits sont sur fond blanc, même en mode sombre : un petit carré blanc arrondi. */
+.photo-promo {
+  display: grid;
+  place-items: center;
+  width: var(--taille-photo);
+  height: var(--taille-photo);
+  border: 1px solid var(--bordure);
+  border-radius: 12px;
+  background: #ffffff;
+  object-fit: contain;
+}
+
+.photo-promo.sans-photo {
+  background: var(--fond);
+  color: var(--discret);
+}
+
+.photo-promo svg {
+  width: 26px;
+  height: 26px;
+  stroke-width: 1.6;
+}
+
 .periode {
   color: var(--discret);
   font-size: 0.82rem;

@@ -30,9 +30,10 @@ jobs:
   robot:
     name: Récupérer les promos
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # Jusqu'à 60 minutes de photos (voir --minutes-photos) : les premières fois, il y en a beaucoup.
+    timeout-minutes: 90
     permissions:
-      contents: write # pour pouvoir enregistrer promos.json dans le dépôt
+      contents: write # pour pouvoir enregistrer promos.json et les photos dans le dépôt
       actions: read # pour savoir si le robot a déjà été lancé aujourd'hui
     steps:
       # Un lancement programmé ne fait rien si le robot a déjà été lancé aujourd'hui (heure de
@@ -53,8 +54,8 @@ jobs:
             echo "deja_passe=oui" >> "$GITHUB_OUTPUT"
           fi
 
-      # Le jeton git reste disponible pendant ce travail : il sert à enregistrer promos.json (rien
-      # d'autre n'est envoyé ni partagé depuis ce travail).
+      # Le jeton git reste disponible pendant ce travail : il sert à enregistrer promos.json et les
+      # photos (rien d'autre n'est envoyé ni partagé depuis ce travail).
       - name: Récupérer le dépôt
         if: steps.aujourdhui.outputs.deja_passe != 'oui'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -71,15 +72,50 @@ jobs:
         if: steps.aujourdhui.outputs.deja_passe != 'oui'
         run: pip install .
 
+      # Les vignettes des photos des produits sont dans la branche « photos » : on reprend celles déjà
+      # faites, pour ne télécharger que les nouvelles.
+      - name: Reprendre les photos déjà faites
+        if: steps.aujourdhui.outputs.deja_passe != 'oui'
+        run: |
+          mkdir -p "$RUNNER_TEMP/photos"
+          if git fetch --depth=1 origin photos; then
+            git archive FETCH_HEAD | tar -x -C "$RUNNER_TEMP/photos"
+            git rev-parse "FETCH_HEAD^{tree}" > "$RUNNER_TEMP/arbre-photos"
+          fi
+
       - name: Lancer le robot
         if: steps.aujourdhui.outputs.deja_passe != 'oui'
         env:
           SANS_CACHE: ${{ inputs.sans_cache }}
         run: |
+          options=(--photos "$RUNNER_TEMP/photos" --minutes-photos 60)
           if [ "$SANS_CACHE" = "true" ]; then
-            python -m robot_promos --sans-cache
+            options+=(--sans-cache)
+          fi
+          python -m robot_promos "${options[@]}"
+
+      # La branche « photos » est réécrite à chaque fois, en un seul enregistrement : elle ne garde que
+      # les photos des promos en cours, sans historique (le dépôt ne grossit pas). Elle est publiée
+      # avant promos.json, pour que l'appli ne cherche jamais une photo qui n'existe pas encore.
+      - name: Enregistrer les photos
+        if: steps.aujourdhui.outputs.deja_passe != 'oui'
+        run: |
+          printf '%s\n' "# Photos des produits" "" \
+            "Vignettes des photos des promos en cours, écrites chaque matin par le robot" \
+            "(voir src/robot_promos/photos.py sur la branche main). Cette branche est réécrite à" \
+            "chaque passage : ne rien y modifier à la main." > "$RUNNER_TEMP/photos/LISEZMOI.md"
+          depot="$PWD/.git"
+          cd "$RUNNER_TEMP/photos"
+          export GIT_DIR="$depot" GIT_WORK_TREE="$PWD" GIT_INDEX_FILE="$RUNNER_TEMP/index-photos"
+          git add -A .
+          arbre=$(git write-tree)
+          if [ "$arbre" = "$(cat "$RUNNER_TEMP/arbre-photos" 2>/dev/null)" ]; then
+            echo "Photos inchangées."
           else
-            python -m robot_promos
+            enregistrement=$(git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit-tree "$arbre" -m "Photos du $(TZ=Europe/Paris date +%d/%m/%Y)")
+            git push --force origin "$enregistrement:refs/heads/photos"
           fi
 
       - name: Enregistrer promos.json

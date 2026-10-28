@@ -78,7 +78,8 @@ Son format est décrit précisément (et vérifié à chaque passage) par le sch
 | `carte_fidelite` | `true` | Il faut la carte E.Leclerc (réduction en caisse ou Ticket E.Leclerc). |
 | `date_debut`, `date_fin` | `2026-10-20`, `2026-10-31` | Validité, dates incluses. Une promo dont `date_debut` est dans le futur est « à venir ». |
 | `lien` | | Page du catalogue sur le site de l'enseigne. |
-| `image` | | Photo du produit. |
+| `image` | | Photo du produit (l'originale, dans le catalogue), **seulement si elle est sûre** : la photo du produit seul, qui porte son code-barres ou son nom exact. `null` sinon (produits frais, promos sur toute une marque). |
+| `photo` | | Vignette de cette photo pour l'appli (256 pixels, JPEG), dans la branche `photos` du dépôt. `null` tant qu'elle n'est pas faite. Facultatif : un fichier sans ce champ reste valable. |
 | `page` | `null` | Numéro de page dans le catalogue, si connu. |
 
 ## Comment l'appli s'en sert

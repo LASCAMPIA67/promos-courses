@@ -23,6 +23,10 @@ VISIONNEUSE = "https://nos-catalogues-promos-v2.e.leclerc"
 ENTETES = {"Origin": VISIONNEUSE, "Referer": VISIONNEUSE + "/", "Accept": "application/json"}
 UNITES = {"le kg": "kg", "le l": "l", "la pièce": "pièce"}
 
+# Change quand la façon de lire un catalogue change : chaque catalogue est alors relu une fois, au
+# prochain passage, au lieu de garder les offres lues à l'ancienne (2 : photos fiables).
+LECTURE = 2
+
 
 class Leclerc(Source):
     id = "leclerc"
@@ -49,7 +53,7 @@ class Leclerc(Source):
                     nom=nom,
                     debut=(op.get("start_date") or "")[:10] or None,
                     fin=fin,
-                    version=f"{op.get('documentUid')}@{op.get('updatedDate')}",
+                    version=f"{op.get('documentUid')}@{op.get('updatedDate')}#lecture-{LECTURE}",
                     lien=f"{VISIONNEUSE}/catalog/{code}/{NUMERO}",
                     donnees={"document": op.get("documentUid")},
                 )
@@ -149,7 +153,6 @@ def convertir(p, catalogue):
     if mandat_debut and mandat_fin and mandat_debut <= mandat_fin:
         debut, fin = mandat_debut, mandat_fin  # dates propres à ce produit
 
-    images = p.get("images") or []
     return creer_offre(
         id=f"leclerc-{catalogue.id}-{(p.get('uid') or '')[:12]}".lower(),
         source="leclerc",
@@ -170,8 +173,35 @@ def convertir(p, catalogue):
         date_debut=debut,
         date_fin=fin,
         lien=catalogue.lien,
-        image=images[0].get("url") if images else None,
+        image=None if toute_la_gamme else photo_fiable(p, nom),
     )
+
+
+def simplifier(texte):
+    """« Crème  Douche.jpg » -> « creme douche » : pour comparer des noms écrits différemment."""
+    texte = re.sub(r"\.(jpe?g|png|webp|tiff?)$", "", (texte or "").strip(), flags=re.IGNORECASE)
+    return " ".join(sans_accents(texte).lower().split())
+
+
+def photo_fiable(p, nom):
+    """L'adresse de la photo du produit lui-même, seulement si on est sûr que c'est la bonne ; sinon None.
+
+    Le catalogue donne des photos « packshot » (le produit seul, son emballage) et des photos
+    d'« ambiance » (un plat, une mise en scène) : seules les premières comptent. Et la photo doit porter
+    dans son nom le code-barres du produit (le cas de presque toutes), ou exactement le nom du produit
+    (« VODKA PEACH »). Les photos génériques (« 26G310G_5_AMB ») ou d'un autre produit sont écartées :
+    mieux vaut pas de photo qu'une photo trompeuse.
+    """
+    codes = {str(code).strip() for code in [p.get("ean"), *(p.get("eans") or [])] if code}
+    codes |= {code.lstrip("0") for code in codes}
+    codes.discard("")
+    for image in p.get("imagesV2") or []:
+        fichier = image.get("name") or ""
+        if image.get("type") != "packshot" or not image.get("url") or re.search(r"(^|_)(AMB|BBZ)(_|\.|$)", fichier):
+            continue
+        if any(code in fichier for code in codes) or simplifier(fichier) == simplifier(nom):
+            return image["url"]
+    return None
 
 
 def payes_offerts(reduction):

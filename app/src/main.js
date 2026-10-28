@@ -437,23 +437,27 @@ function element(balise, classe, texte) {
 }
 
 /**
- * Une promo, rangée pour se lire d'un coup d'œil : jusqu'à quand ; le produit ; sa taille ; le prix ;
- * le type de promo (couleur selon l'endroit où va la réduction) et le détail utile.
+ * Une promo, rangée pour se lire d'un coup d'œil : la photo du produit et, à côté, jusqu'à quand, le
+ * produit et sa taille ; dessous, le prix, le type de promo (couleur selon l'endroit où va la
+ * réduction) et le détail utile.
  */
 function cartePromo(offre, aVenir, aujourdhui, { avecAjout = false } = {}) {
   const carte = element("li", "promo");
   carte.toggleAttribute("data-a-venir", aVenir);
 
-  const haut = element("p", "periode", periode(offre, aujourdhui));
-
+  const textes = element("div", "promo-textes");
+  textes.append(element("p", "periode", periode(offre, aujourdhui)));
   // Le nom, avec la marque si elle n'y est pas déjà.
   const nom = element("p", "promo-nom", joliNom(offre.produit));
   if (offre.marque && !joliNom(offre.produit).toLowerCase().includes(offre.marque.toLowerCase())) {
     nom.append(" ", element("span", "promo-marque", offre.marque));
   }
-  carte.append(haut, nom);
+  textes.append(nom);
   const description = resumeDescription(offre.description);
-  if (description) carte.append(element("p", "promo-description", description));
+  if (description) textes.append(element("p", "promo-description", description));
+  const tete = element("div", "promo-tete");
+  tete.append(photoPromo(offre), textes);
+  carte.append(tete);
 
   // Le prix payé en caisse, l'ancien prix, le prix au kilo ; à droite, le bouton pour l'ajouter.
   const explication = explicationPrix(offre);
@@ -544,6 +548,30 @@ $("plus-de-resultats").addEventListener("click", () => {
 });
 
 /** « Ajouter à la liste », ou « Dans la liste » si l'article y est déjà. */
+/**
+ * La photo du produit (une vignette faite par le robot, seulement quand elle est sûre), ou un
+ * emplacement neutre : jamais une photo qui pourrait tromper. Décorative : le nom est juste à côté.
+ */
+function photoPromo(offre) {
+  const sansPhoto = () => {
+    const cadre = element("span", "photo-promo sans-photo");
+    cadre.innerHTML =
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2z" /><path d="M9 8V6.5a3 3 0 0 1 6 0V8" /></svg>';
+    return cadre;
+  };
+  if (!/^https:\/\//.test(offre.photo ?? "")) return sansPhoto();
+  const image = document.createElement("img");
+  image.className = "photo-promo";
+  image.alt = "";
+  image.loading = "lazy";
+  image.decoding = "async";
+  image.crossOrigin = "anonymous"; // pour la garder sur le téléphone (hors connexion)
+  image.referrerPolicy = "no-referrer";
+  image.addEventListener("error", () => image.replaceWith(sansPhoto()), { once: true });
+  image.src = offre.photo;
+  return image;
+}
+
 function boutonAjouter(offre) {
   const bouton = element("button", "bouton-ajouter");
   bouton.type = "button";

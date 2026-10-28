@@ -1,7 +1,7 @@
 import pytest
 
 from robot_promos.sources import Catalogue
-from robot_promos.sources.leclerc import completer_lot, convertir
+from robot_promos.sources.leclerc import completer_lot, convertir, photo_fiable
 
 CATALOGUE = Catalogue(id="26G124G", nom="Nos promos", debut="2026-10-20", fin="2026-10-31", version="v1", lien="l")
 
@@ -19,7 +19,11 @@ def produit(**champs):
         "containerPriceUnit": "Le kg",
         "containerPrice": "8.00",
         "containerPriceBeforeMeca": "8.00",
-        "images": [{"url": "https://exemple/image"}],
+        "ean": "3018257905006",
+        "imagesV2": [
+            {"type": "packshot", "name": "3018257905006.jpg", "url": "https://exemple/media/a1"},
+            {"type": "ambiance", "name": "AMB_3018257905006.jpg", "url": "https://exemple/media/b2"},
+        ],
     }
     return base | champs
 
@@ -29,7 +33,7 @@ def test_prix_simple():
     assert (o["prix"], o["ancien_prix"], o["reduction"], o["lot"]) == (2.0, None, None, None)
     assert (o["prix_unitaire"], o["unite"]) == (8.0, "kg")
     assert (o["date_debut"], o["date_fin"]) == ("2026-10-20", "2026-10-31")
-    assert o["image"] == "https://exemple/image"
+    assert o["image"] == "https://exemple/media/a1"
     assert o["id"] == "leclerc-26g124g-abcdef123456"
 
 
@@ -150,3 +154,52 @@ def test_completer_lot_calcule_le_prix_manquant():
     assert lot == {"quantite": 2, "prix": 2.27, "prix_unitaire": 2.84}
     lot = completer_lot({"quantite": 3, "prix": None, "prix_unitaire": None}, 1.0, 2.0, None, (2, 1))
     assert lot["prix"] == 2.0
+
+
+def photo(type_, nom, url="https://exemple/media/x"):
+    return {"type": type_, "name": nom, "url": url}
+
+
+def test_photo_fiable_seulement_celle_du_produit():
+    # La photo du produit (son code-barres dans le nom), jamais celle d'ambiance, même placée avant.
+    ambiance_d_abord = produit(
+        imagesV2=[photo("ambiance", "AMB_3018257905006.jpg", "amb"), photo("packshot", "3018257905006.jpg", "ok")]
+    )
+    assert photo_fiable(ambiance_d_abord, "PRODUIT") == "ok"
+    # Un des codes-barres d'une promo « au choix », ou sans le 0 du début.
+    assert (
+        photo_fiable(
+            produit(
+                ean=None,
+                eans=["3564706769809", "3564706768932"],
+                imagesV2=[photo("packshot", "24G_3564706768932", "ok")],
+            ),
+            "x",
+        )
+        == "ok"
+    )
+    assert (
+        photo_fiable(produit(ean="03222270171359", imagesV2=[photo("packshot", "3222270171359.png", "ok")]), "x")
+        == "ok"
+    )
+    # Pas de code-barres dans le nom, mais exactement le nom du produit (accents, espaces, extension).
+    assert photo_fiable(produit(imagesV2=[photo("packshot", " Crème  Douche.jpg", "ok")]), "CRÈME DOUCHE") == "ok"
+
+
+def test_photo_fiable_ecarte_les_photos_douteuses():
+    douteuses = [
+        [photo("ambiance", "AMB_3018257905006.jpg")],  # ambiance seulement (produit frais)
+        [photo("packshot", "26G310G_5_AMB")],  # « packshot » qui est en fait une ambiance
+        [photo("packshot", "21G309G_5_BBZ")],  # photo générique
+        [photo("packshot", "24G303G_3266110907173")],  # le code-barres d'un autre produit
+        [photo("packshot", "VODAK RASPBERRI")],  # nom différent
+        [photo("packshot", "3018257905006.jpg", url=None)],
+        [],
+    ]
+    for images in douteuses:
+        assert photo_fiable(produit(imagesV2=images), "VODKA RASPBERRI") is None, images
+
+
+def test_pas_de_photo_pour_toute_une_gamme():
+    o = convertir(produit(name="SUR LES PRODUITS PRÉSENTS EN MAGASIN DE LA MARQUE"), CATALOGUE)
+    assert o["image"] is None

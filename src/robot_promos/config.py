@@ -15,5 +15,8 @@ MAGASINS = {
     "leclerc-geispolsheim": {"nom": "E.Leclerc Geispolsheim", "enseigne": "E.Leclerc", "ville": "Geispolsheim"},
 }
 
+# Où l'appli trouve les vignettes des photos des produits (branche « photos » du dépôt).
+ADRESSE_PHOTOS = "https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/"
+
 # Numéro du magasin E.Leclerc de Geispolsheim dans les catalogues Leclerc.
 LECLERC_NUMERO_MAGASIN = "1067"

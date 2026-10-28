@@ -12,6 +12,7 @@ authors = [{ name = "Emilio" }]
 dependencies = [
     "requests>=2.32,<3",
     "jsonschema>=4.23,<5",
+    "pillow>=12,<14",
 ]
 
 [project.optional-dependencies]
