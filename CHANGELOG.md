@@ -14,6 +14,25 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+### Ajouté
+
+- **Le logo de la marque**, en haut à droite de chaque promo (sur une petite étiquette blanche,
+  lisible aussi en mode sombre) ; le nom du produit est désormais écrit seul. Le logo vient du
+  catalogue Leclerc, qui en joint à beaucoup de produits ; il n'est gardé que si son nom de fichier
+  contient exactement la marque, en mots entiers (« LACTEL-LOGO », « AIRWICK » pour AIR WICK),
+  jamais un label, un visuel publicitaire ou une autre marque qui commence pareil (« Clementoni »
+  pour CLÉMENT). Une marque n'a qu'un logo, repris pour toutes ses promos : 239 marques, 59 % des
+  produits de marque (28/10/2026). Sans logo sûr, le nom de la marque est écrit en petit au même
+  endroit. Le robot en fait une petite image PNG (1 à 12 Ko) rangée dans `logos/` de la branche
+  `photos` ; nouveaux champs facultatifs `logo_catalogue` et `logo` dans `promos.json` (format
+  inchangé). Chaque catalogue est relu une fois (lecture n° 3).
+
+### Modifié
+
+- L'étape du robot « Fabriquer les photos » devient « Fabriquer les photos et les logos » (les
+  logos d'abord, puis les photos, au plus une heure en tout) ; dans la fenêtre d'avancée :
+  « Photos et logos ».
+
 ## [0.12.0] - 2026-10-28
 
 ### Ajouté

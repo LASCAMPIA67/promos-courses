@@ -1,8 +1,10 @@
-"""Les photos des produits, en petit, pour l'appli.
+"""Les photos des produits et les logos des marques, en petit, pour l'appli.
 
 Les photos du catalogue Leclerc pèsent souvent 2 à 6 Mo : bien trop pour un téléphone. Le robot
 télécharge une seule fois chaque photo fiable (voir sources/leclerc.py, photo_fiable) et en fait une
-vignette JPEG carrée de 256 pixels (une quinzaine de Ko), sur fond blanc, le produit centré.
+vignette JPEG carrée de 256 pixels (une quinzaine de Ko), sur fond blanc, le produit centré. De même
+pour le logo de chaque marque (sources/leclerc.py, logo_de_la_marque) : une petite image PNG, dans
+« logos/ », qui sert à toutes les promos de la marque.
 
 Les vignettes sont rangées dans la branche « photos » du dépôt, réécrite à chaque passage : elle ne
 garde que les photos des promos en cours, sans historique (le dépôt ne grossit pas). L'appli les lit
@@ -18,6 +20,7 @@ import os
 import re
 import sys
 import time
+from collections import Counter, defaultdict
 from pathlib import Path
 
 from PIL import Image, ImageChops, ImageOps
@@ -30,27 +33,32 @@ from robot_promos.web import Navigateur
 TAILLE = 256  # côté de la vignette, en pixels : net pour une photo de 80 points sur l'iPhone
 MARGE = 12  # blanc autour du produit, en pixels
 TAILLE_MAX = 20_000_000  # une photo plus lourde est ignorée (les plus grosses font environ 6 Mo)
+LOGO = (300, 96)  # largeur et hauteur maximales d'un logo, en pixels : net en 24 points de haut
 
 # Une image de plus de 40 millions de pixels est refusée (protection contre les images piégées).
 Image.MAX_IMAGE_PIXELS = 40_000_000
 
 
-def nom_photo(adresse):
+def nom_photo(adresse, extension="jpg"):
     """« …/media/a36742fdec095062bc70d90a1edd4f3c » -> « a36742fdec095062bc70d90a1edd4f3c.jpg » (ou None)."""
     identifiant = (adresse or "").rstrip("/").rsplit("/", 1)[-1]
-    return f"{identifiant}.jpg" if re.fullmatch(r"[0-9a-f]{16,64}", identifiant) else None
+    return f"{identifiant}.{extension}" if re.fullmatch(r"[0-9a-f]{16,64}", identifiant) else None
 
 
-def reduire(octets):
-    """La vignette JPEG d'une photo : carrée, fond blanc, le produit centré et sans les bords vides."""
+def sur_fond_blanc(octets):
+    """L'image sur fond blanc (le transparent devient blanc), sans les bords vides tout autour."""
     with Image.open(io.BytesIO(octets)) as originale:
         image = ImageOps.exif_transpose(originale).convert("RGBA")
     blanc = Image.new("RGB", image.size, "white")
     blanc.paste(image, mask=image.getchannel("A"))
-    # Le produit seul : on retire le blanc (ou le transparent) tout autour.
     contenu = ImageChops.difference(blanc, Image.new("RGB", image.size, "white")).convert("L")
     cadre = contenu.point(lambda v: 255 if v > 12 else 0).getbbox()
-    produit = blanc.crop(cadre) if cadre else blanc
+    return blanc.crop(cadre) if cadre else blanc
+
+
+def reduire(octets):
+    """La vignette JPEG d'une photo : carrée, fond blanc, le produit centré et sans les bords vides."""
+    produit = sur_fond_blanc(octets)
     produit.thumbnail((TAILLE - 2 * MARGE, TAILLE - 2 * MARGE), Image.Resampling.LANCZOS)
     vignette = Image.new("RGB", (TAILLE, TAILLE), "white")
     vignette.paste(produit, ((TAILLE - produit.width) // 2, (TAILLE - produit.height) // 2))
@@ -59,61 +67,105 @@ def reduire(octets):
     return sortie.getvalue()
 
 
+def reduire_logo(octets):
+    """La vignette PNG d'un logo : sur fond blanc, sans les bords vides, 300 sur 96 pixels au plus."""
+    logo = sur_fond_blanc(octets)
+    logo.thumbnail(LOGO, Image.Resampling.LANCZOS)
+    sortie = io.BytesIO()
+    logo.quantize(colors=64).save(sortie, "PNG", optimize=True)  # 64 couleurs suffisent à un logo
+    return sortie.getvalue()
+
+
 def nombre(n):
     """1450 -> « 1 450 »."""
     return f"{n:,}".replace(",", "\u202f")
 
 
-def preparer_photos(nav, offres, dossier, budget=None, horloge=time.monotonic, avancee=sans_nouvelles):
-    """Fait les vignettes qui manquent dans `dossier`, retire celles qui ne servent plus et indique
-    dans chaque offre l'adresse de sa vignette (« photo »), ou None.
-
-    `budget` : temps maximal de téléchargement, en secondes ; les photos restantes seront faites au
-    prochain passage. `avancee` reçoit où on en est (voir avancee.py). Renvoie un petit bilan.
-    """
-    dossier = Path(dossier)
+def faire_vignettes(
+    nav, a_faire, dossier, extension, fabriquer, libelle, limite=None, horloge=time.monotonic, avancee=sans_nouvelles
+):
+    """Fait les vignettes qui manquent dans `dossier` avec `fabriquer` : `a_faire` donne, pour chaque
+    fichier (d'extension `extension`), l'adresse de l'original. S'arrête à l'heure `limite` (les autres
+    attendront le prochain passage), puis retire celles qui ne servent plus. Renvoie (les fichiers
+    présents, un petit bilan)."""
     dossier.mkdir(parents=True, exist_ok=True)
-    a_faire = {}
-    for offre in offres:
-        nom = nom_photo(offre.get("image"))
-        if nom:
-            a_faire.setdefault(nom, offre["image"])
-
-    presentes = {fichier.name for fichier in dossier.glob("*.jpg")}
-    debut = horloge()
+    presentes = {fichier.name for fichier in dossier.glob(f"*.{extension}")}
     bilan = {"nouvelles": 0, "en_attente": 0, "erreurs": 0, "retirees": 0}
     pretes = len(presentes & a_faire.keys())
     for nom, adresse in a_faire.items():
         if nom in presentes:
             continue
         nouvelles = f" ({nombre(bilan['nouvelles'])} nouvelles)" if bilan["nouvelles"] else ""
-        avancee(f"Photos : {nombre(pretes)} sur {nombre(len(a_faire))}{nouvelles}")
-        if budget is not None and horloge() - debut > budget:
+        avancee(f"{libelle} : {nombre(pretes)} sur {nombre(len(a_faire))}{nouvelles}")
+        if limite is not None and horloge() > limite:
             bilan["en_attente"] += 1
             continue
         try:
             reponse = nav.get(adresse, timeout=60)
             if len(reponse.content) > TAILLE_MAX:
-                raise ValueError(f"photo trop lourde ({len(reponse.content)} octets)")
-            (dossier / nom).write_bytes(reduire(reponse.content))
-        except Exception as erreur:  # noqa: BLE001 — une photo illisible ne doit pas arrêter le robot
-            print(f"   Photo ignorée ({adresse}) : {type(erreur).__name__} : {erreur}"[:300], flush=True)
+                raise ValueError(f"image trop lourde ({len(reponse.content)} octets)")
+            (dossier / nom).write_bytes(fabriquer(reponse.content))
+        except Exception as erreur:  # noqa: BLE001 — une image illisible ne doit pas arrêter le robot
+            print(f"   Image ignorée ({adresse}) : {type(erreur).__name__} : {erreur}"[:300], flush=True)
             bilan["erreurs"] += 1
             continue
         presentes.add(nom)
         bilan["nouvelles"] += 1
         pretes += 1
 
-    for fichier in dossier.glob("*.jpg"):
+    for fichier in dossier.glob(f"*.{extension}"):
         if fichier.name not in a_faire:
             fichier.unlink()
             presentes.discard(fichier.name)
             bilan["retirees"] += 1
+    return presentes, bilan
 
+
+def preparer_photos(nav, offres, dossier, budget=None, horloge=time.monotonic, avancee=sans_nouvelles):
+    """Fait les vignettes des photos qui manquent dans `dossier`, retire celles qui ne servent plus et
+    indique dans chaque offre l'adresse de sa vignette (« photo »), ou None.
+
+    `budget` : temps maximal de téléchargement, en secondes ; les photos restantes seront faites au
+    prochain passage. `avancee` reçoit où on en est (voir avancee.py). Renvoie un petit bilan.
+    """
+    a_faire = {}
+    for offre in offres:
+        nom = nom_photo(offre.get("image"))
+        if nom:
+            a_faire.setdefault(nom, offre["image"])
+    limite = None if budget is None else horloge() + budget
+    presentes, bilan = faire_vignettes(nav, a_faire, Path(dossier), "jpg", reduire, "Photos", limite, horloge, avancee)
     for offre in offres:
         nom = nom_photo(offre.get("image"))
         offre["photo"] = f"{ADRESSE_PHOTOS}{nom}" if nom in presentes else None
     bilan["avec_photo"] = sum(1 for offre in offres if offre["photo"])
+    return bilan
+
+
+def cle_marque(marque):
+    """La même marque, écrite « Foxter » ou « FOXTER »."""
+    return " ".join((marque or "").upper().split())
+
+
+def preparer_logos(nav, offres, dossier, budget=None, horloge=time.monotonic, avancee=sans_nouvelles):
+    """Fait les vignettes des logos (dans `dossier`/logos) et indique dans chaque offre celui de sa
+    marque (« logo »), ou None. Une marque n'a qu'un logo : celui que le catalogue joint le plus
+    souvent à ses produits, repris pour tous, même ceux qui n'en ont pas. Renvoie un petit bilan.
+    """
+    par_marque = defaultdict(Counter)
+    for offre in offres:
+        if offre.get("marque") and nom_photo(offre.get("logo_catalogue"), "png"):
+            par_marque[cle_marque(offre["marque"])][offre["logo_catalogue"]] += 1
+    choisis = {marque: logos.most_common(1)[0][0] for marque, logos in par_marque.items()}
+    a_faire = {nom_photo(adresse, "png"): adresse for adresse in choisis.values()}
+    limite = None if budget is None else horloge() + budget
+    dossier = Path(dossier) / "logos"
+    presentes, bilan = faire_vignettes(nav, a_faire, dossier, "png", reduire_logo, "Logos", limite, horloge, avancee)
+    for offre in offres:
+        nom = nom_photo(choisis.get(cle_marque(offre.get("marque"))), "png")
+        offre["logo"] = f"{ADRESSE_PHOTOS}logos/{nom}" if nom in presentes else None
+    bilan["avec_logo"] = sum(1 for offre in offres if offre["logo"])
+    bilan["marques"] = len({nom for nom in a_faire if nom in presentes})
     return bilan
 
 
@@ -127,8 +179,14 @@ def main(argv=None):
     chemin = Path(args.promos)
     document = json.loads(chemin.read_text(encoding="utf-8"))
     avancee = Avancee()
+    nav = Navigateur()
+    debut = time.monotonic()
+    # Les logos d'abord (peu nombreux, une fois par marque), puis les photos avec le temps qui reste.
+    print("→ Logos des marques…", flush=True)
+    logos = preparer_logos(nav, document["offres"], args.dossier, budget=args.minutes * 60, avancee=avancee)
     print("→ Photos des produits…", flush=True)
-    bilan = preparer_photos(Navigateur(), document["offres"], args.dossier, budget=args.minutes * 60, avancee=avancee)
+    reste = max(0, args.minutes * 60 - (time.monotonic() - debut))
+    bilan = preparer_photos(nav, document["offres"], args.dossier, budget=reste, avancee=avancee)
     verifier(document)
     chemin.write_text(json.dumps(document, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     phrase = (
@@ -136,11 +194,16 @@ def main(argv=None):
         f"{bilan['nouvelles']} nouvelles, {bilan['retirees']} retirées, {bilan['erreurs']} illisibles, "
         f"{bilan['en_attente']} pour le prochain passage."
     )
-    print(f"   {phrase}", flush=True)
+    phrase_logos = (
+        f"{nombre(logos['avec_logo'])} promos avec le logo de leur marque ({logos['marques']} marques) ; "
+        f"{logos['nouvelles']} nouveaux, {logos['retirees']} retirés, {logos['erreurs']} illisibles, "
+        f"{logos['en_attente']} pour le prochain passage."
+    )
+    print(f"   {phrase_logos}\n   {phrase}", flush=True)
     avancee(f"Photos : {nombre(bilan['avec_photo'])} promos avec photo", forcer=True)
     if resume := os.environ.get("GITHUB_STEP_SUMMARY"):
         with Path(resume).open("a", encoding="utf-8") as f:
-            f.write(f"\n### Photos\n\n{phrase}\n")
+            f.write(f"\n### Photos et logos\n\n{phrase}\n\n{phrase_logos}\n")
     return 0
 
 

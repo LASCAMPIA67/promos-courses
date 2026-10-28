@@ -24,8 +24,8 @@ ENTETES = {"Origin": VISIONNEUSE, "Referer": VISIONNEUSE + "/", "Accept": "appli
 UNITES = {"le kg": "kg", "le l": "l", "la pièce": "pièce"}
 
 # Change quand la façon de lire un catalogue change : chaque catalogue est alors relu une fois, au
-# prochain passage, au lieu de garder les offres lues à l'ancienne (2 : photos fiables).
-LECTURE = 2
+# prochain passage, au lieu de garder les offres lues à l'ancienne (2 : photos fiables, 3 : logos).
+LECTURE = 3
 
 
 class Leclerc(Source):
@@ -174,6 +174,7 @@ def convertir(p, catalogue):
         date_fin=fin,
         lien=catalogue.lien,
         image=None if toute_la_gamme else photo_fiable(p, nom),
+        logo_catalogue=logo_de_la_marque(p, p.get("brand")),
     )
 
 
@@ -240,4 +241,31 @@ def calculer_prix_unitaire(p, prix, prix_rayon, prix_sans_remise):
     base = avant or apres
     if base and prix_rayon:
         return round(base * prix / prix_rayon, 2)
+    return None
+
+
+def mots(texte):
+    """« LACTEL-LOGO.png » -> ["lactel", "logo"] : minuscules, sans accents ni extension ni ponctuation."""
+    texte = re.sub(r"\.(jpe?g|png|svg|eps|ai|tiff?|webp)$", "", sans_accents(texte or "").lower().strip())
+    return [mot for mot in re.split(r"[^a-z0-9]+", texte) if mot]
+
+
+def logo_de_la_marque(p, marque):
+    """L'adresse du logo de la marque du produit, donné par le catalogue, seulement si on est sûr.
+
+    Le catalogue joint parfois des « logos » à un produit : celui de sa marque, mais aussi des labels
+    (« POMMES_DE_FRANCE ») ou des visuels publicitaires. On ne garde que celui dont le nom de fichier
+    contient exactement la marque, en mots entiers qui se suivent (« LACTEL-LOGO », « PNG-LOGO
+    INNOCENT », « AIRWICK » pour AIR WICK) ; jamais un nom qui la contient seulement en partie
+    (« Clementoni » n'est pas CLÉMENT).
+    """
+    cible = "".join(mots(marque))
+    if not cible:
+        return None
+    for logo in p.get("logosV2") or []:
+        if logo.get("type") != "logo" or not logo.get("url"):
+            continue
+        nom = mots(logo.get("name"))
+        if any("".join(nom[debut:fin]) == cible for debut in range(len(nom)) for fin in range(debut + 1, len(nom) + 1)):
+            return logo["url"]
     return None

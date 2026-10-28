@@ -95,6 +95,8 @@
         "lien": {"type": ["string", "null"]},
         "image": {"type": ["string", "null"], "description": "Photo du produit (originale), seulement si elle est fiable."},
         "photo": {"type": ["string", "null"], "description": "Vignette de la photo pour l'appli (facultatif)."},
+        "logo_catalogue": {"type": ["string", "null"], "description": "Logo de la marque donné par le catalogue (original), seulement s'il est sûr (facultatif)."},
+        "logo": {"type": ["string", "null"], "description": "Vignette du logo de la marque pour l'appli (facultatif)."},
         "page": {"type": ["integer", "null"], "minimum": 1}
       }
     }

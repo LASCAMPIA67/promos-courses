@@ -47,7 +47,8 @@ test("un article ajouté depuis une promo l'affiche à droite ; écrit à la mai
   const promo = fenetre.locator(".promo");
   await expect(promo).toHaveCount(1);
   await expect(promo.locator(".periode")).toContainText("Dès");
-  await expect(promo.locator(".promo-nom")).toHaveText("Lait demi-écrémé UHT LACTEL");
+  await expect(promo.locator(".promo-nom")).toHaveText("Lait demi-écrémé UHT");
+  await expect(promo.getByRole("img", { name: "LACTEL" })).toHaveClass("logo-marque"); // en haut à droite
   await expect(promo.locator(".promo-description")).toHaveText("6 x 1 L");
   await expect(promo.locator(".promo-prix")).toHaveText("6,12 €1,02 €/L");
   await expect(promo.locator(".promo-bas")).toHaveText("-50 % sur le 2e9,18 € les 2 (0,77 €/L)");
@@ -112,7 +113,10 @@ test("une même promo « au choix » (plusieurs parfums) n'est montrée qu'une f
   await page.getByLabel("Article à ajouter").fill("shampoing");
   const resultats = page.locator("#resultats .promo");
   await expect(resultats).toHaveCount(1);
-  await expect(resultats.locator(".promo-nom")).toHaveText("Shampooing LE PETIT MARSEILLAIS");
+  await expect(resultats.locator(".promo-nom")).toHaveText("Shampooing");
+  // Son logo est introuvable : son nom, en petit, à la place.
+  await expect(resultats.locator(".marque-promo")).toHaveText("LE PETIT MARSEILLAIS");
+  await expect(resultats.locator(".logo-marque")).toHaveCount(0);
   await expect(resultats.locator(".promo-description")).toHaveText(
     "Au choix : Douceur & Éclat, Nutrition, Purifiant · 2 x 300 ml (600 ml)",
   );
@@ -128,7 +132,7 @@ test("« Chips » trouve aussi les marques de chips, comme Pringles", async ({ p
   await expect(page.locator("#resultats .promo-nom")).toHaveText(["Pringles"]);
 });
 
-test("chaque promo montre la photo de son produit, ou un emplacement neutre sans photo sûre", async ({
+test("chaque promo montre la photo de son produit et, dans le coin, le logo de sa marque", async ({
   page,
   context,
 }) => {
@@ -136,12 +140,19 @@ test("chaque promo montre la photo de son produit, ou un emplacement neutre sans
   await seConnecter(page, COMPTES.un);
   await page.getByLabel("Article à ajouter").fill("lait");
   const promos = page.locator("#resultats .promo");
+  // Le nom seul : la marque est dans le coin.
   await expect(promos.locator(".promo-nom")).toHaveText([
-    "Lait demi-écrémé CANDIA",
-    "Lait demi-écrémé UHT LACTEL",
+    "Lait demi-écrémé",
+    "Lait demi-écrémé UHT",
     "Laitue",
-    "Chocolat au lait CÔTE D'OR",
+    "Chocolat au lait",
   ]);
+  // Le logo de la marque (vignette du robot), bien chargé ; sans logo sûr, le nom de la marque en petit.
+  const logo = promos.first().getByRole("img", { name: "CANDIA" });
+  await expect(logo).toHaveAttribute("src", "https://exemple.test/logos/candia.png");
+  await expect.poll(() => logo.evaluate((image) => image.complete && image.naturalWidth)).toBe(240);
+  await expect(promos.nth(3).locator(".marque-promo")).toHaveText("CÔTE D'OR");
+  await expect(promos.nth(2).locator(".marque-promo, .logo-marque")).toHaveCount(0); // pas de marque
   // La vignette du robot, bien chargée.
   const photo = promos.first().locator("img.photo-promo");
   await expect(photo).toHaveAttribute("src", "https://exemple.test/photos/lait.jpg");

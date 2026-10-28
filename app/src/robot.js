@@ -108,7 +108,7 @@ export const PHASES = [
     ],
   },
   { titre: "Lecture des catalogues Leclerc", etapes: ["Lire les catalogues"] },
-  { titre: "Photos des produits", etapes: ["Fabriquer les photos"] },
+  { titre: "Photos et logos", etapes: ["Fabriquer les photos et les logos"] },
   {
     titre: "Enregistrement",
     etapes: ["Enregistrer les photos", "Enregistrer les promos", "Signaler la fin à l'appli"],

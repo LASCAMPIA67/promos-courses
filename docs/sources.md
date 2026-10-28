@@ -50,13 +50,33 @@ Ko). Au plus une heure de photos par passage : les premiers jours, elles arriven
 > la visionneuse officielle : une zone grise pour le droit d'auteur, comme l'accès au catalogue.
 > Emilio a choisi de l'accepter. Pour tout retirer d'un coup : supprimer la branche `photos`.
 
+## Logos des marques
+
+Le catalogue joint aussi des « logos » à beaucoup de produits : celui de la marque, mais parfois un
+label (« POMMES_DE_FRANCE ») ou un visuel publicitaire. Le robot ne garde que le logo dont le nom de
+fichier contient **exactement la marque**, en mots entiers qui se suivent (« LACTEL-LOGO », « PNG-LOGO
+INNOCENT », « AIRWICK » pour AIR WICK), jamais un nom qui la contient seulement en partie
+(« Clementoni » n'est pas la marque CLÉMENT, « DELPEYRAT » n'est pas toute la marque MAISON
+DELPEYRAT). Une marque n'a qu'un logo, repris pour toutes ses promos. Mesure du 28/10/2026 : 239
+marques sur 547 ont un logo sûr, soit 59 % des produits de marque. Les autres gardent leur nom, écrit
+en petit à la même place.
+
+Le robot en fait une petite image PNG (96 pixels de haut au plus, 1 à 12 Ko), rangée dans `logos/` de
+la branche `photos`, avec la même règle que les photos (téléchargée une seule fois, retirée quand
+plus aucune promo n'en a besoin).
+
+> Wikidata (la base de Wikipédia) donne aussi le logo officiel de 139 de ces marques, mais la
+> recherche par nom s'y trompe trop souvent (« SVR » → une compagnie aérienne, « WELL » → un club
+> de football, « ARIEL » → des motos) : écartée le 28/10/2026, faute de pouvoir la vérifier
+> automatiquement.
+
 ## L'avancée d'un passage
 
 Pendant un passage, le robot écrit où il en est (« Catalogue 3 sur 9 : … », « Photos : 312 sur
 1 450 ») dans un « statut » GitHub de l'enregistrement qu'il traite (nom : `robot-promos/avancee`,
 voir [`avancee.py`](../src/robot_promos/avancee.py)), au plus toutes les 10 secondes. L'appli le lit
 pour sa fenêtre « Mise à jour des promos » ([appli.md](appli.md#mettre-à-jour-les-promos-sans-attendre)).
-Les étapes du passage (« Lire les catalogues », « Fabriquer les photos »…) sont celles du workflow
+Les étapes du passage (« Lire les catalogues », « Fabriquer les photos et les logos »…) sont celles du workflow
 [`robot.yml`](../.github/workflows/robot.yml) : l'appli reprend leurs noms exacts, et un test vérifie
 qu'ils restent identiques.
 

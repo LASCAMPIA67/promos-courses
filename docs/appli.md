@@ -118,10 +118,11 @@ Geispolsheim. L'appli lit ce fichier :
   leur note (« Leclerc · 2,25 € ») ;
 - en touchant l'étiquette, on voit **cette promo**, rangée pour se lire d'un coup d'œil (comme dans
   les résultats quand on écrit un article) :
-  1. à gauche, la **photo du produit** (voir « Les photos des produits » ci-dessous) ; à côté,
-     **jusqu'à quand** elle dure (« Jusqu'au sam. 31 oct. », « Dernier jour ») ; une promo **à venir** (catalogue de la semaine suivante) est en
-     bleu (« Dès jeu. 29 oct. ») ;
-  2. le produit et sa marque ;
+  1. à gauche, la **photo du produit** ; à côté, **jusqu'à quand** elle dure (« Jusqu'au sam.
+     31 oct. », « Dernier jour » ; une promo **à venir**, du catalogue suivant, est en bleu : « Dès
+     jeu. 29 oct. ») et, dans le coin, le **logo de la marque** (voir « Les photos des produits et
+     les logos des marques » ci-dessous) ;
+  2. le nom du produit ;
   3. sa taille, sur une ligne (« 2 x 300 ml », sans les prix répétés) ;
   4. le prix payé en caisse, l'ancien prix barré, le prix au kilo, et à droite « Catalogue », qui
      ouvre le catalogue officiel ;
@@ -131,7 +132,7 @@ Geispolsheim. L'appli lit ce fichier :
 - en écrivant un article, les promos les plus proches viennent d'abord : pour « Lait », « Lait
   demi-écrémé » passe avant « Chocolat au lait ».
 
-### Les photos des produits
+### Les photos des produits et les logos des marques
 
 Chaque promo montre la photo de son produit, prise dans le catalogue officiel Leclerc, à condition
 d'être **sûr que c'est la bonne** : la photo du produit seul (pas une photo d'ambiance, un plat ou
@@ -143,6 +144,11 @@ marque.
 Les photos du catalogue pèsent 2 à 6 Mo chacune : le robot en fait une fois pour toutes une petite
 vignette (256 pixels, une quinzaine de Ko). L'appli les garde sur le téléphone : elles s'affichent
 aussi sans réseau, une fois vues. Détails : [sources.md](sources.md#photos-des-produits).
+
+En haut à droite de chaque promo, le **logo de sa marque**, celui que le catalogue Leclerc donne pour
+cette marque (une marque sur deux environ) ; sinon, le nom de la marque écrit en petit au même
+endroit. Le nom du produit, lui, est écrit seul (sans la marque à la suite). Les logos aussi restent
+sur le téléphone. Détails : [sources.md](sources.md#logos-des-marques).
 
 ### Comprendre le prix : où va la réduction
 
@@ -236,7 +242,7 @@ la fenêtre **« Mise à jour des promos »** montre où il en est, étape par �
 |---|---|---|
 | **Démarrage** | GitHub trouve une machine (quelques secondes, parfois une minute), y installe le robot et reprend les photos déjà faites. | « En attente d'une machine GitHub… » |
 | **Lecture des catalogues Leclerc** | Le robot lit chaque catalogue du magasin (ceux qui n'ont pas changé sont repris tels quels). | « Catalogue 3 sur 9 : Un automne en fête » |
-| **Photos des produits** | Il fait les vignettes des nouvelles photos (au plus une heure). | « Photos : 312 sur 1 450 (12 nouvelles) » |
+| **Photos et logos** | Il fait les vignettes des nouveaux logos de marque, puis des nouvelles photos (au plus une heure). | « Logos : 12 sur 239 », « Photos : 312 sur 1 450 (12 nouvelles) » |
 | **Enregistrement** | Il enregistre les photos et les promos sur GitHub. | |
 | **Nouvelles promos dans l'appli** | L'appli lit les promos qu'il vient d'écrire. | |
 

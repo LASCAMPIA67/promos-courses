@@ -1,7 +1,7 @@
 import pytest
 
 from robot_promos.sources import Catalogue
-from robot_promos.sources.leclerc import completer_lot, convertir, photo_fiable
+from robot_promos.sources.leclerc import completer_lot, convertir, logo_de_la_marque, photo_fiable
 
 CATALOGUE = Catalogue(id="26G124G", nom="Nos promos", debut="2026-10-20", fin="2026-10-31", version="v1", lien="l")
 
@@ -203,3 +203,40 @@ def test_photo_fiable_ecarte_les_photos_douteuses():
 def test_pas_de_photo_pour_toute_une_gamme():
     o = convertir(produit(name="SUR LES PRODUITS PRÉSENTS EN MAGASIN DE LA MARQUE"), CATALOGUE)
     assert o["image"] is None
+
+
+def logo(nom, url="https://exemple/media/logo"):
+    return {"type": "logo", "name": nom, "url": url}
+
+
+def test_logo_de_la_marque_seulement_s_il_porte_exactement_son_nom():
+    bons = {
+        "LACTEL": "LACTEL-LOGO",
+        "INNOCENT": "PNG-LOGO INNOCENT",
+        "AIR WICK": "AIRWICK",
+        "WILLIAM LAWSON'S": "WILLIAM_LAWSONS",
+        "NESTLÉ": "NESTLE",
+        "GLENLIVET": "THE GLENLIVET",
+        "Martini": "Logo Martini.png",
+    }
+    for marque, nom in bons.items():
+        assert logo_de_la_marque(produit(logosV2=[logo(nom)]), marque) == "https://exemple/media/logo", marque
+    douteux = {
+        "CLÉMENT": "Clementoni",  # une autre marque qui commence pareil
+        "MAISON DELPEYRAT": "DELPEYRAT",  # pas toute la marque
+        "PANIER DU PRIMEUR": "POMMES_DE_FRANCE",  # un label
+        "KELLOGG'S": "11 - DEPENSER MOINS 4 - MARQUES PREFEREES-1542-POU",  # un visuel publicitaire
+        "": "LACTEL-LOGO",  # pas de marque
+    }
+    for marque, nom in douteux.items():
+        assert logo_de_la_marque(produit(logosV2=[logo(nom)]), marque) is None, marque
+    # Seulement les « logos » (pas les pictogrammes), avec une adresse.
+    assert logo_de_la_marque(produit(logosV2=[{"type": "picto", "name": "LACTEL", "url": "x"}]), "LACTEL") is None
+    assert logo_de_la_marque(produit(logosV2=[logo("LACTEL", url=None)]), "LACTEL") is None
+
+
+def test_l_offre_garde_le_logo_de_sa_marque():
+    o = convertir(
+        produit(brand="LACTEL", logosV2=[logo("POMMES_DE_FRANCE", "label"), logo("LACTEL-LOGO", "ok")]), CATALOGUE
+    )
+    assert o["logo_catalogue"] == "ok"

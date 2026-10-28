@@ -8,7 +8,7 @@ from PIL import Image
 from robot_promos import photos
 from robot_promos.config import ADRESSE_PHOTOS, MAGASINS
 from robot_promos.offres import creer_offre
-from robot_promos.photos import TAILLE, nom_photo, preparer_photos, reduire
+from robot_promos.photos import TAILLE, nom_photo, preparer_logos, preparer_photos, reduire, reduire_logo
 
 MEDIA = "https://nos-catalogues-promos-v2.e.leclerc/media/"
 
@@ -126,4 +126,44 @@ def test_la_commande_photos_complete_promos_json(tmp_path, monkeypatch):
     assert photos.main([str(tmp_path / "vignettes"), "--promos", str(promos)]) == 0
     ecrites = json.loads(promos.read_text(encoding="utf-8"))["offres"]
     assert [o["photo"] for o in ecrites] == [f"{ADRESSE_PHOTOS}{'a' * 32}.jpg", None]
+    assert [o["logo"] for o in ecrites] == [None, None]  # pas de logo dans le catalogue
     assert (tmp_path / "vignettes" / f"{'a' * 32}.jpg").exists()
+
+
+def logo_png():
+    """Un logo bleu de 600 sur 200 pixels, avec beaucoup de transparent autour."""
+    image = Image.new("RGBA", (1200, 600), (0, 0, 0, 0))
+    image.paste((20, 60, 200, 255), (300, 200, 900, 400))
+    sortie = io.BytesIO()
+    image.save(sortie, "PNG")
+    return sortie.getvalue()
+
+
+def test_reduire_logo_petit_png_sur_fond_blanc_sans_les_bords():
+    vignette = Image.open(io.BytesIO(reduire_logo(logo_png())))
+    assert vignette.format == "PNG"
+    assert vignette.size == (288, 96)  # le logo seul (600 sur 200), réduit à 96 pixels de haut
+    assert vignette.convert("RGB").getpixel((144, 48))[2] > 150  # bleu
+
+
+def test_preparer_logos_un_logo_par_marque_pour_toutes_ses_promos(tmp_path):
+    (tmp_path / "logos").mkdir()
+    (tmp_path / "logos" / f"{'f' * 32}.png").write_bytes(b"ancien")  # plus utilisé
+    offres = [
+        {"marque": "LACTEL", "logo_catalogue": f"{MEDIA}{'a' * 32}"},
+        {"marque": "Lactel", "logo_catalogue": f"{MEDIA}{'a' * 32}"},
+        {"marque": "LACTEL", "logo_catalogue": f"{MEDIA}{'b' * 32}"},  # moins fréquent
+        {"marque": "LACTEL", "logo_catalogue": None},  # même marque : reçoit son logo
+        {"marque": "INCONNUE", "logo_catalogue": None},
+        {"marque": None, "logo_catalogue": f"{MEDIA}{'c' * 32}"},  # pas de marque : pas de logo
+    ]
+    nav = FauxNavigateur(logo_png())
+    bilan = preparer_logos(nav, offres, tmp_path)
+
+    assert nav.demandes == [f"{MEDIA}{'a' * 32}"]
+    attendu = f"{ADRESSE_PHOTOS}logos/{'a' * 32}.png"
+    assert [o["logo"] for o in offres] == [attendu, attendu, attendu, attendu, None, None]
+    assert sorted(f.name for f in (tmp_path / "logos").iterdir()) == [f"{'a' * 32}.png"]
+    assert bilan["marques"] == 1
+    assert bilan["avec_logo"] == 4
+    assert bilan["retirees"] == 1

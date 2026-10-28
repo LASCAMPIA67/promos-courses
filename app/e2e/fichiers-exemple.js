@@ -38,28 +38,45 @@ export function pngExemple({ largeur = 300, hauteur = 700 } = {}) {
  * Une photo de produit d'exemple (PNG carré de 256 pixels) : un emballage simple de la couleur
  * donnée, avec une étiquette blanche, sur fond blanc. Aucune marque : juste de quoi voir une photo.
  */
-export function photoProduitExemple([rouge, vert, bleu], taille = 256) {
+export function photoProduitExemple(couleur, taille = 256) {
+  return imageExemple(taille, taille, [
+    [72, 36, 184, 220, 16, couleur],
+    [88, 104, 168, 150, 8, [255, 255, 255]],
+    [100, 122, 156, 130, 3, couleur],
+  ]);
+}
+
+/** Un logo de marque d'exemple (PNG de 240 sur 96 pixels) : un cartouche de couleur, sans texte. */
+export function logoExemple(couleur) {
+  return imageExemple(240, 96, [
+    [8, 8, 232, 88, 40, couleur],
+    [48, 40, 192, 56, 8, [255, 255, 255]],
+  ]);
+}
+
+/** Une image PNG sur fond blanc faite de rectangles arrondis : [gauche, haut, droite, bas, rayon, couleur]. */
+function imageExemple(largeur, hauteur, formes) {
   const dedans = (x, y, gauche, haut, droite, bas, rayon) => {
     const cx = Math.min(Math.max(x, gauche + rayon), droite - rayon);
     const cy = Math.min(Math.max(y, haut + rayon), bas - rayon);
     return x >= gauche && x <= droite && y >= haut && y <= bas && (x - cx) ** 2 + (y - cy) ** 2 <= rayon ** 2;
   };
   const lignes = [];
-  for (let y = 0; y < taille; y += 1) {
-    const ligne = Buffer.alloc(taille * 3 + 1, 255);
+  for (let y = 0; y < hauteur; y += 1) {
+    const ligne = Buffer.alloc(largeur * 3 + 1, 255);
     ligne[0] = 0; // pas de filtre
-    for (let x = 0; x < taille; x += 1) {
+    for (let x = 0; x < largeur; x += 1) {
       let pixel = null;
-      if (dedans(x, y, 72, 36, 184, 220, 16)) pixel = [rouge, vert, bleu];
-      if (dedans(x, y, 88, 104, 168, 150, 8)) pixel = [255, 255, 255];
-      if (dedans(x, y, 100, 122, 156, 130, 3)) pixel = [rouge, vert, bleu];
+      for (const [gauche, haut, droite, bas, rayon, couleur] of formes) {
+        if (dedans(x, y, gauche, haut, droite, bas, rayon)) pixel = couleur;
+      }
       if (pixel) ligne.set(pixel, 1 + x * 3);
     }
     lignes.push(ligne);
   }
   const entete = Buffer.alloc(13);
-  entete.writeUInt32BE(taille, 0);
-  entete.writeUInt32BE(taille, 4);
+  entete.writeUInt32BE(largeur, 0);
+  entete.writeUInt32BE(hauteur, 4);
   entete[8] = 8; // 8 bits par couleur
   entete[9] = 2; // rouge, vert, bleu
   return Buffer.concat([

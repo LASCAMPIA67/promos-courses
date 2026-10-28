@@ -57,7 +57,7 @@ test("« Mettre à jour les promos » : la clé une seule fois, puis l'avancée 
   await expect(avancee(telephone1).locator(".titre-etape")).toHaveText([
     "Démarrage",
     "Lecture des catalogues Leclerc",
-    "Photos des produits",
+    "Photos et logos",
     "Enregistrement",
     "Nouvelles promos dans l'appli",
   ]);

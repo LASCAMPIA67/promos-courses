@@ -1124,12 +1124,44 @@ dialog h2 {
   overflow-wrap: anywhere;
 }
 
-.promo-marque {
+/* En haut de la promo : jusqu'à quand, et la marque dans le coin (son logo, sinon son nom). */
+.promo-haut {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 26px;
+}
+
+.promo-haut .periode {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Les logos sont faits pour un fond blanc, même en mode sombre : une petite étiquette blanche. */
+.logo-marque {
+  flex: none;
+  box-sizing: border-box;
+  height: 26px;
+  max-width: 88px;
+  padding: 2px 4px;
+  border-radius: 6px;
+  background: #ffffff;
+  object-fit: contain;
+}
+
+.marque-promo {
+  flex: 0 1 auto;
+  max-width: 50%;
+  overflow: hidden;
   color: var(--discret);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 650;
   letter-spacing: 0.03em;
+  text-align: right;
+  text-overflow: ellipsis;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 /* La taille et les variantes, sur une seule ligne. */

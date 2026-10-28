@@ -17,7 +17,7 @@ const ETAPES = [
   "Installer le robot",
   "Reprendre les photos déjà faites",
   "Lire les catalogues",
-  "Fabriquer les photos",
+  "Fabriquer les photos et les logos",
   "Enregistrer les photos",
   "Enregistrer les promos",
   "Signaler la fin à l'appli",
@@ -26,7 +26,7 @@ const ETAPES = [
 const MOMENTS = [
   { enCours: null, nouvelle: null }, // en attente d'une machine GitHub
   { enCours: "Lire les catalogues", nouvelle: "Catalogue 3 sur 9 : Un automne en fête" },
-  { enCours: "Fabriquer les photos", nouvelle: "Photos : 312 sur 1\u202f450 (12 nouvelles)" },
+  { enCours: "Fabriquer les photos et les logos", nouvelle: "Photos : 312 sur 1\u202f450 (12 nouvelles)" },
   { enCours: "fini", nouvelle: "Promos enregistrées" },
 ];
 

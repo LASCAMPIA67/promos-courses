@@ -98,8 +98,9 @@ jobs:
             python -m robot_promos
           fi
 
-      # Au plus une heure de téléchargement ; une panne ici n'empêche pas d'enregistrer les promos.
-      - name: Fabriquer les photos
+      # Les logos des marques, puis les photos des produits : au plus une heure de téléchargement en
+      # tout ; une panne ici n'empêche pas d'enregistrer les promos.
+      - name: Fabriquer les photos et les logos
         if: steps.aujourdhui.outputs.deja_passe != 'oui'
         continue-on-error: true
         env:
@@ -112,8 +113,8 @@ jobs:
       - name: Enregistrer les photos
         if: steps.aujourdhui.outputs.deja_passe != 'oui'
         run: |
-          printf '%s\n' "# Photos des produits" "" \
-            "Vignettes des photos des promos en cours, écrites chaque matin par le robot" \
+          printf '%s\n' "# Photos des produits et logos des marques" "" \
+            "Vignettes des photos des promos en cours (et logos des marques, dans logos/), écrites chaque matin par le robot" \
             "(voir src/robot_promos/photos.py sur la branche main). Cette branche est réécrite à" \
             "chaque passage : ne rien y modifier à la main." > "$RUNNER_TEMP/photos/LISEZMOI.md"
           depot="$PWD/.git"

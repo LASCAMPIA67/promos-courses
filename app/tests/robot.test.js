@@ -145,7 +145,7 @@ describe("l'avancée détaillée d'un passage", () => {
     expect(resume(phases)).toEqual([
       "Démarrage : en_cours",
       "Lecture des catalogues Leclerc : a_venir",
-      "Photos des produits : a_venir",
+      "Photos et logos : a_venir",
       "Enregistrement : a_venir",
     ]);
     expect(phases[0].detail).toBe("En attente d'une machine GitHub…");
@@ -155,7 +155,7 @@ describe("l'avancée détaillée d'un passage", () => {
     const etapes = [
       ...preparation,
       etape("Lire les catalogues", "completed", "success", "2026-10-28T07:24:52Z", "2026-10-28T07:26:02Z"),
-      etape("Fabriquer les photos", "in_progress", null, "2026-10-28T07:26:02Z"),
+      etape("Fabriquer les photos et les logos", "in_progress", null, "2026-10-28T07:26:02Z"),
       etape("Enregistrer les photos", "queued"),
     ];
     const phases = avanceeDuPassage(
@@ -166,7 +166,7 @@ describe("l'avancée détaillée d'un passage", () => {
     expect(resume(phases)).toEqual([
       "Démarrage : fait",
       "Lecture des catalogues Leclerc : fait",
-      "Photos des produits : en_cours",
+      "Photos et logos : en_cours",
       "Enregistrement : a_venir",
     ]);
     expect(phases.map((phase) => phase.duree)).toEqual([47_000, 70_000, 540_000, null]);
@@ -185,7 +185,7 @@ describe("l'avancée détaillée d'un passage", () => {
     expect(resume(avanceeDuPassage({ ...enCours, etat: "echoue" }, { etapes: enPanne })).slice(0, 3)).toEqual([
       "Démarrage : fait",
       "Lecture des catalogues Leclerc : echoue",
-      "Photos des produits : a_venir",
+      "Photos et logos : a_venir",
     ]);
     // Arrêté sans étape en panne (annulé) : la première étape pas finie est signalée.
     expect(avanceeDuPassage({ ...enCours, etat: "echoue" }, { etapes: preparation })[1].etat).toBe("echoue");

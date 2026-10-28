@@ -27,12 +27,7 @@ test("en écrivant un article, les promos s'affichent ; on en ajoute une, ou ce 
   // « lait » : les promos trouvées remplacent la liste, le mot entier (en cours, puis à venir) avant « Laitue ».
   await champ(page).fill("lait");
   await expect(page.locator("#etat-recherche")).toHaveText("4 promos");
-  await expect(noms(page)).toHaveText([
-    "Lait demi-écrémé CANDIA",
-    "Lait demi-écrémé UHT LACTEL",
-    "Laitue",
-    "Chocolat au lait CÔTE D'OR",
-  ]);
+  await expect(noms(page)).toHaveText(["Lait demi-écrémé", "Lait demi-écrémé UHT", "Laitue", "Chocolat au lait"]);
   await expect(page.locator("#contenu")).toBeHidden();
 
   // Ajouter une promo : le bouton le confirme.

@@ -34,6 +34,7 @@ def creer_offre(
     lien=None,
     image=None,
     page=None,
+    logo_catalogue=None,
 ):
     """Fabrique une offre avec toujours les mêmes champs, dans le même ordre.
 
@@ -78,6 +79,7 @@ def creer_offre(
         "lien": lien,
         "image": image,
         "page": page,
+        "logo_catalogue": logo_catalogue,
     }
 
 

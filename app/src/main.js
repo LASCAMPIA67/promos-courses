@@ -479,14 +479,13 @@ function cartePromo(offre, aVenir, aujourdhui, { avecAjout = false } = {}) {
   const carte = element("li", "promo");
   carte.toggleAttribute("data-a-venir", aVenir);
 
+  // En haut : jusqu'à quand et, dans le coin, la marque ; puis le nom du produit.
+  const haut = element("div", "promo-haut");
+  haut.append(element("p", "periode", periode(offre, aujourdhui)));
+  const marque = marquePromo(offre);
+  if (marque) haut.append(marque);
   const textes = element("div", "promo-textes");
-  textes.append(element("p", "periode", periode(offre, aujourdhui)));
-  // Le nom, avec la marque si elle n'y est pas déjà.
-  const nom = element("p", "promo-nom", joliNom(offre.produit));
-  if (offre.marque && !joliNom(offre.produit).toLowerCase().includes(offre.marque.toLowerCase())) {
-    nom.append(" ", element("span", "promo-marque", offre.marque));
-  }
-  textes.append(nom);
+  textes.append(haut, element("p", "promo-nom", joliNom(offre.produit)));
   const description = resumeDescription(offre.description);
   if (description) textes.append(element("p", "promo-description", description));
   const tete = element("div", "promo-tete");
@@ -582,6 +581,26 @@ $("plus-de-resultats").addEventListener("click", () => {
 });
 
 /** « Ajouter à la liste », ou « Dans la liste » si l'article y est déjà. */
+/**
+ * La marque, en haut à droite : son logo (une vignette faite par le robot, seulement quand le
+ * catalogue le donne pour cette marque), sinon son nom en petit. Rien pour un produit sans marque.
+ */
+function marquePromo(offre) {
+  if (!offre.marque) return null;
+  const nom = () => element("span", "marque-promo", offre.marque);
+  if (!/^https:\/\//.test(offre.logo ?? "")) return nom();
+  const logo = document.createElement("img");
+  logo.className = "logo-marque";
+  logo.alt = offre.marque; // lu par VoiceOver : le nom de la marque n'est écrit nulle part ailleurs
+  logo.loading = "lazy";
+  logo.decoding = "async";
+  logo.crossOrigin = "anonymous"; // pour le garder sur le téléphone (hors connexion)
+  logo.referrerPolicy = "no-referrer";
+  logo.addEventListener("error", () => logo.replaceWith(nom()), { once: true });
+  logo.src = offre.logo;
+  return logo;
+}
+
 /**
  * La photo du produit (une vignette faite par le robot, seulement quand elle est sûre), ou un
  * emplacement neutre : jamais une photo qui pourrait tromper. Décorative : le nom est juste à côté.

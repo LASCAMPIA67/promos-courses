@@ -1,7 +1,7 @@
 // Un petit promos.json d'exemple, aux dates du jour, pour les scénarios réels et les captures.
 // Mêmes champs que le vrai fichier (voir docs/format-promos.md).
 
-import { photoProduitExemple } from "./fichiers-exemple.js";
+import { logoExemple, photoProduitExemple } from "./fichiers-exemple.js";
 
 /** Les photos d'exemple : nom → couleur de l'emballage dessiné. « absente.jpg » n'existe pas. */
 const PHOTOS = "https://exemple.test/photos/";
@@ -14,6 +14,15 @@ const COULEURS = {
   "cafe.jpg": [45, 45, 45],
   "pates.jpg": [235, 190, 40],
   "shampooing.jpg": [46, 158, 91],
+};
+
+/** Les logos d'exemple : nom → couleur du cartouche. « absent.png » n'existe pas. */
+const LOGOS = "https://exemple.test/logos/";
+const COULEURS_LOGOS = {
+  "candia.png": [30, 90, 200],
+  "lactel.png": [20, 70, 160],
+  "panzani.png": [0, 110, 60],
+  "harrys.png": [200, 30, 40],
 };
 
 /** Date à « décalage » jours d'aujourd'hui, au format du fichier : « 2026-10-27 ». */
@@ -45,6 +54,8 @@ function offre(id, champs) {
     lien: `https://exemple.test/catalogue/${id}`,
     image: null,
     photo: null,
+    logo_catalogue: null,
+    logo: null,
     page: 3,
     ...champs,
   };
@@ -53,6 +64,7 @@ function offre(id, champs) {
 const OFFRES = [
   offre("lait", {
     photo: `${PHOTOS}lait.jpg`,
+    logo: `${LOGOS}candia.png`,
     produit: "Lait demi-écrémé",
     marque: "CANDIA",
     description: "La bouteille de 1 L",
@@ -64,6 +76,7 @@ const OFFRES = [
   }),
   offre("lait-leclerc", {
     photo: `${PHOTOS}lait-uht.jpg`,
+    logo: `${LOGOS}lactel.png`,
     produit: "LAIT DEMI-ÉCRÉMÉ UHT",
     marque: "LACTEL",
     description: "6 x 1 L. Par 2 (12 L) : 9,18 € au lieu de 12,24 €",
@@ -123,6 +136,7 @@ const OFFRES = [
   }),
   offre("pain", {
     photo: `${PHOTOS}pain.jpg`,
+    logo: `${LOGOS}harrys.png`,
     produit: "PAIN DE MIE COMPLET",
     marque: "HARRYS",
     description: "500 g. Le kg : 4,70 €",
@@ -146,6 +160,7 @@ const OFFRES = [
   }),
   offre("pates", {
     photo: `${PHOTOS}pates.jpg`,
+    logo: `${LOGOS}panzani.png`,
     produit: "PÂTES SPAGHETTI",
     marque: "PANZANI",
     description: "500 g. Par 3 (1,5 kg) : 1,90 €",
@@ -159,6 +174,7 @@ const OFFRES = [
   ...["SHAMPOOING", "SHAMPOOING PURIFIANT"].map((produit, rang) =>
     offre(`shampooing-${rang + 1}`, {
       photo: `${PHOTOS}shampooing.jpg`,
+      logo: `${LOGOS}absent.png`,
       produit,
       marque: "LE PETIT MARSEILLAIS",
       description: "Au choix : Douceur & Éclat, Nutrition, Purifiant. 2 x 300 ml (600 ml)",
@@ -205,6 +221,15 @@ export function promosExemple({ miseAJour = new Date(), etatLeclerc = "ok", mult
  */
 export async function servirPromos(contexte, options) {
   await contexte.route("**/promos-test.json", (requete) => requete.fulfill({ json: promosExemple(options) }));
+  await contexte.route(`${LOGOS}**`, (requete) => {
+    const couleur = COULEURS_LOGOS[new URL(requete.request().url()).pathname.split("/").at(-1)];
+    if (!couleur) return requete.fulfill({ status: 404, body: "introuvable" });
+    return requete.fulfill({
+      contentType: "image/png",
+      headers: { "Access-Control-Allow-Origin": "*" },
+      body: logoExemple(couleur),
+    });
+  });
   await contexte.route(`${PHOTOS}**`, (requete) => {
     const couleur = COULEURS[new URL(requete.request().url()).pathname.split("/").at(-1)];
     if (!couleur) return requete.fulfill({ status: 404, body: "introuvable" });
