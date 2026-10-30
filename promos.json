@@ -1,6 +1,6 @@
 {
  "format": 2,
- "mise_a_jour": "2026-10-29T12:07:56+01:00",
+ "mise_a_jour": "2026-10-30T12:02:57+01:00",
  "version_robot": "0.16.0",
  "magasins": {
   "leclerc-geispolsheim": {
@@ -23,9 +23,19 @@
      "nom": "FOIRE AU GRAS",
      "debut": "2026-10-27",
      "fin": "2026-10-31",
-     "version": "18660164073aa70d5bbccfa015b22a2f@2026-10-29T08:04:24Z#lecture-5",
+     "version": "18660164073aa70d5bbccfa015b22a2f@2026-10-30T08:04:11Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26C409N/1067",
      "nb_offres": 29,
+     "reutilise": false
+    },
+    {
+     "id": "26G310G",
+     "nom": "Plein pouvoirs d'achat",
+     "debut": "2026-10-27",
+     "fin": "2026-11-07",
+     "version": "07da9b7ca474d937ebc986e4a3194029@2026-10-30T08:24:03Z#lecture-5",
+     "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
+     "nb_offres": 270,
      "reutilise": false
     },
     {
@@ -39,21 +49,11 @@
      "reutilise": true
     },
     {
-     "id": "26G310G",
-     "nom": "Plein pouvoirs d'achat",
-     "debut": "2026-10-27",
-     "fin": "2026-11-07",
-     "version": "07da9b7ca474d937ebc986e4a3194029@2026-10-29T08:24:20Z#lecture-5",
-     "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
-     "nb_offres": 270,
-     "reutilise": false
-    },
-    {
      "id": "26D009D",
      "nom": "10 jours diamants",
      "debut": "2026-10-20",
      "fin": "2026-10-31",
-     "version": "60892f34c8e392dbfe81adf23c4e7e2f@2026-10-29T08:06:06Z#lecture-5",
+     "version": "60892f34c8e392dbfe81adf23c4e7e2f@2026-10-30T08:05:56Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26D009D/1067",
      "nb_offres": 0,
      "reutilise": false
@@ -63,7 +63,7 @@
      "nom": "Un automne en fête",
      "debut": "2026-10-20",
      "fin": "2026-10-31",
-     "version": "96a4c42bff10c8219b2775fd9f5c54cf@2026-10-29T08:16:41Z#lecture-5",
+     "version": "96a4c42bff10c8219b2775fd9f5c54cf@2026-10-30T08:16:59Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G124G/1067",
      "nb_offres": 354,
      "reutilise": false
@@ -83,7 +83,7 @@
      "nom": "Jouets de Noël",
      "debut": "2026-10-20",
      "fin": "2026-12-05",
-     "version": "ef5e6e393e883b27666cab63ed125268@2026-10-29T08:11:48Z#lecture-5",
+     "version": "ef5e6e393e883b27666cab63ed125268@2026-10-30T08:11:56Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G047G/1067",
      "nb_offres": 646,
      "reutilise": false
@@ -93,7 +93,7 @@
      "nom": "Parapharmacie d'automne",
      "debut": "2026-10-06",
      "fin": "2026-10-31",
-     "version": "fffae2e102be2e77a7b735c039a3fc5d@2026-10-29T08:09:40Z#lecture-5",
+     "version": "fffae2e102be2e77a7b735c039a3fc5d@2026-10-30T08:09:43Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G009P/1067",
      "nb_offres": 46,
      "reutilise": false
