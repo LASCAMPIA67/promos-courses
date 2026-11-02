@@ -1,6 +1,6 @@
 {
  "format": 2,
- "mise_a_jour": "2026-11-01T12:31:11+01:00",
+ "mise_a_jour": "2026-11-02T13:53:59+01:00",
  "version_robot": "0.16.0",
  "magasins": {
   "leclerc-geispolsheim": {
@@ -16,14 +16,14 @@
    "nom": "Catalogues E.Leclerc Geispolsheim",
    "etat": "ok",
    "nb_offres": 1416,
-   "remarque": "10 catalogue(s) ; 2 inchangé(s) depuis le dernier passage",
+   "remarque": "10 catalogue(s) ; 3 inchangé(s) depuis le dernier passage",
    "catalogues": [
     {
      "id": "26C617N",
-     "nom": "BREDELE CHOUCROUTE ALSACE 3 EXPRESS (version courte)",
+     "nom": "Bredele & Choucroute (version courte)",
      "debut": "2026-11-03",
      "fin": "2026-11-14",
-     "version": "493b83f7ae161db2d2be1ed508bf6a44@2026-11-01T08:04:15Z#lecture-5",
+     "version": "493b83f7ae161db2d2be1ed508bf6a44@2026-11-02T09:14:39Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26C617N/1067",
      "nb_offres": 77,
      "reutilise": false
@@ -33,7 +33,7 @@
      "nom": "BREDELE + CHOUCROUTE ALSACE 3",
      "debut": "2026-11-03",
      "fin": "2026-11-14",
-     "version": "d5e0f311c3843c44976fa8e35fe4609c@2026-11-01T08:04:01Z#lecture-5",
+     "version": "d5e0f311c3843c44976fa8e35fe4609c@2026-11-02T08:11:45Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26C410N/1067",
      "nb_offres": 110,
      "reutilise": false
@@ -43,7 +43,7 @@
      "nom": "Déco de Noël",
      "debut": "2026-11-03",
      "fin": "2026-11-14",
-     "version": "64288e6811b41a31cc5d8f1a4e7fe23d@2026-11-01T08:07:42Z#lecture-5",
+     "version": "64288e6811b41a31cc5d8f1a4e7fe23d@2026-11-02T08:16:33Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G006G/1067",
      "nb_offres": 101,
      "reutilise": false
@@ -53,7 +53,7 @@
      "nom": "Plein pouvoirs d'achat",
      "debut": "2026-11-03",
      "fin": "2026-11-14",
-     "version": "42f42dcd1640d286a891dc8c12930ed1@2026-11-01T08:24:35Z#lecture-5",
+     "version": "42f42dcd1640d286a891dc8c12930ed1@2026-11-02T08:32:24Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G311G/1067",
      "nb_offres": 176,
      "reutilise": false
@@ -66,14 +66,14 @@
      "version": "697db564d8fc733031ab5be4fd5b2d32@2026-10-30T15:40:53Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G311E/1067",
      "nb_offres": 22,
-     "reutilise": false
+     "reutilise": true
     },
     {
      "id": "26D010D",
      "nom": "Bijoux d'hiver",
      "debut": "2026-11-03",
      "fin": "2026-12-31",
-     "version": "d759fd4dafe627c51cbe658bd8180de4@2026-11-01T08:05:39Z#lecture-5",
+     "version": "d759fd4dafe627c51cbe658bd8180de4@2026-11-02T08:13:39Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26D010D/1067",
      "nb_offres": 0,
      "reutilise": false
@@ -83,7 +83,7 @@
      "nom": "Plein pouvoirs d'achat",
      "debut": "2026-10-27",
      "fin": "2026-11-07",
-     "version": "07da9b7ca474d937ebc986e4a3194029@2026-11-01T08:23:48Z#lecture-5",
+     "version": "07da9b7ca474d937ebc986e4a3194029@2026-11-02T08:31:25Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G310G/1067",
      "nb_offres": 247,
      "reutilise": false
@@ -103,7 +103,7 @@
      "nom": "Jouets de Noël",
      "debut": "2026-10-20",
      "fin": "2026-12-05",
-     "version": "ef5e6e393e883b27666cab63ed125268@2026-11-01T08:10:20Z#lecture-5",
+     "version": "ef5e6e393e883b27666cab63ed125268@2026-11-02T11:44:22Z#lecture-5",
      "lien": "https://nos-catalogues-promos-v2.e.leclerc/catalog/26G047G/1067",
      "nb_offres": 646,
      "reutilise": false
