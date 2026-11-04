@@ -97,6 +97,7 @@ const etat = {
   ticketOuvert: null, // { ticket, blob, liberer } : le ticket affiché en grand
   ticketEnCours: null, // { ticket, fichier, jeton, touches, arret } : le ticket qu'on ajoute (fichier) ou qu'on corrige (ticket)
   articleOuvert: null,
+  articleDeLaPromo: null, // l'article dont la promo est ouverte (pour le modifier depuis sa promo)
   ligneOuverte: null, // article dont le bouton « Supprimer » est visible (glissé vers la gauche)
   promos: null, // { donnees, index, luesLe }
   promosIndisponibles: false,
@@ -299,15 +300,17 @@ function ligneArticle(article, promo = null) {
   const auteur = auteurDe(article);
   caseACocher.append(pastilleMembre(auteur.couleur));
 
-  // Le nom, puis quand il a été ajouté, la quantité et la note.
+  // Le nom, puis quand il a été ajouté, la quantité et la note. Le toucher ouvre sa promo quand il en
+  // a une (elle permet aussi de le modifier), sinon la fenêtre pour le modifier.
+  const enPromo = promo && !promo.terminee;
   const contenu = document.createElement("button");
   contenu.type = "button";
   contenu.className = "texte";
-  // Lu par VoiceOver : « Modifier Pain, 18:02 · 2 L, ajouté par Camille ».
+  // Lu par VoiceOver : « Modifier Pain, 18:02 · 2 L, ajouté par Camille » ; « Ouvrir Lait, … » en promo.
   const nom = document.createElement("span");
   nom.className = "nom";
   nom.textContent = article.nom;
-  contenu.append(element("span", "cache", "Modifier "), nom);
+  contenu.append(element("span", "cache", enPromo ? "Ouvrir " : "Modifier "), nom);
   const details = [auteur.quand, article.quantite, noteAffichee(article.note)].filter(Boolean).join(" · ");
   if (details) {
     const sousTitre = document.createElement("span");
@@ -316,7 +319,7 @@ function ligneArticle(article, promo = null) {
     contenu.append(sousTitre);
   }
   contenu.append(element("span", "cache", `, ajouté par ${auteur.nom}`));
-  contenu.addEventListener("click", () => ouvrirArticle(article));
+  contenu.addEventListener("click", () => (enPromo ? ouvrirPromo(article, promo) : ouvrirArticle(article)));
 
   // Devant : la ligne elle-même ; derrière : le bouton « Supprimer », qu'on découvre en glissant.
   const devant = document.createElement("div");
@@ -466,12 +469,19 @@ function dessinerEtatPromos() {
   afficherMessage($("etat-promos"), alertes.filter(Boolean).join(" "), "attention");
 }
 
+/** La promo d'un article de la liste ; dessous, de quoi modifier l'article. */
 function ouvrirPromo(article, { offre, aVenir }) {
+  etat.articleDeLaPromo = article;
   $("titre-fenetre-promos").textContent = `Promo pour « ${article.nom} »`;
   $("liste-promos").replaceChildren(cartePromo(offre, aVenir, dateDuJour()));
   $("fenetre-promos").showModal();
   $("liste-promos").scrollTop = 0;
 }
+
+$("modifier-depuis-promo").addEventListener("click", () => {
+  $("fenetre-promos").close();
+  ouvrirArticle(etat.articleDeLaPromo);
+});
 
 function element(balise, classe, texte) {
   const el = document.createElement(balise);

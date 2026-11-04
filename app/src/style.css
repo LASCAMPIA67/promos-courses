@@ -935,6 +935,12 @@ dialog h2 {
   padding: 0;
 }
 
+/* Sous la promo d'un article : de quoi le modifier. */
+.pied-promos {
+  padding: 2px 20px 20px;
+  border-top: 1px solid var(--bordure);
+}
+
 .entete-fenetre p {
   margin: 4px 0 0;
   font-size: 0.9rem;

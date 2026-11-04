@@ -20,6 +20,9 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
   coché, la photo du produit et son étiquette « Promo » avec le type de promo (« -15 % en caisse »).
   On voit d'un coup d'œil ce qui était en promo, et la promo s'ouvre toujours en touchant
   l'étiquette.
+- **Toucher un article en promo montre sa promo**, comme son étiquette ou sa photo ; sous la promo,
+  « Modifier l'article » ouvre la fenêtre pour changer son nom, sa quantité ou sa note. Un article
+  sans promo (ou dont la promo est finie) s'ouvre comme avant, pour le modifier.
 
 ## [0.18.0] - 2026-11-04
 

@@ -81,6 +81,19 @@ test("un article ajouté depuis une promo l'affiche à droite ; écrit à la mai
   await expect(lait.locator(".periode")).toContainText("Jusqu'au");
   await page.getByRole("button", { name: "Fermer" }).click();
 
+  // Toucher l'article lui-même montre aussi sa promo ; on peut le modifier depuis là.
+  await ligne(page, "Lait demi-écrémé")
+    .getByRole("button", { name: /^Ouvrir Lait demi-écrémé/ })
+    .click();
+  const fenetrePromo = page.getByRole("dialog", { name: "Promo pour « Lait demi-écrémé »" });
+  await expect(fenetrePromo.locator(".type")).toHaveText("-15 % en caisse");
+  await fenetrePromo.getByRole("button", { name: "Modifier l'article" }).click();
+  await expect(fenetrePromo).toBeHidden();
+  await expect(page.getByRole("dialog", { name: "Modifier l'article" }).getByLabel("Nom")).toHaveValue(
+    "Lait demi-écrémé",
+  );
+  await page.getByRole("button", { name: "Annuler" }).click();
+
   // Dans le caddie, l'étiquette reste : on voit ce qui était en promo, et la promo s'ouvre toujours.
   await page.getByRole("checkbox", { name: "Lait demi-écrémé : à acheter" }).click();
   await expect(caddie(page)).toContainText("Lait demi-écrémé");

@@ -37,7 +37,8 @@ Les captures sont faites avec des promos d'exemple et des prénoms fictifs (Cami
 - **Mon compte** (le bonhomme en haut à droite) : chacun écrit son **prénom** et choisit **sa
   couleur** parmi six ; la légende dessous rappelle qui a quelle couleur. Tant qu'un compte n'a pas
   choisi, il a une couleur donnée d'office (la même sur les deux téléphones).
-- **Modifier** un article (toucher son nom) : nom, quantité, note (« sans lactose »…), ou le supprimer.
+- **Modifier** un article (toucher son nom ; pour un article en promo, sa promo s'ouvre, avec
+  « Modifier l'article » dessous) : nom, quantité, note (« sans lactose »…), ou le supprimer.
   La fenêtre rappelle qui l'a ajouté et quand.
 - **Supprimer d'un geste** : glisser l'article vers la gauche, puis toucher **Supprimer** (comme
   dans Mail sur l'iPhone). Pendant 6 secondes, **Annuler** le remet à sa place, même s'il était
@@ -120,8 +121,9 @@ Geispolsheim. L'appli lit ce fichier :
   la liste reste légère ; pour les voir, il suffit d'écrire l'article dans le champ ;
 - les articles ajoutés depuis une promo par les versions précédentes retrouvent leur promo d'après
   leur note (« Leclerc · 2,25 € ») ;
-- en touchant l'étiquette, on voit **cette promo**, rangée pour se lire d'un coup d'œil (comme dans
-  les résultats quand on écrit un article) :
+- en touchant l'étiquette, la photo **ou l'article lui-même**, on voit **cette promo** (et dessous,
+  « Modifier l'article » pour changer son nom, sa quantité ou sa note), rangée pour se lire d'un coup
+  d'œil (comme dans les résultats quand on écrit un article) :
   1. à gauche, la **photo du produit** ; à côté, **jusqu'à quand** elle dure (« Jusqu'au sam.
      31 oct. », « Dernier jour » ; une promo **à venir**, du catalogue suivant, est en bleu : « Dès
      jeu. 29 oct. ») et, dans le coin, le **logo de la marque** (voir « Les photos des produits et

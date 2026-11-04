@@ -120,7 +120,9 @@ for (const theme of ["light", "dark"]) {
     await page.getByRole("button", { name: "Effacer" }).click();
 
     if (theme === "light") {
-      await page.getByRole("button", { name: "Modifier Lait demi-écrémé" }).click();
+      // Un article en promo : le toucher ouvre sa promo, d'où on le modifie.
+      await page.getByRole("button", { name: /^Ouvrir Lait demi-écrémé/ }).click();
+      await page.getByRole("button", { name: "Modifier l'article" }).click();
       await page
         .getByRole("dialog", { name: "Modifier l'article" })
         .getByLabel("Note")

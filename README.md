@@ -102,8 +102,8 @@ Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
   d'ajout.
 - **Promos** : un article ajouté depuis une promo porte une étiquette « Promo », avec dessous le
   type de promo (« -60 % sur le 2e », « 30 % sur la carte »…) ; un article écrit à la main n'en
-  affiche pas. En touchant l'étiquette, on voit la promo : prix, prix au kilo, jusqu'à quand (ou à
-  partir de quand) et, en clair, **où va la réduction** : déjà déduite en caisse, en prenant
+  affiche pas. En touchant l'étiquette ou l'article, on voit la promo : prix, prix au kilo,
+  jusqu'à quand (ou à partir de quand) et, en clair, **où va la réduction** : déjà déduite en caisse, en prenant
   plusieurs, en caisse avec la carte E.Leclerc, ou rendue sur la carte (Ticket E.Leclerc).
 - **Une photo pour chaque promo** : la photo du produit lui-même, prise dans le catalogue
   officiel, seulement quand on est sûr que c'est la bonne (elle porte le code-barres ou le nom exact
