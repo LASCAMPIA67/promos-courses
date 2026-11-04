@@ -219,19 +219,12 @@
       </form>
       <p id="message-ajout" class="message" role="status" hidden></p>
 
-      <!-- Pendant qu'on écrit un article : tous les produits qui correspondent, en promo ou non -->
+      <!-- Pendant qu'on écrit un article : les promos qui correspondent -->
       <section id="suggestions" class="suggestions" aria-labelledby="titre-suggestions" hidden>
-        <h2 id="titre-suggestions" class="cache">Produits trouvés</h2>
+        <h2 id="titre-suggestions" class="cache">Promos trouvées</h2>
         <p id="etat-recherche" class="etat-recherche discret" role="status"></p>
-        <!-- Une seule liste : les produits en promo ont leur promo sous leur nom, les autres non. -->
         <ul id="resultats" class="promos resultats"></ul>
-        <p id="etat-produits" class="etat-produits discret" hidden></p>
-        <button type="button" id="plus-de-resultats" class="bouton large" hidden>Voir plus de produits</button>
-        <p id="credit-produits" class="credit-produits discret" hidden>
-          Produits et photos :
-          <a href="https://fr.openfoodfacts.org" target="_blank" rel="noopener noreferrer">Open Food Facts</a>
-          et ses bases sœurs (licences ODbL et CC BY-SA), et catalogues Leclerc.
-        </p>
+        <button type="button" id="plus-de-resultats" class="bouton large" hidden>Voir plus de promos</button>
       </section>
 
       <main id="contenu" class="contenu">

@@ -132,9 +132,7 @@ export function chercherPromos(index, nom, aujourdhui) {
  * mot du produit ou de sa marque (« fro » trouve « Fromage »), ou un nom de famille complet
  * (« chips » trouve aussi « Pringles »). Sans rien à chercher : toutes les promos, celles en cours
  * d'abord. Même ordre que chercherPromos. `approches` : les mots connus qui ressemblent à un mot
- * mal écrit (voir ressemblance.js), comme équivalents. Renvoie [{ offre, aVenir, proximite, eans }] :
- * `proximite` dit pourquoi elle est trouvée (pour la ranger parmi les autres produits), `eans` les
- * codes-barres de la promo et de ses variantes.
+ * mal écrit (voir ressemblance.js), comme équivalents. Renvoie [{ offre, aVenir }].
  */
 export function rechercherPromos(index, texte, aujourdhui, { approches } = {}) {
   const mots = motsCles(texte);
@@ -170,11 +168,10 @@ export function regrouperVariantes(resultats) {
       o.date_fin,
     ].join("|");
     if (groupes.has(cle)) groupes.get(cle).offres.push(o);
-    else groupes.set(cle, { aVenir: resultat.aVenir, proximite: resultat.proximite, offres: [o] });
+    else groupes.set(cle, { aVenir: resultat.aVenir, offres: [o] });
   }
-  return [...groupes.values()].map(({ aVenir, proximite, offres }) => {
-    const eans = offres.map((o) => o.ean).filter(Boolean);
-    if (offres.length === 1) return { offre: offres[0], aVenir, proximite, eans };
+  return [...groupes.values()].map(({ aVenir, offres }) => {
+    if (offres.length === 1) return { offre: offres[0], aVenir };
     const plusCourt = offres.reduce((a, b) => (b.produit.length < a.produit.length ? b : a));
     const avecPrixAuKilo = offres.find((o) => o.prix_unitaire != null) ?? offres[0];
     return {
@@ -187,8 +184,6 @@ export function regrouperVariantes(resultats) {
         variantes: offres.length,
       },
       aVenir,
-      proximite,
-      eans,
     };
   });
 }
@@ -203,7 +198,7 @@ function toutes(index, aujourdhui) {
 const egal = (motCherche, mot) => mot === motCherche;
 
 /** Les groupes de mots cherchés, avec, pour un mot mal écrit, les mots connus qui lui ressemblent. */
-export function regrouperAvecApproches(motsCherches, approches) {
+function regrouperAvecApproches(motsCherches, approches) {
   const groupes = regrouper(motsCherches);
   if (!approches?.size) return groupes;
   return groupes.map((groupe) =>
@@ -240,33 +235,24 @@ function trouver(index, motsCherches, aujourdhui, correspond, approches) {
     trouvees.push({
       offre,
       aVenir: Boolean(offre.date_debut && offre.date_debut > aujourdhui),
-      proximite: {
-        parFamille,
-        position: position === -1 ? Number.MAX_SAFE_INTEGER : position,
-        // Le mot entier avant les mots qui commencent pareil : « Lait » avant « Laitue ».
-        exact: contient(premier, egal),
-      },
+      parFamille,
+      position: position === -1 ? Number.MAX_SAFE_INTEGER : position,
+      // Le mot entier avant les mots qui commencent pareil : « Lait » avant « Laitue ».
+      exact: contient(premier, egal),
       longueur: motsProduit.length,
     });
   }
   // Les plus proches d'abord.
   trouvees.sort(
     (a, b) =>
-      comparerProximite(a.proximite, b.proximite) ||
+      Number(a.parFamille) - Number(b.parFamille) ||
+      a.position - b.position ||
+      Number(b.exact) - Number(a.exact) ||
       Number(a.aVenir) - Number(b.aVenir) ||
       a.longueur - b.longueur ||
       (a.offre.prix ?? Infinity) - (b.offre.prix ?? Infinity),
   );
-  return trouvees.map(({ offre, aVenir, proximite }) => ({ offre, aVenir, proximite }));
-}
-
-/**
- * Le plus proche de ce qu'on cherche d'abord : trouvé par ses propres mots avant par sa famille (ou
- * un mot qui ressemble), le premier mot cherché tôt dans le nom, puis le mot entier (« Lait » avant
- * « Laitue »). Pour les promos comme pour les autres produits (voir produits.js).
- */
-export function comparerProximite(a, b) {
-  return Number(a.parFamille) - Number(b.parFamille) || a.position - b.position || Number(b.exact) - Number(a.exact);
+  return trouvees.map(({ offre, aVenir }) => ({ offre, aVenir }));
 }
 
 /**
@@ -286,10 +272,10 @@ const notePromo = (offre) =>
 /**
  * La promo choisie pour un article ajouté depuis les promos (« + Ajouter ») : retrouvée par son
  * identifiant, ou, pour un article ajouté par une ancienne version, d'après sa note (« Leclerc ·
- * 2,25 € »). Un article venu d'un produit (son code-barres, « produit ») montre aussi la promo en
- * cours de ce produit, dès qu'il y en a une. Renvoie { offre, aVenir } ; { terminee: true } si la
- * promo choisie n'est plus dans les promos ; null pour un article écrit à la main ou un produit sans
- * promo (rien n'est alors affiché), ou si les promos ne sont pas encore lues.
+ * 2,25 € »). L'article garde le code-barres du produit de sa promo (« produit ») : quand sa promo est
+ * finie, la promo suivante de ce produit prend le relais. Renvoie { offre, aVenir } ; { terminee: true }
+ * si la promo choisie n'est plus dans les promos ; null pour un article écrit à la main (rien n'est
+ * alors affiché), ou si les promos ne sont pas encore lues.
  */
 export function promoChoisie(article, index, aujourdhui) {
   // Espaces insécables ou non (« 2,25 € ») : la même note.

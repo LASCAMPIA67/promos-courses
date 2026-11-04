@@ -108,23 +108,18 @@ Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
 - **Une photo pour chaque promo** : la photo du produit lui-même, prise dans le catalogue
   officiel, seulement quand on est sûr que c'est la bonne (elle porte le code-barres ou le nom exact
   du produit) ; sinon un emplacement neutre, jamais une photo trompeuse. En haut à droite, le
-  **logo de la marque** (celui du catalogue, sinon le logo officiel pris sur Wikipédia ; le logo
-  Marque Repère pour tous les produits Marque Repère), sinon son nom en petit.
-- **Tous les produits, même sans promo** : en écrivant un article, l'appli montre **une seule
-  liste** de fiches : les produits en promo avec leur promo dessous, les autres avec la même fiche
-  sans la promo (photo, marque, contenance, prix habituel quand un catalogue Leclerc l'a donné).
-  Plus de 100 000 produits, d'après [Open Food Facts](https://fr.openfoodfacts.org) et ses bases
-  sœurs (hygiène, maison, animaux) ; la photo du catalogue Leclerc pour les produits déjà vus en
-  promo. Un mot mal écrit (« nutela ») propose les produits qui y ressemblent. Un produit ajouté
-  sans promo montre sa promo dès qu'il y en a une.
+  **logo de la marque**, seulement quand il est sûr pour ce produit (celui du catalogue, sinon le
+  logo officiel de cette marque pris sur Wikipédia, vérifié à l'œil ; le logo Marque Repère pour
+  tous les produits Marque Repère), sinon son nom en petit.
 - **L'historique des prix** : le robot garde chaque jour les promos vues ; quand un produit revient
   en promo, une ligne dit si c'est le prix le plus bas vu, aussi bas que le meilleur, ou déjà vu
   moins cher (et à combien).
 - **Familles de produits** : « Chips » trouve aussi Pringles, Lay's, Doritos… ; « Soda » trouve
   Coca-Cola, Fanta… ; « Couches » trouve Pampers… (environ 50 familles).
 - **Les promos en écrivant** : en écrivant un article, les promos qui correspondent s'affichent
-  aussitôt ; « + » ajoute ce qu'on a écrit (même sans promo), ou on ajoute une promo d'un geste (avec
-  une note courte : « 0,89 € ») ; dans la liste, il montre la photo du produit en petit.
+  aussitôt ; un mot mal écrit (« chocolta ») montre celles qui y ressemblent ; « + » ajoute ce qu'on
+  a écrit (même sans promo, sans photo), ou on ajoute une promo d'un geste (avec une note courte :
+  « 0,89 € ») ; dans la liste, il montre la photo du produit en petit.
 - **Promos à jour** : l'appli prévient si le robot n'est pas passé ou si les promos sont incomplètes ;
   **« Mettre à jour les promos »** (dans Mon compte) lance le robot sans attendre, montre où il en
   est étape par étape (« Photos : 312 sur 1 450 ») et recharge les promos dès qu'il a fini.
@@ -293,9 +288,8 @@ promos-courses/
 │   ├── robot.py                    ← chef d'orchestre
 │   ├── web.py                      ← téléchargement poli (robots.txt, pauses)
 │   ├── offres.py                   ← format d'une offre, doublons, vérification
-│   ├── photos.py                   ← vignettes des photos et des logos (branche « photos », vignettes.json)
+│   ├── photos.py                   ← vignettes des photos et des logos (branche « photos »)
 │   ├── historique.py               ← historique des prix (historique.json)
-│   ├── produits.py                 ← tous les produits, d'après Open Food Facts et ses bases sœurs (branche « produits »)
 │   ├── marques.py                  ← produits Marque Repère, logos pris sur Wikipédia
 │   ├── logos.json                  ← liste des logos de Wikipédia, vérifiés un par un
 │   ├── avancee.py                  ← où en est le robot, pour l'appli

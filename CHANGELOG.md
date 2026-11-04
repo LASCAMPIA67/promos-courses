@@ -14,6 +14,24 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+### Retiré
+
+- **La base de tous les produits et ses photos** (décision d'Emilio du 04/11/2026) : l'appli ne
+  montre plus que les **promos Leclerc**, comme avant la version 0.16 ; ce qui n'est pas en promo
+  s'écrit à la main dans la liste, sans photo. Retirés : `produits.json` (Open Food Facts et ses
+  bases sœurs), le workflow « Produits Leclerc » et la branche `produits` ; dans la branche
+  `photos`, les vignettes des produits qui ne sont plus en promo et `vignettes.json`.
+
+### Modifié
+
+- **Logos : seulement ceux sûrs pour le produit.** Une gamme écrite comme une marque à part
+  (« Disney - Stitch », « Monster Munch Crazy », « Panier de Yoplait ») ne prend plus le logo de sa
+  marque mère : une offre « Disney - Stitch » réunissait par exemple un jeu Stitch et un jeu Marvel.
+  Sans logo sûr, la promo montre le nom de la marque en petit. Les logos du catalogue et ceux de
+  Wikipédia, vérifiés un par un, restent.
+- **Un mot mal écrit** (« chocolta », « nutela ») montre les promos qui y ressemblent (« Rien pour
+  « chocolta » · 1 promo qui ressemble ») : gardé de la version 0.16, parmi les promos seulement.
+
 ## [0.16.0] - 2026-10-28
 
 ### Ajouté

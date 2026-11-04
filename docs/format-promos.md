@@ -106,79 +106,12 @@ prix comparé est le **prix le plus bas pour un article** : celui du lot quand i
 ```
 
 - `prix_habituel` (facultatif) : le prix habituel d'un article, quand le catalogue le donne
-  (l'ancien prix barré ; pour une promo sur le lot, le prix d'un seul article) ; repris dans
-  `produits.json`.
+  (l'ancien prix barré ; pour une promo sur le lot, le prix d'un seul article).
 - `debut` : le premier passage enregistré. L'historique a commencé **vide** le 28/10/2026 : les
   comparaisons arrivent au fil des semaines, quand un produit revient en promo.
 - Une ligne par produit : le fichier reste lisible, et ses changements d'un jour à l'autre, petits.
 - Une promo n'est rangée qu'une fois (même catalogue, même date de début), même avec plusieurs
   passages par jour ; si son prix change, on garde le plus bas.
-
-## Tous les produits (`produits.json`)
-
-Écrit chaque semaine par le robot d'après Open Food Facts et ses bases sœurs (voir
-[sources.md](sources.md#tous-les-produits-open-food-facts)), dans la branche `produits` :
-`https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/produits/produits.json`. Pour rester
-léger (plus de 100 000 produits), chaque produit est une liste de valeurs, dans l'ordre de
-`colonnes`, sur une ligne :
-
-```json
-{
- "format": 1,
- "mise_a_jour": "2026-11-02T04:31:12+01:00",
- "licence": "Open Food Facts, Open Beauty Facts, Open Products Facts et Open Pet Food Facts (https://fr.openfoodfacts.org) : données sous licence ODbL, photos sous licence CC BY-SA.",
- "sources": [
-  {"nom": "Open Food Facts", "etat": "ok", "produits": 99512},
-  {"nom": "Open Beauty Facts", "etat": "ok", "produits": 11240},
-  {"nom": "Open Products Facts", "etat": "erreur", "message": "ConnectionError : …"}
- ],
- "photos": {
-  "off": "https://images.openfoodfacts.org/images/products/",
-  "obf": "https://images.openbeautyfacts.org/images/products/",
-  "opf": "https://images.openproductsfacts.org/images/products/",
-  "opff": "https://images.openpetfoodfacts.org/images/products/"
- },
- "colonnes": ["ean", "nom", "marque", "quantite", "photo", "leclerc", "prix_habituel", "prix_vu_le"],
- "produits": [
-["3564700000229","Brocolis en fleurette surgelés","Notre Jardin","1 kg","front_fr.9",2,null,null],
-["7613035000000","Arôme Maggi","Maggi","250 ml","front_fr.3",0,null,null],
-["8714789000007","Dentifrice blancheur","Signal","75 ml","obf:front_fr.2",0,null,null]
- ]
-}
-```
-
-| Colonne | Signification |
-|---|---|
-| `ean` | Code-barres. |
-| `nom`, `marque`, `quantite` | Nom du produit, sa marque (la gamme plutôt que « Marque Repère »), sa contenance (`null` si inconnues). |
-| `photo` | Fin du nom de la photo (`front_fr.9`), précédée du code de la base quand ce n'est pas Open Food Facts (`obf:front_fr.2`) : l'adresse complète est celle de la base dans `photos` + le code-barres en dossiers (`356/470/000/0229`) + `/front_fr.9.200.jpg`. `null` sans photo. |
-| `leclerc` | Ce qu'on sait du produit : `2` Marque Repère, `1` vu chez Leclerc (la base ou un catalogue), `0` courant en France. Les produits sont rangés dans cet ordre, puis du plus scanné au moins scanné. |
-| `prix_habituel`, `prix_vu_le` | Le dernier prix habituel donné par un catalogue Leclerc, et la date de début de cette promo ; `null` sinon. |
-
-`sources` dit, pour chaque base lue, si elle a répondu (`ok`, avec le nombre de produits gardés)
-ou non (`erreur`, avec le message) : une base sœur injoignable n'empêche pas d'écrire le fichier.
-
-## Les vignettes (`vignettes.json`)
-
-Écrit chaque matin par le robot dans la branche `photos`, à côté des vignettes
-(`https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/vignettes.json`, voir
-[`photos.py`](../src/robot_promos/photos.py)) : la vignette de chaque produit déjà vu en promo (par
-code-barres) et le logo de chaque marque d'un de ces produits, tant qu'ils sont dans l'historique
-des prix (deux ans). L'appli s'en sert pour les produits sans promo : la photo du catalogue Leclerc
-passe avant celle de la base, et leur marque a son logo.
-
-```json
-{
-"format":1,
-"adresse":"https://raw.githubusercontent.com/LASCAMPIA67/promos-courses/photos/",
-"photos":{"3017620422003":"868d5a998002f8def255244f18efb276.jpg"},
-"logos":{"FERRERO":"logos/09916c2248ebb72c773e82b7811c5a6a.png"},
-"marque_repere":"logos/e006a12b32e5d5b481bdddf7968566fa.png"
-}
-```
-
-Les marques sont écrites sans accents ni signes, en majuscules (« CÔTE D'OR » → `COTE D OR`).
-L'appli ne garde que les noms de fichier attendus (32 caractères `0-9a-f`, `.jpg` ; `logos/…png`).
 
 ## Comment l'appli s'en sert
 

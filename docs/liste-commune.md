@@ -53,7 +53,7 @@ Un document par article, pour que deux modifications en même temps ne se gênen
 | `quantite` | texte (30 caractères max.) | non | « 2 L », « 1 kg », « 6 »… |
 | `note` | texte (200 caractères max.) | non | Précision libre : « sans lactose », « marque Milbona »… |
 | `promo` | texte (100 caractères max.) | non | Identifiant de la promo (dans `promos.json`) quand l'article a été ajouté depuis une promo (« + Ajouter ») : l'appli affiche cette promo à droite de l'article. |
-| `produit` | texte (8 à 14 chiffres) | non | Code-barres du produit d'où vient l'article (une promo ou un produit sans promo, « + Ajouter ») : l'appli montre sa photo dans la liste, et sa promo dès qu'il y en a une. |
+| `produit` | texte (8 à 14 chiffres) | non | Code-barres du produit de la promo d'où vient l'article (« + Ajouter ») : quand cette promo est finie, l'appli montre la promo suivante du même produit, dès qu'il y en a une. |
 | `achete` | vrai / faux | oui | Coché quand c'est dans le caddie. |
 | `ajoute_par` | identifiant de compte | oui | Qui a ajouté l'article (ne peut plus changer ensuite). |
 | `cree_le` | date du serveur | oui | Date d'ajout (ne peut plus changer ensuite). |

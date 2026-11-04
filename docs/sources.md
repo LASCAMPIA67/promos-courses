@@ -45,13 +45,14 @@ de 3 secondes entre deux demandes, et en fait une vignette JPEG de 256 pixels (u
 Ko). Au plus une heure de photos par passage : les premiers jours, elles arrivent par vagues.
 
 > **Décision du 28/10/2026.** Les vignettes sont rangées dans la branche `photos` de ce dépôt
-> (public), réécrite à chaque passage, sans historique : elle garde les photos des promos en cours
-> et celles des **produits déjà vus en promo** (tant qu'ils sont dans l'historique des prix, deux
-> ans), pour les montrer aussi quand ils n'ont plus de promo ; `vignettes.json` dit laquelle va avec
-> quel code-barres ([format](format-promos.md#les-vignettes-vignettesjson)). Ce sont des copies
-> réduites des photos du catalogue Leclerc, que n'importe qui voit sur la visionneuse officielle :
-> une zone grise pour le droit d'auteur, comme l'accès au catalogue. Emilio a choisi de l'accepter.
-> Pour tout retirer d'un coup : supprimer la branche `photos`.
+> (public), réécrite à chaque passage : elle ne garde que les photos des promos en cours, sans
+> historique. Ce sont des copies réduites des photos du catalogue Leclerc, que n'importe qui voit sur
+> la visionneuse officielle : une zone grise pour le droit d'auteur, comme l'accès au catalogue.
+> Emilio a choisi de l'accepter. Pour tout retirer d'un coup : supprimer la branche `photos`.
+
+> **Décision du 04/11/2026.** Uniquement les promos Leclerc : la base de tous les produits
+> (d'après Open Food Facts, essayée dans la version 0.16) est retirée, avec ses photos. Ce qui n'est
+> pas en promo s'écrit à la main dans la liste, sans photo.
 
 ## Logos des marques
 
@@ -74,16 +75,17 @@ du produit commence exactement par le nom du logo, en mots entiers (un label com
 « POMMES_DE_FRANCE » ne devient jamais la marque des « POMMES GALA »). Voir `marque_du_logo` dans
 [`leclerc.py`](../src/robot_promos/sources/leclerc.py).
 
-Quelques **gammes** sont écrites comme une marque à part (« MONSTER MUNCH CRAZY », « PANIER DE
-YOPLAIT », « DISNEY - STITCH ») : sans logo à elles, elles prennent celui de leur marque, d'après une
-courte liste vérifiée à la main (`SOUS_MARQUES` dans [`marques.py`](../src/robot_promos/marques.py)).
-Pas de règle automatique du genre « même début de nom, même marque » : LOTUS BABY (des couches)
-n'est pas une gamme de LOTUS (des biscuits).
+Un logo n'est montré que s'il est **sûr pour ce produit** (décision d'Emilio du 04/11/2026) : celui
+que le catalogue Leclerc joint aux produits de cette marque, ou le logo officiel de cette même
+marque, vérifié à l'œil (plus bas). Une **gamme** écrite comme une marque à part (« MONSTER MUNCH
+CRAZY », « PANIER DE YOPLAIT », « DISNEY - STITCH ») ne prend pas le logo de sa marque mère : une
+offre « Disney - Stitch » réunissait par exemple un jeu Stitch et un jeu Marvel. Pas de règle
+automatique du genre « même début de nom, même marque » non plus : LOTUS BABY (des couches) n'est
+pas une gamme de LOTUS (des biscuits). Sans logo sûr, la promo montre le nom de la marque en petit.
 
 Le robot en fait une petite image PNG (96 pixels de haut au plus, 1 à 12 Ko), rangée dans `logos/` de
-la branche `photos`, avec la même règle que les photos (téléchargée une seule fois, gardée tant
-qu'un produit de la marque est dans l'historique des prix : l'appli la montre aussi pour ses
-produits sans promo).
+la branche `photos`, avec la même règle que les photos (téléchargée une seule fois, retirée quand
+plus aucune promo n'en a besoin).
 
 ### Le logo Marque Repère
 
@@ -144,74 +146,6 @@ travail, c'est le robot qui télécharge ces logos, en deux temps :
 > illustrer l'article de la marque. Une petite copie dans l'appli, pour reconnaître la marque d'un
 > produit en promo : la même zone grise que les logos du catalogue, acceptée par Emilio le
 > 28/10/2026. La page de chaque fichier est notée dans `logos.json`.
-
-## Tous les produits (Open Food Facts)
-
-Pour trouver **tous les produits**, même sans promo (l'arôme Maggi, le Nutella, un shampooing…),
-avec leur photo, l'appli lit `produits.json`, que le robot écrit **une fois par semaine** (le lundi
-à 4 h 23, workflow [`produits.yml`](../.github/workflows/produits.yml), code
-[`produits.py`](../src/robot_promos/produits.py)).
-
-**D'où viennent les produits.** Les catalogues Leclerc ne donnent que les produits en promo. Le seul
-endroit qui a tous les produits du magasin, avec leurs prix, est **Leclerc Drive** : il est protégé
-par une vérification anti-robot (« Please enable JS and disable any ad blocker ») ; y aller quand
-même, ce serait la contourner : écarté le 28/10/2026, comme l'application Leclerc. Le site
-`e.leclerc` ne vend en ligne que du non-alimentaire (son plan du site ne liste pas les produits du
-magasin : Kinder ou Doritos n'y sont pas). Les produits viennent donc de bases libres, faites par
-leurs utilisateurs et tenues par la même association :
-
-| Base | Ce qu'on y trouve | Fichier complet |
-|---|---|---|
-| [**Open Food Facts**](https://fr.openfoodfacts.org) | l'alimentaire | 1,5 Go |
-| [Open Beauty Facts](https://fr.openbeautyfacts.org) | hygiène, beauté (shampooing, dentifrice…) | 18 Mo |
-| [Open Products Facts](https://fr.openproductsfacts.org) | maison, entretien | 6 Mo |
-| [Open Pet Food Facts](https://fr.openpetfoodfacts.org) | animaux (croquettes, pâtée…) | 3 Mo |
-
-Leur fichier complet (dossier `/data/` de `static.…facts.org`, permis par leur `robots.txt`) est lu
-**au fil du téléchargement, sans être gardé**, une fois par semaine. Le robot garde les produits
-vendus en France (ou, sans pays indiqué, au code-barres français, `30` à `37`) qui ont un nom :
-
-- ceux dont on est **sûr qu'ils sont chez Leclerc** : Marque Repère (code-barres `356470…`, plus de
-  10 000), ceux que la base dit vendus chez Leclerc, et ceux déjà vus dans un catalogue Leclerc
-  (l'[historique des prix](format-promos.md#lhistorique-des-prix-historiquejson)) ;
-- les **produits courants**, avec une photo, d'un pays dont les produits se vendent en France (le
-  début du code-barres) : scannés par au moins 3 personnes dans Open Food Facts ; tous ceux des
-  bases sœurs, bien plus petites ;
-- **sans** les marques propres des autres enseignes, qu'on ne trouve pas chez Leclerc : Carrefour,
-  U, Auchan, Intermarché (Pâturages, Chabrior…), Lidl (Milbona…), Aldi, Monoprix, Casino… d'après
-  leur nom et le début de leur code-barres (vérifié sur Open Food Facts : `3560070`, `3270190`
-  Carrefour ; `325622` U ; `3596710` Auchan ; `325039` Intermarché et Netto ; `4056489` Lidl).
-
-Si une base sœur est injoignable, les autres suffisent : c'est noté dans `produits.json`
-(`sources`). Sans Open Food Facts, `produits.json` n'est pas modifié (celui de la semaine d'avant
-reste).
-
-Essai du 28/10/2026 sur les vrais fichiers : **111 895 produits** (Open Food Facts 95 041, Open
-Beauty Facts 10 066, Open Products Facts 4 871, Open Pet Food Facts 2 598), dont 13 439 sûrs d'être
-chez Leclerc et **109 072 avec une photo** (97 %) ; 10 Mo (3 Mo à télécharger), 10 minutes de
-lecture pour le robot. Une recherche les parcourt en moins d'un dixième de seconde, un mot mal
-écrit en moins de deux dixièmes (mesuré sur un ordinateur ; un peu plus sur un téléphone).
-
-**Les photos.** Celle du **catalogue Leclerc** pour les produits déjà vus en promo (la même
-vignette que la promo, gardée dans la branche `photos`, voir plus haut) ; sinon celle de la base du
-produit (`images.openfoodfacts.org`, `images.openbeautyfacts.org`…), la photo de face choisie par
-ses utilisateurs. Sans photo : l'emplacement neutre. Le **logo** de la marque : celui d'une promo en
-cours, ou d'un produit de la marque déjà vu en promo ; sinon son nom en petit.
-
-**Les prix.** Seuls ceux qu'un catalogue Leclerc a donnés : le **prix habituel** (l'ancien prix
-barré, ou le prix d'un seul article pour une promo sur le lot), gardé dans l'historique des prix et
-repris dans `produits.json`. Les autres produits n'affichent pas de prix.
-
-**Rangement.** `produits.json` est dans la branche `produits` du dépôt, réécrite chaque semaine en un
-seul enregistrement : le dépôt ne grossit pas. L'appli le garde sur le téléphone (la recherche
-marche sans réseau, et ce qu'on tape ne sort pas du téléphone) ; les photos viennent directement
-des sites des bases (ou de la branche `photos`) et restent aussi sur le téléphone, une fois vues.
-
-> **Licences.** Les données de ces bases sont sous licence
-> [ODbL](https://opendatacommons.org/licenses/odbl/1-0/) (citer la source, partager à l'identique :
-> `produits.json` l'est donc aussi), les photos sous licence
-> [CC BY-SA](https://creativecommons.org/licenses/by-sa/3.0/deed.fr). L'appli le dit sous les
-> produits trouvés (« Produits et photos : Open Food Facts et ses bases sœurs… »).
 
 ## L'avancée d'un passage
 

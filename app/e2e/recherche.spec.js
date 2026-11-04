@@ -1,5 +1,4 @@
-// Scénario réel : en écrivant un article, les produits qui correspondent s'affichent aussitôt (ici,
-// sans la base de tous les produits : les promos seules).
+// Scénario réel : en écrivant un article, les promos qui correspondent s'affichent aussitôt.
 
 import { expect, test } from "@playwright/test";
 
@@ -27,7 +26,7 @@ test("en écrivant un article, les promos s'affichent ; on en ajoute une, ou ce 
 
   // « lait » : les promos trouvées remplacent la liste, le mot entier (en cours, puis à venir) avant « Laitue ».
   await champ(page).fill("lait");
-  await expect(page.locator("#etat-recherche")).toHaveText("4 produits en promo");
+  await expect(page.locator("#etat-recherche")).toHaveText("4 promos");
   await expect(noms(page)).toHaveText(["Lait demi-écrémé", "Lait demi-écrémé UHT", "Laitue", "Chocolat au lait"]);
   await expect(page.locator("#contenu")).toBeHidden();
 
@@ -43,7 +42,7 @@ test("en écrivant un article, les promos s'affichent ; on en ajoute une, ou ce 
 
   // Aucune promo : « OK » sur le clavier l'ajoute quand même.
   await champ(page).fill("xyz");
-  await expect(page.locator("#etat-recherche")).toHaveText("Aucun produit · + pour l'ajouter tel quel");
+  await expect(page.locator("#etat-recherche")).toHaveText("Aucune promo · + pour l'ajouter");
   await champ(page).press("Enter");
   await expect(champ(page)).toHaveValue("");
   await expect(aAcheter(page).locator(".nom")).toHaveText(["Lait demi-écrémé", "xyz"]);
@@ -54,9 +53,19 @@ test("beaucoup de promos : on en montre 30, puis plus à la demande", async ({ p
   await servirPromos(context, { multiplier: 10 }); // 40 promos pour « lait »
   await seConnecter(page, COMPTES.un);
   await champ(page).fill("lait");
-  await expect(page.locator("#etat-recherche")).toHaveText("40 produits en promo");
+  await expect(page.locator("#etat-recherche")).toHaveText("40 promos");
   await expect(noms(page)).toHaveCount(30);
-  await page.getByRole("button", { name: "Voir plus de produits" }).click();
+  await page.getByRole("button", { name: "Voir plus de promos" }).click();
   await expect(noms(page)).toHaveCount(40);
-  await expect(page.getByRole("button", { name: "Voir plus de produits" })).toBeHidden();
+  await expect(page.getByRole("button", { name: "Voir plus de promos" })).toBeHidden();
+});
+
+test("un mot mal écrit : les promos qui y ressemblent, pour choisir la bonne", async ({ page }) => {
+  await seConnecter(page, COMPTES.un);
+  await champ(page).fill("chocolta");
+  await expect(page.locator("#etat-recherche")).toHaveText("Rien pour « chocolta » · 1 promo qui ressemble");
+  await expect(noms(page)).toHaveText(["Chocolat au lait"]);
+  await page.getByRole("button", { name: "Ajouter Chocolat au lait à la liste" }).click();
+  await page.getByRole("button", { name: "Effacer" }).click();
+  await expect(aAcheter(page).locator(".nom")).toHaveText(["Chocolat au lait"]);
 });

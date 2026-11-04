@@ -6,7 +6,7 @@ import { expect, test } from "@playwright/test";
 import { choisirFichier, dessinerTicket, pdfExemple } from "./fichiers-exemple.js";
 import { CLE, simulerGitHub } from "./github-exemple.js";
 import { COMPTES, creerComptes, seConnecter, viderLaBase } from "./outils.js";
-import { servirProduits, servirPromos } from "./promos-exemple.js";
+import { servirPromos } from "./promos-exemple.js";
 
 const COMPTE = COMPTES.un;
 const AUTRE = COMPTES.deux;
@@ -34,7 +34,6 @@ for (const theme of ["light", "dark"]) {
   test(`captures en mode ${theme === "light" ? "clair" : "sombre"}`, async ({ page, context }) => {
     test.slow(); // la lecture du ticket en photo prend quelques secondes
     await servirPromos(context);
-    await servirProduits(context);
     await page.emulateMedia({ colorScheme: theme });
     const suffixe = theme === "light" ? "" : "-sombre";
     await page.goto("");
@@ -110,12 +109,9 @@ for (const theme of ["light", "dark"]) {
     await page.screenshot({ path: `${DOSSIER}promos${suffixe}.png` });
     await page.getByRole("button", { name: "Fermer" }).click();
 
-    // En écrivant un article : tous les produits qui correspondent, en une seule liste.
+    // En écrivant un article : les promos qui correspondent.
     await page.getByLabel("Article à ajouter").fill("lait");
-    await expect(page.locator("#etat-recherche")).toHaveText("5 produits, dont 4 en promo");
-    // Parmi les promos, un produit sans promo : la même fiche sans la promo, avec sa photo et son prix habituel.
-    const laitEntier = page.locator("#resultats .promo").filter({ hasText: "Lait entier bio" });
-    await expect.poll(() => laitEntier.locator("img.photo-promo").evaluate((i) => i.naturalWidth)).toBe(256);
+    await expect(page.locator("#etat-recherche")).toHaveText("4 promos");
     await page.getByLabel("Article à ajouter").blur();
     await page.screenshot({ path: `${DOSSIER}recherche${suffixe}.png` });
     await page.getByRole("button", { name: "Effacer" }).click();

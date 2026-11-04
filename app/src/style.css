@@ -1066,8 +1066,7 @@ dialog h2 {
   padding: 0;
 }
 
-/* Une promo se lit de haut en bas : dates, produit, taille, prix, type de promo. Un produit sans
-   promo a la même fiche, sans la partie promo (dates, prix, type de promo). */
+/* Une promo se lit de haut en bas : dates, produit, taille, prix, type de promo. */
 .promo {
   display: grid;
   gap: 3px;
@@ -1154,11 +1153,6 @@ dialog h2 {
   min-width: 0;
 }
 
-/* Sans promo, pas de dates : la marque reste dans le coin. */
-.promo-haut > :only-child {
-  margin-left: auto;
-}
-
 /* Les logos sont faits pour un fond blanc, même en mode sombre : une petite étiquette blanche. */
 .logo-marque {
   flex: none;
@@ -1215,8 +1209,7 @@ dialog h2 {
 }
 
 .ancien-prix,
-.prix-unitaire,
-.prix-habituel {
+.prix-unitaire {
   color: var(--discret);
   font-size: 0.85rem;
 }
@@ -1298,23 +1291,10 @@ dialog h2 {
 }
 
 /* ------------------------------------------------------------------------------------------ */
-/* Les produits trouvés pendant qu'on écrit un article */
+/* Les promos trouvées pendant qu'on écrit un article */
 
 .suggestions {
   margin-top: 8px;
-}
-
-.etat-produits {
-  margin: 10px 4px 0;
-}
-
-.credit-produits {
-  margin: 8px 4px 0;
-  font-size: 0.75rem;
-}
-
-.credit-produits a {
-  color: var(--accent-texte);
 }
 
 .etat-recherche {
