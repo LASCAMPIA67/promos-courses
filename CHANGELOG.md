@@ -14,6 +14,13 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+### Modifié
+
+- **La promo reste affichée dans le caddie** : un article ajouté depuis une promo garde, une fois
+  coché, la photo du produit et son étiquette « Promo » avec le type de promo (« -15 % en caisse »).
+  On voit d'un coup d'œil ce qui était en promo, et la promo s'ouvre toujours en touchant
+  l'étiquette.
+
 ## [0.18.0] - 2026-11-04
 
 ### Ajouté

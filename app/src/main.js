@@ -235,19 +235,20 @@ function dessinerListe() {
   const rayons = rangerParRayon(aAcheter, etat.correctionsRayons);
   const aujourdhui = dateDuJour();
   // Rangés par rayon, dans l'ordre du magasin. À droite d'un article ajouté depuis une promo
-  // (« + Ajouter ») : cette promo, toujours à jour.
+  // (« + Ajouter ») : cette promo, toujours à jour ; dans le caddie aussi, pour voir ce qui était en promo.
+  const promoDe = (article) => promoChoisie(article, etat.promos?.index, aujourdhui);
   $("liste-a-acheter").replaceChildren(
     ...rayons.map(({ rayon, articles }) => {
       const section = element("section", "rayon");
       section.setAttribute("aria-label", rayon.nom);
       const titre = element("h3", "titre-rayon", rayon.nom);
       const liste = element("ul", "liste");
-      liste.append(...articles.map((a) => ligneArticle(a, promoChoisie(a, etat.promos?.index, aujourdhui))));
+      liste.append(...articles.map((a) => ligneArticle(a, promoDe(a))));
       section.append(titre, liste);
       return section;
     }),
   );
-  $("liste-caddie").replaceChildren(...dansLeCaddie.map((a) => ligneArticle(a)));
+  $("liste-caddie").replaceChildren(...dansLeCaddie.map((a) => ligneArticle(a, promoDe(a))));
   $("liste-vide").hidden = aAcheter.length > 0;
   $("section-caddie").hidden = dansLeCaddie.length === 0;
   $("titre-caddie").textContent = `Dans le caddie (${dansLeCaddie.length})`;

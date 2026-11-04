@@ -109,11 +109,13 @@ Geispolsheim. L'appli lit ce fichier :
 - en écrivant un article, les promos qui correspondent s'affichent (voir plus bas) ; **« + Ajouter »**
   sur l'une d'elles ajoute l'article **avec cette promo** ;
 - un article ajouté ainsi montre, juste après le rond à cocher, la **photo du produit** en petit (la
-  toucher montre la promo ; rien sans photo sûre, ni dans le caddie) ;
+  toucher montre la promo ; rien sans photo sûre) ;
 - il porte à droite une étiquette orange **« Promo »**, et dessous, en petit, le
   **type de promo**, sans avoir à l'ouvrir : « -60 % sur le 2e » (en prenant plusieurs), « -20 % en
   caisse », « 30 % sur la carte » (Ticket E.Leclerc), « -25 % avec la carte », ou le prix s'il n'y a pas de réduction particulière ; « dès le 29 oct. » s'ajoute pour une promo
   qui n'a pas encore commencé ; quand la promo n'est plus dans les catalogues, « Promo terminée » ;
+- une fois l'article coché, **dans le caddie**, la photo et l'étiquette « Promo » restent : on voit
+  d'un coup d'œil ce qui était en promo, et la promo s'ouvre toujours en touchant l'étiquette ;
 - un article **écrit à la main** (« + » ou « OK ») n'affiche **aucune promo**, même s'il y en a :
   la liste reste légère ; pour les voir, il suffit d'écrire l'article dans le champ ;
 - les articles ajoutés depuis une promo par les versions précédentes retrouvent leur promo d'après

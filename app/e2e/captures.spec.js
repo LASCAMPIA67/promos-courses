@@ -82,10 +82,13 @@ for (const theme of ["light", "dark"]) {
       }
       await autre.context().close();
       await page.getByRole("checkbox", { name: "Café moulu : à acheter" }).click();
-      await page.getByRole("checkbox", { name: "Pâtes : à acheter" }).click();
+      // Une promo dans le caddie : son étiquette reste.
+      await page.getByRole("checkbox", { name: "Bananes : à acheter" }).click();
     }
     await expect(page.locator("#liste-caddie .article")).toHaveCount(2);
     await expect(page.locator(".bouton-promos")).toHaveCount(3);
+    // Les bananes n'ont pas de photo sûre : l'emplacement est retiré avant la capture.
+    await expect(page.locator("#liste-caddie .photo-article")).toHaveCount(0);
     await page.locator("#ajout-nom").blur();
     await page.screenshot({ path: `${DOSSIER}liste${suffixe}.png` });
 

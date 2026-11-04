@@ -81,11 +81,16 @@ test("un article ajouté depuis une promo l'affiche à droite ; écrit à la mai
   await expect(lait.locator(".periode")).toContainText("Jusqu'au");
   await page.getByRole("button", { name: "Fermer" }).click();
 
-  // Dans le caddie, plus besoin de l'étiquette.
+  // Dans le caddie, l'étiquette reste : on voit ce qui était en promo, et la promo s'ouvre toujours.
   await page.getByRole("checkbox", { name: "Lait demi-écrémé : à acheter" }).click();
   await expect(caddie(page)).toContainText("Lait demi-écrémé");
-  await expect(caddie(page).locator(".bouton-promos")).toHaveCount(0);
-  await expect(caddie(page).locator(".photo-article")).toHaveCount(0);
+  await expect(caddie(page).locator(".type-promo")).toHaveText("-15 % en caisse");
+  await expect(caddie(page).locator(".photo-article")).toHaveAttribute("src", "https://exemple.test/photos/lait.jpg");
+  await caddie(page)
+    .getByRole("button", { name: /^Voir la promo de Lait demi-écrémé/i })
+    .click();
+  await expect(page.getByRole("dialog", { name: "Promo pour « Lait demi-écrémé »" })).toBeVisible();
+  await page.getByRole("button", { name: "Fermer" }).click();
 });
 
 test("le prix dit clairement où va la réduction : sur la carte E.Leclerc, ou en caisse avec la carte", async ({
