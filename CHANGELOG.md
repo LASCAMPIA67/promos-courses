@@ -14,6 +14,8 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+## [0.18.0] - 2026-11-04
+
 ### Ajouté
 
 - **Vraie baisse ou fausse promo**, sur chaque promo : une ligne dit si elle est vraiment moins
@@ -490,7 +492,8 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 - Version antérieure à la mise en place des publications : pas de page « Release » (voir le lien
   ci-dessous vers son enregistrement d'origine).
 
-[Non publié]: https://github.com/lascampia67/promos-courses/compare/v0.17.0...HEAD
+[Non publié]: https://github.com/lascampia67/promos-courses/compare/v0.18.0...HEAD
+[0.18.0]: https://github.com/lascampia67/promos-courses/compare/v0.17.0...v0.18.0
 [0.17.0]: https://github.com/lascampia67/promos-courses/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/lascampia67/promos-courses/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/lascampia67/promos-courses/compare/v0.14.0...v0.15.0
