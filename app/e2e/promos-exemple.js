@@ -61,6 +61,7 @@ function offre(id, champs) {
     logo_marque: null,
     page: 3,
     historique: null,
+    habituel_avant: null,
     ...champs,
   };
 }
@@ -164,6 +165,8 @@ const OFFRES = [
     prix_unitaire: 9.99,
     unite: "kg",
     reduction: "-25 %",
+    // Une fausse promo : le même prix qu'il y a un mois, quand il était « prix normal ».
+    habituel_avant: { prix: 9.99, le: jour(-30) },
   }),
   offre("pates", {
     photo: `${PHOTOS}pates.jpg`,

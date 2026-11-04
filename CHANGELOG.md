@@ -14,6 +14,18 @@ Tant que le projet est en `0.x`, il est en construction : le format peut encore 
 
 ## [Non publié]
 
+### Ajouté
+
+- **Vraie baisse ou fausse promo**, sur chaque promo : une ligne dit si elle est vraiment moins
+  chère que le prix normal. En vert « Vraie baisse : -15 % sur le prix normal » quand le prix barré
+  le prouve (la loi l'oblige à être le prix le plus bas des 30 jours d'avant), « Vraie baisse si vous
+  en prenez 2 » pour un lot, ou d'après le prix normal vu dans un catalogue d'avant ; en gris « Prix
+  normal inconnu » quand le catalogue ne donne que le prix ; en ocre « Pas moins cher que
+  d'habitude » ou « Prix normal plus haut qu'avant » quand l'historique le montre. Toutes les
+  promos restent affichées (décision d'Emilio du 04/11/2026).
+- Nouveau champ facultatif `habituel_avant` des offres (format inchangé) : le dernier prix habituel
+  du produit vu dans un catalogue d'avant, d'après l'historique des prix.
+
 ## [0.17.0] - 2026-11-04
 
 ### Retiré

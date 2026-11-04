@@ -178,6 +178,21 @@ test("chaque promo montre la photo de son produit et, dans le coin, le logo de s
   );
   await expect(promos.nth(2).locator(".historique-prix")).toHaveCount(0);
 
+  // Vraie baisse ou non, sur le prix normal : prouvée par le prix barré ou le lot, inconnue pour un prix seul.
+  await expect(promos.locator(".baisse")).toHaveText([
+    "Vraie baisse : -15 % sur le prix normal",
+    "Vraie baisse si vous en prenez 2 : -25 % par article",
+    "Prix normal inconnu",
+    "Vraie baisse : -20 % sur le prix normal",
+  ]);
+  await expect(promos.first().locator(".baisse")).toHaveAttribute("data-genre", "vraie");
+  await expect(promos.nth(2).locator(".baisse")).toHaveAttribute("data-genre", "inconnue");
+  // Une fausse promo : pas moins chère que le prix normal vu il y a un mois, malgré son prix barré.
+  await page.getByLabel("Article à ajouter").fill("café");
+  await expect(promos.locator(".promo-nom")).toHaveText(["Café moulu pur arabica"]);
+  await expect(promos.locator(".baisse")).toHaveText(/^Pas moins cher que d'habitude : 9,99\u00a0€ le \S+ \S+$/);
+  await expect(promos.locator(".baisse")).toHaveAttribute("data-genre", "douteuse");
+
   // Un produit Marque Repère : le logo Marque Repère ; VoiceOver lit aussi le nom de la gamme.
   await page.getByLabel("Article à ajouter").fill("jambon");
   await expect(promos.locator(".promo-nom")).toHaveText(["Jambon cuit supérieur"]);

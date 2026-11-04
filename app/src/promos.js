@@ -475,12 +475,16 @@ const enseigne = (offre) => ENSEIGNES[offre.source] ?? offre.source;
  * - detail : ce qu'il faut savoir en plus, en court (« 3,15 € les 2 », « revient à 1,65 € »), ou
  *   null. Le type de promo lui-même est donné par typePromo.
  */
+/** Le prix du lot est sûr, sauf « -50 % sur le 2e » au même prix qu'un seul (erreur du catalogue). */
+function lotSur(offre) {
+  const { lot, prix } = offre;
+  return lot?.prix != null && (prix == null || lot.prix > prix || /offert/i.test(offre.reduction ?? ""));
+}
+
 export function explicationPrix(offre) {
   const reduction = offre.reduction ?? "";
   const euros = (montant) => (montant == null ? null : formaterPrix(montant));
-  // Prix du lot, sauf s'il est douteux (« -50 % sur le 2e » au même prix qu'un seul : erreur du catalogue).
-  const lotFiable =
-    offre.lot?.prix != null && (offre.prix == null || offre.lot.prix > offre.prix || /offert/i.test(reduction));
+  const lotFiable = lotSur(offre);
   const auKiloDuLot =
     lotFiable && offre.lot.prix_unitaire != null && offre.unite && offre.unite !== "pièce"
       ? ` (${formaterPrixUnitaire(offre.lot.prix_unitaire, offre.unite)})`
@@ -556,6 +560,64 @@ export function phraseHistorique(offre) {
     return { genre: verdict, texte };
   }
   return null;
+}
+
+/**
+ * Vraie baisse ou non : ce que la promo fait vraiment gagner sur le prix normal d'un article.
+ *
+ * Le prix normal : l'ancien prix barré du catalogue (la loi l'oblige à être le prix le plus bas des
+ * 30 jours d'avant ; pour un Ticket E.Leclerc, le prix payé en caisse), le prix d'un seul article
+ * pour une promo sur le lot, ou la réduction en caisse écrite par le catalogue (« -30 % ») ; sinon
+ * le dernier prix habituel vu dans un catalogue d'avant (`habituel_avant`, écrit par le robot). Une
+ * promo pas moins chère que ce dernier, ou un prix barré plus haut que lui, est signalée.
+ *
+ * Renvoie { genre, texte } : genre « vraie », « inconnue » (le catalogue ne donne que le prix) ou
+ * « douteuse » ; null pour une promo sans prix ni réduction.
+ */
+export function phraseBaisse(offre) {
+  const { genre } = explicationPrix(offre);
+  const seul = offre.prix; // pour un Ticket E.Leclerc : une fois le Ticket déduit
+  const parLot = lotSur(offre) && offre.lot.quantite > 1 ? offre.lot.prix / offre.lot.quantite : null;
+  const paye = parLot != null && (seul == null || parLot < seul) ? parLot : seul;
+  const siLot = paye != null && paye === parLot ? ` si vous en prenez ${offre.lot.quantite}` : "";
+  const avant = offre.habituel_avant?.prix > 0 ? offre.habituel_avant : null;
+  const baisse = (normal) => Math.round((1 - paye / normal) * 100);
+  const pourcentage = (n) => (n >= 1 ? `-${n} %` : "moins de 1 %");
+
+  // D'abord ce que dit l'historique : pas moins cher que d'habitude, ou un prix barré gonflé.
+  if (paye != null && avant) {
+    const quand = `${formaterPrix(avant.prix)} le ${jourCourt(avant.le)}`;
+    if (paye >= avant.prix - 0.005) {
+      return { genre: "douteuse", texte: `Pas moins cher que d'habitude : ${quand}` };
+    }
+    if (offre.ancien_prix != null && offre.ancien_prix > avant.prix + 0.005) {
+      const texte = `Prix normal plus haut qu'avant (${quand}) : vraie baisse ${pourcentage(baisse(avant.prix))}${siLot}`;
+      return { genre: "douteuse", texte };
+    }
+  }
+  if (paye != null && offre.ancien_prix > 0) {
+    if (paye >= offre.ancien_prix) return { genre: "douteuse", texte: "Pas moins cher que le prix barré" };
+    return {
+      genre: "vraie",
+      texte: `Vraie baisse : ${pourcentage(baisse(offre.ancien_prix))} sur le prix normal${siLot}`,
+    };
+  }
+  if (siLot) {
+    return {
+      genre: "vraie",
+      texte: `Vraie baisse si vous en prenez ${offre.lot.quantite} : ${pourcentage(baisse(seul))} par article`,
+    };
+  }
+  const ecrite = /^-\s*(\d+(?:[.,]\d+)?)\s*%$/.exec((offre.reduction ?? "").trim());
+  if (ecrite && (genre === "caisse" || genre === "carte-caisse")) {
+    return { genre: "vraie", texte: `Vraie baisse : -${ecrite[1]} % sur le prix en rayon` };
+  }
+  if (paye != null && avant) {
+    const texte = `Vraie baisse : ${pourcentage(baisse(avant.prix))} sur le prix normal vu le ${jourCourt(avant.le)}`;
+    return { genre: "vraie", texte };
+  }
+  if (paye == null) return null;
+  return { genre: "inconnue", texte: "Prix normal inconnu" };
 }
 
 /**

@@ -111,6 +111,16 @@
             "meilleur_prix": {"type": "number", "minimum": 0, "description": "Le prix le plus bas pour un article dans les promos d'avant."},
             "meilleur_le": {"$ref": "#/$defs/date", "description": "Début de la promo d'avant la moins chère (la dernière, à égalité)."}
           }
+        },
+        "habituel_avant": {
+          "description": "Le dernier prix habituel de ce produit vu dans un catalogue d'avant (facultatif ; null s'il n'est pas connu).",
+          "type": ["object", "null"],
+          "required": ["prix", "le"],
+          "additionalProperties": false,
+          "properties": {
+            "prix": {"type": "number", "minimum": 0, "description": "Le prix habituel d'un article : l'ancien prix barré, ou le prix d'un seul article pour une promo sur le lot."},
+            "le": {"$ref": "#/$defs/date", "description": "Début de la promo où ce prix habituel a été vu."}
+          }
         }
       }
     }

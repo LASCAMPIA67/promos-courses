@@ -2,7 +2,15 @@
 
 import json
 
-from robot_promos.historique import ajouter, comparer, lire, mettre_a_jour, prix_article, prix_habituel
+from robot_promos.historique import (
+    ajouter,
+    comparer,
+    habituel_avant,
+    lire,
+    mettre_a_jour,
+    prix_article,
+    prix_habituel,
+)
 
 EAN = "3564700000017"
 
@@ -92,3 +100,31 @@ def test_le_prix_habituel_quand_le_catalogue_le_donne():
     historique = lire("/nexiste/pas.json")
     ajouter(historique, [{**offre("A", "2026-10-20", 0.89), "ancien_prix": 1.05}], "2026-10-28")
     assert historique["produits"][EAN]["promos"][0]["prix_habituel"] == 1.05
+
+
+def test_le_dernier_prix_habituel_vu_avant():
+    historique = lire("/nexiste/pas.json")
+    ajouter(
+        historique,
+        [
+            {**offre("A", "2026-09-01", 1.99), "ancien_prix": 2.29},
+            offre("B", "2026-09-20", 1.89),  # sans prix habituel
+            {**offre("C", "2026-10-06", 1.95), "ancien_prix": 2.49},
+        ],
+        "2026-10-06",
+    )
+    # Le plus récent d'avant, même s'il est plus cher : c'est le prix normal du moment.
+    assert habituel_avant(historique, offre("D", "2026-11-03", 2.49)) == {"prix": 2.49, "le": "2026-10-06"}
+    assert habituel_avant(historique, offre("D", "2026-10-01", 2.49)) == {"prix": 2.29, "le": "2026-09-01"}
+    # Ni la promo elle-même, ni un produit jamais vu, ni une promo sans date.
+    assert habituel_avant(historique, offre("A", "2026-09-01", 1.99)) is None
+    assert habituel_avant(historique, offre("D", "2026-11-03", 1.89, ean="1111111111111")) is None
+    assert habituel_avant(historique, {**offre("D", None, 1.89)}) is None
+
+
+def test_mettre_a_jour_note_le_prix_habituel_d_avant(tmp_path):
+    chemin = tmp_path / "historique.json"
+    mettre_a_jour(chemin, [{**offre("A", "2026-10-20", 1.99), "ancien_prix": 2.29}], "2026-10-28")
+    suivant = [offre("B", "2026-11-03", 2.29)]
+    mettre_a_jour(chemin, suivant, "2026-11-03")
+    assert suivant[0]["habituel_avant"] == {"prix": 2.29, "le": "2026-10-20"}

@@ -84,6 +84,7 @@ Son format est décrit précisément (et vérifié à chaque passage) par le sch
 | `logo` | | Vignette du logo de la marque pour l'appli (PNG, 96 pixels de haut au plus), dans `logos/` de la branche `photos` : la même pour toutes les promos de la marque, même celles dont le produit n'a pas de logo dans le catalogue. Sinon le logo officiel pris sur Wikipédia (liste vérifiée à la main) ; le logo Marque Repère pour tous les produits Marque Repère. `null` sans logo sûr. Facultatif. |
 | `logo_marque` | | La marque que montre le logo quand ce n'est pas celle du produit : `"Marque Repère"` (pour une gamme comme Délisse) ; `null` sinon. Facultatif. |
 | `page` | `null` | Numéro de page dans le catalogue, si connu. |
+| `habituel_avant` | `{"prix": 2.29, "le": "2026-10-12"}` | Le **dernier prix habituel** de ce produit vu dans un catalogue d'avant, d'après l'historique des prix : l'ancien prix barré, ou le prix d'un seul article pour une promo sur le lot ; `le` : le début de cette promo-là. L'appli s'en sert pour dire si la promo est vraiment moins chère que d'habitude. `null` s'il n'est pas connu. Facultatif. |
 | `historique` | `{"verdict": "plus_bas", "depuis": "2026-09-01", "promos": 3, "meilleur_prix": 1.99, "meilleur_le": "2026-10-01"}` | Ce que dit l'**historique des prix** de cette promo (voir ci-dessous) : `verdict` vaut `plus_bas` (jamais vue aussi basse), `egal` (le même prix que la meilleure) ou `plus_cher` (déjà vue moins chère), comparé aux `promos` d'avant du même produit, connues depuis `depuis` ; `meilleur_prix` et `meilleur_le` : la moins chère d'entre elles (prix pour un article, date de début). `null` faute de promo plus ancienne du même produit. Facultatif. |
 
 ## L'historique des prix (`historique.json`)
@@ -128,6 +129,10 @@ Le code est dans [`app/src/promos.js`](../app/src/promos.js) ; le détail côté
 - **Fraîcheur des données** : si `mise_a_jour` date de plus de 36 heures (le robot a manqué au moins un
   passage), un bandeau jaune prévient que les promos ont pu changer (voir le README, section
   « Dépannage »).
+- **Vraie baisse ou non** : sous le type de promo, une ligne dit si la promo est vraiment moins
+  chère que le prix normal (`ancien_prix`, le lot, la `reduction` en caisse, ou `habituel_avant`),
+  si le prix normal est inconnu, ou si elle n'est pas moins chère que d'habitude (voir
+  [appli.md](appli.md#vraie-baisse-ou-fausse-promo-)).
 - **Historique des prix** : sous le prix, une ligne dit si la promo est la moins chère vue depuis
   le début de l'historique de ce produit, aussi basse que la meilleure, ou déjà vue moins chère
   (champ `historique`).

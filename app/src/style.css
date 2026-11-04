@@ -1246,6 +1246,28 @@ dialog h2 {
 
 /* L'historique des prix, sous le type de promo : en vert quand c'est le meilleur prix vu (le texte
    le dit aussi : la couleur n'est qu'un repère). */
+/* Vraie baisse ou non : en vert la baisse prouvée, en gris le prix normal inconnu, en ocre ce qui
+   n'est pas vraiment moins cher. */
+.baisse {
+  margin: 6px 0 0;
+  color: var(--discret);
+  font-size: 0.82rem;
+}
+
+.baisse[data-genre="vraie"] {
+  color: var(--accent-texte);
+  font-weight: 650;
+}
+
+.baisse[data-genre="douteuse"] {
+  color: var(--attention);
+  font-weight: 650;
+}
+
+.baisse + .historique-prix {
+  margin-top: 2px;
+}
+
 .historique-prix {
   margin: 6px 0 0;
   color: var(--discret);

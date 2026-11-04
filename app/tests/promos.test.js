@@ -18,6 +18,7 @@ import {
   noteCourte,
   periode,
   periodeCourte,
+  phraseBaisse,
   phraseHistorique,
   phraseSource,
   prixUnitaire,
@@ -560,5 +561,74 @@ describe("phraseHistorique", () => {
     expect(phraseHistorique({})).toBeNull();
     expect(phraseHistorique({ historique: null })).toBeNull();
     expect(phraseHistorique(historique("bizarre"))).toBeNull();
+  });
+});
+
+describe("phraseBaisse : vraie baisse ou non, sur le prix normal", () => {
+  const avant = (prix, le = "2026-10-06") => ({ habituel_avant: { prix, le } });
+  const texte = (o) => {
+    const phrase = phraseBaisse(offre(o));
+    return phrase && { genre: phrase.genre, texte: simple(phrase.texte) };
+  };
+
+  test("le prix barré du catalogue prouve la baisse", () => {
+    expect(texte({ prix: 0.89, ancien_prix: 1.05 })).toEqual({
+      genre: "vraie",
+      texte: "Vraie baisse : -15 % sur le prix normal",
+    });
+  });
+
+  test("sur le lot : seulement si on en prend plusieurs", () => {
+    expect(texte({ prix: 6.12, lot: { quantite: 2, prix: 9.18 } })).toEqual({
+      genre: "vraie",
+      texte: "Vraie baisse si vous en prenez 2 : -25 % par article",
+    });
+  });
+
+  test("une réduction en caisse écrite par le catalogue, sans prix barré", () => {
+    expect(texte({ prix: null, reduction: "-30 %" })).toEqual({
+      genre: "vraie",
+      texte: "Vraie baisse : -30 % sur le prix en rayon",
+    });
+  });
+
+  test("un prix seul : le prix normal est inconnu, sauf si l'historique le connaît", () => {
+    expect(texte({ prix: 0.79 })).toEqual({
+      genre: "inconnue",
+      texte: "Prix normal inconnu",
+    });
+    expect(texte({ prix: 0.79, ...avant(0.99) })).toEqual({
+      genre: "vraie",
+      texte: "Vraie baisse : -20 % sur le prix normal vu le 6 oct.",
+    });
+  });
+
+  test("pas moins cher que d'habitude : signalé", () => {
+    expect(texte({ prix: 2.49, ...avant(2.49) })).toEqual({
+      genre: "douteuse",
+      texte: "Pas moins cher que d'habitude : 2,49 € le 6 oct.",
+    });
+    // Même avec un prix barré qui promet une baisse.
+    expect(texte({ prix: 2.49, ancien_prix: 2.99, ...avant(2.39) }).genre).toBe("douteuse");
+  });
+
+  test("un prix barré plus haut qu'avant : la vraie baisse, comptée sur le prix d'avant", () => {
+    expect(texte({ prix: 2.15, ancien_prix: 2.69, ...avant(2.29) })).toEqual({
+      genre: "douteuse",
+      texte: "Prix normal plus haut qu'avant (2,29 € le 6 oct.) : vraie baisse -6 %",
+    });
+    // Le même prix barré qu'avant : rien à redire.
+    expect(texte({ prix: 2.15, ancien_prix: 2.69, ...avant(2.69) }).genre).toBe("vraie");
+  });
+
+  test("un Ticket E.Leclerc : comparé au prix payé en caisse", () => {
+    expect(texte({ prix: 2.4, ancien_prix: 3.0, reduction: "20 % en Ticket E.Leclerc" })).toEqual({
+      genre: "vraie",
+      texte: "Vraie baisse : -20 % sur le prix normal",
+    });
+  });
+
+  test("rien à dire sans prix ni réduction", () => {
+    expect(texte({ prix: null })).toBeNull();
   });
 });

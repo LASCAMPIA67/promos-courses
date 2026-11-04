@@ -169,6 +169,26 @@ est toujours celui **payé en caisse**.
 Sans pastille : c'est le prix du catalogue, sans réduction particulière. Le même type de promo est
 écrit en petit sous l'étiquette « Promo » de la liste.
 
+### Vraie baisse ou fausse promo ?
+
+Sous le type de promo, une ligne dit si la promo est **vraiment moins chère que le prix normal**
+(décision d'Emilio du 04/11/2026 : toutes les promos restent, chacune avec sa mention) :
+
+| Ligne | Ce que ça veut dire |
+|---|---|
+| **Vraie baisse : -15 % sur le prix normal** (en vert) | Le catalogue donne un prix barré. La loi l'oblige à être le prix le plus bas pratiqué dans le magasin pendant les 30 jours d'avant : la baisse est prouvée. Pour un Ticket E.Leclerc, le prix normal est celui payé en caisse. |
+| **Vraie baisse si vous en prenez 2 : -25 % par article** (en vert) | Promo sur le lot : moins cher seulement en prenant le lot. |
+| **Vraie baisse : -30 % sur le prix en rayon** (en vert) | Une réduction en caisse, sur le prix affiché en rayon. |
+| **Vraie baisse : -10 % sur le prix normal vu le 12 oct.** (en vert) | Le catalogue ne donne qu'un prix, mais l'historique connaît le prix normal de ce produit, vu dans un catalogue d'avant. |
+| Prix normal inconnu (en gris) | Le catalogue ne donne que ce prix : rien ne dit qu'il est plus bas que d'habitude. |
+| **Pas moins cher que d'habitude : 2,49 € le 12 oct.** (en ocre) | Une fausse promo : le prix normal vu dans un catalogue d'avant n'était pas plus cher. |
+| **Prix normal plus haut qu'avant (2,29 € le 12 oct.) : vraie baisse -6 %** (en ocre) | Le prix barré est plus haut que le prix normal vu avant : la baisse annoncée est gonflée ; la vraie baisse est comptée sur le prix d'avant. |
+
+Le prix normal « vu avant » vient de l'historique des prix (ci-dessous), qui a commencé le
+28/10/2026 : ces deux dernières lignes apparaissent au fil des semaines. Le prix normal d'un produit
+jamais vu avec un prix barré reste inconnu : seul le site Leclerc Drive le connaît, et il bloque les
+robots.
+
 ### Le prix est-il bon ? L'historique des prix
 
 Chaque jour, le robot garde les promos vues, produit par produit. Quand un produit revient en

@@ -111,6 +111,9 @@ Une appli web pensée pour l'iPhone, publiée gratuitement par GitHub Pages :
   **logo de la marque**, seulement quand il est sûr pour ce produit (celui du catalogue, sinon le
   logo officiel de cette marque pris sur Wikipédia, vérifié à l'œil ; le logo Marque Repère pour
   tous les produits Marque Repère), sinon son nom en petit.
+- **Vraie baisse ou fausse promo** : sur chaque promo, une ligne dit si elle est vraiment moins
+  chère que le prix normal (prouvé par le prix barré, le lot ou l'historique des prix), si le prix
+  normal est inconnu, ou si elle n'est pas moins chère que d'habitude.
 - **L'historique des prix** : le robot garde chaque jour les promos vues ; quand un produit revient
   en promo, une ligne dit si c'est le prix le plus bas vu, aussi bas que le meilleur, ou déjà vu
   moins cher (et à combien).

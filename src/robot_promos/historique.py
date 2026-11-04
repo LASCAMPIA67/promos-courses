@@ -4,8 +4,9 @@
 promos vues : le catalogue, les dates et le prix le plus bas pour un article. Avant de les ajouter, il
 compare chaque promo en cours aux promos d'avant du même produit, et l'écrit dans promos.json
 (« historique » de chaque offre) : le prix le plus bas vu, le même que le meilleur, ou déjà vu moins
-cher. L'historique a commencé vide le 28/10/2026 : les comparaisons arrivent au fil des semaines.
-Format : docs/format-promos.md.
+cher. Il y note aussi le dernier prix habituel vu avant (« habituel_avant ») : l'appli s'en sert pour
+dire si la promo est vraiment moins chère que d'habitude. L'historique a commencé vide le
+28/10/2026 : les comparaisons arrivent au fil des semaines. Format : docs/format-promos.md.
 """
 
 import json
@@ -85,6 +86,27 @@ def comparer(historique, offre):
     }
 
 
+def habituel_avant(historique, offre):
+    """Le dernier prix habituel de ce produit vu dans un catalogue d'avant (l'ancien prix barré, ou le
+    prix d'un seul article pour une promo sur le lot) : {"prix", "le"} (début de cette promo), ou None.
+    Pour repérer une promo qui n'est pas moins chère que d'habitude, ou un prix barré plus haut
+    qu'avant."""
+    produit = historique["produits"].get(offre.get("ean") or "")
+    if not produit or not offre.get("date_debut"):
+        return None
+    avant = [
+        p
+        for p in produit["promos"]
+        if p.get("prix_habituel")
+        and p["du"] < offre["date_debut"]
+        and (p["catalogue"], p["du"]) != (offre["catalogue"], offre["date_debut"])
+    ]
+    if not avant:
+        return None
+    dernier = max(avant, key=lambda p: (p["du"], p["catalogue"]))
+    return {"prix": dernier["prix_habituel"], "le": dernier["du"]}
+
+
 def ajouter(historique, offres, jour):
     """Range les promos en cours dans l'historique (une seule fois chacune, même avec plusieurs passages
     par jour) et oublie celles finies depuis plus de deux ans. `jour` : la date du passage."""
@@ -125,10 +147,11 @@ def ecrire(chemin, historique):
 
 
 def mettre_a_jour(chemin, offres, jour):
-    """Compare chaque promo à l'historique (champ « historique » de l'offre), puis l'y ajoute et
-    enregistre le fichier. Renvoie le nombre de promos comparées."""
+    """Compare chaque promo à l'historique (champs « historique » et « habituel_avant » de l'offre),
+    puis l'y ajoute et enregistre le fichier. Renvoie le nombre de promos comparées."""
     historique = lire(chemin)
     for offre in offres:
         offre["historique"] = comparer(historique, offre)
+        offre["habituel_avant"] = habituel_avant(historique, offre)
     ecrire(chemin, ajouter(historique, offres, jour))
     return sum(1 for offre in offres if offre["historique"])

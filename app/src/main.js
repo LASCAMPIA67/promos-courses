@@ -39,6 +39,7 @@ import {
   joliNom,
   noteAffichee,
   periode,
+  phraseBaisse,
   phraseHistorique,
   phraseSource,
   periodeCourte,
@@ -531,6 +532,14 @@ function cartePromo(offre, aVenir, aujourdhui, { avecAjout = false } = {}) {
     bas.append(type);
     if (explication.detail) bas.append(element("span", "detail", explication.detail));
     carte.append(bas);
+  }
+
+  // Vraie baisse ou non, sur le prix normal : « Vraie baisse : -20 % », « Prix normal inconnu »…
+  const baisse = phraseBaisse(offre);
+  if (baisse) {
+    const ligne = element("p", "baisse", baisse.texte);
+    ligne.dataset.genre = baisse.genre;
+    carte.append(ligne);
   }
 
   // L'historique des prix : le prix le plus bas vu, aussi bas que le meilleur, ou déjà vu moins cher.
